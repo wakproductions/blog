@@ -1,0 +1,92 @@
+@charset "utf-8";
+@import "normalize";
+@import "bootstrap";
+
+body {
+  background: #c3d5d5;  // Not sure if I want a background color
+  font-size: 11pt;
+}
+
+.jumbotron {
+  background: #000000 url('/images/blog-header-photo.jpg') center no-repeat;
+  background-size: cover;
+  height: 250px;
+  margin: 0 0 35px 0;
+  padding: 0;
+
+  .container {
+    z-index: 4;
+    position: relative;
+
+    .blog-title-box {
+      position: relative;
+
+      .content {
+        background-color: rgba(0, 0, 0, 0.65);
+        color: #ffffff;
+        font-size: 24pt;
+        margin-top: 50px;
+        padding: 40px 20px;
+        text-align: center;
+        text-shadow: 3px 3px #000000;
+      }
+    }
+  }
+}
+
+.content {
+  background: #e1ecee;
+}
+
+h1 {
+  color: rgba(0,0,0,0.5);
+  font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.8em;
+  font-weight: 400;
+  margin: 0;
+}
+
+.doc {
+  margin: 3em 0;
+  font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.1em;
+  font-weight: 300;
+
+  a {
+    border: 1px solid white;
+    border-radius: 3px;
+    padding: 0.75em 0.7em;
+    color: white;
+    text-decoration: none;
+    transition: color 0.1s linear;
+    &:hover {
+      background: rgba(0,0,0,0.2);
+      color: white;
+      transition: all 0.15s linear;
+    }
+  }
+}
+
+.welcome {
+  -webkit-animation-name: welcome;
+  -webkit-animation-duration: .9s;
+}
+
+@-webkit-keyframes welcome {
+  from {
+    -webkit-transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+   -webkit-transform: scale(0);
+   opacity: 0;
+  }
+  82.5% {
+    -webkit-transform: scale(1.03);
+    -webkit-animation-timing-function: ease-out;
+    opacity: 1;
+  }
+  to {
+    -webkit-transform: scale(1);
+  }
+}
