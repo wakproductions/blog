@@ -1,0 +1,90 @@
+<!--<html>-->
+<!--<head>-->
+<!--</head>-->
+<!--<body>-->
+<!--hello world-->
+<!--<%= yield %>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta charset='utf-8'>
+    <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
+    <title>Separate Github Pages + Organization Page + Domain Name on Middleman</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+    <link href="../../../stylesheets/site.css" rel="stylesheet" />
+    <script src="../../../javascripts/all.js"></script>
+    <script src="../../../javascripts/jquery-2.2.3.min.js"></script>
+    
+    
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-46648633-1', 'winstonkotzan.com');
+        ga('send', 'pageview');
+    </script>
+  </head>
+  <body class='x2016 x2016_09 x2016_09_11 x2016_09_11_github-pages-organization-page-domain-name-on-middleman'>
+    <div class='jumbotron'>
+      <div class='container'>
+        <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
+          <div class='content'>
+            <a href="/">Winston Kotzan's Technology Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container content'>
+      <div class='col-md-8'>
+        <div class='main' role='main'>
+          <h2>Separate Github Pages + Organization Page + Domain Name on Middleman</h2>
+          09/11/2016
+          <p>I have my primary website <a href="http://www.winstonkotzan.com/">winstonkotzan.com</a> set up as a Github Pages organization
+          page. The repo is <a href="https://github.com/wakproductions/wakproductions.github.io">wakproductions.github.io</a>. However,
+          to start this blog I decided to create a new Middleman repo to keep all the code separate from my base website
+          and give me more flexibility between managing the blog component and my other content. So I created a new
+          repo called <a href="https://github.com/wakproductions/blog">blog</a> which would host all the content in the folder
+          <a href="http://www.winstonkotzan.com/blog">winstonkotzan.com/blog</a>.</p>
+          
+          <p>So Github pages have two different flavors. It&#39;s got <em>organization</em> pages and <em>project</em> pages. The <em>organization</em>
+          page goes to your root at <em>myusername.github.io</em> while project pages show up at <em>myusername.github.io/project</em>name<em>.
+          So basically my domain name winstonkotzan.com points to my _organization</em> page and my blog is just a statically
+          generated <em>project</em> page with the project name &quot;blog&quot;. One of the things I always found weird about how to upload
+          your static HTML pages is that the <em>organization</em> page requires the static public web pages to be in the <em>master</em>
+          github branch, but the <em>project</em> pages require the static public web pages to be in a branch named <em>gh-pages</em>.
+          It&#39;s weird becuase for my <em>organization</em> page I have to put all the source code in a branch called <em>source</em>, whereas
+          most other repositories use <em>master</em> for the main branch of source code. You can read the full docs on the 
+          differences between organization and project pages 
+          <a href="https://help.github.com/articles/user-organization-and-project-pages/">here</a>.</p>
+          
+          <p>Upon the first upload of my blog, I had this problem with the blog pages using the wrong style sheet. This is how my
+          website looked:</p>
+          
+          <p><img src="/images/2016/Screen_Shot_2016-09-11_at_3.01.42_PM.png" style="width: 700px" alt="Screen shot 2016 09 11 at 3.01.42 pm" /></p>
+          
+          <p>I was able to fix the problem by using the relative links identifiers in the page template.</p>
+          
+          <p><img src="/images/2016/Pasted_Image_9_11_16__3_18_PM.png" style="width: 700px" alt="Pasted image 9 11 16  3 18 pm" /></p>
+        </div>
+      </div>
+      <div class='col-md-4'>
+        <aside>
+          <h2>Recent Articles</h2>
+          <ol>
+            <li><a href="github-pages-organization-page-domain-name-on-middleman.html">Separate Github Pages + Organization Page + Domain Name on Middleman</a> <span>Sep 11</span></li>
+            <li><a href="middleman-middleman-gh-pages-first-publish-error-src-refspec-gh-pages-does-not-match-any.html">Receiving 'error: src refspec gh-pages does not match any' on first publish with Middleman/middleman-gh-pages</a> <span>Sep 11</span></li>
+            <li><a href="../10/first-post.html">First Post</a> <span>Sep 10</span></li>
+          </ol>
+          <h2>By Year</h2>
+          <ol>
+            <li><a href="../../../2016.html">2016 (3)</a></li>
+          </ol>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>
