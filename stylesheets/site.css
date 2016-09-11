@@ -6177,7 +6177,7 @@ body {
   font-size: 11pt; }
 
 .jumbotron {
-  background: #000000 url("/images/blog-header-photo.jpg") center no-repeat;
+  background: #000000 url("../images/blog-header-photo.jpg") center no-repeat;
   background-size: cover;
   height: 250px;
   margin: 0 0 35px 0;
