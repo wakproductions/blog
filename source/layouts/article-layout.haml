@@ -1,0 +1,49 @@
+<!--<html>-->
+<!--<head>-->
+
+<!--</head>-->
+<!--<body>-->
+<!--hello world-->
+
+<!--<%= yield %>-->
+<!--</body>-->
+<!--</html>-->
+
+!!!
+%html
+  %head
+    %meta{ content: "IE=edge", 'http-equiv': "X-UA-Compatible" }
+    %meta{ charset: "utf-8" }
+    %meta{ content: "width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no", name: "viewport" }
+
+    %title= "#{current_article.nil? ? 'Winston Kotzan\'s Technology Blog' : current_article.title}"
+    =feed_tag(:atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed")
+
+    =stylesheet_link_tag :site
+    =javascript_include_tag :all
+    =javascript_include_tag "jquery-2.2.3.min.js"
+
+  %body{ class: page_classes }
+    = partial "header"
+
+    .container
+      .col-md-8
+        .main{ role: "main" }
+          = yield
+
+      .col-md-4
+        %aside
+          %h2 Recent Articles
+          %ol
+            - blog.articles[0...10].each do |article|
+              %li= "#{link_to(article.title, article)} <span>#{article.date.strftime('%b %e')}</span>"
+
+          -#%h2 Tags
+          -#%ol
+          -#  - blog.tags.each do |tag, articles|
+          -#    %li= link_to("#{tag} (#{articles.size})", tag_path(tag))
+
+          %h2 By Year
+          %ol
+            - blog.articles.group_by {|a| a.date.year }.each do |year, articles|
+              %li= link_to("#{year} (#{articles.size})", blog_year_path(year))

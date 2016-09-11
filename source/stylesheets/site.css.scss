@@ -29,6 +29,11 @@ body {
         padding: 40px 20px;
         text-align: center;
         text-shadow: 3px 3px #000000;
+
+        a, a:link, a:hover, a:visited {
+          color: inherit;
+          text-decoration: none;
+        }
       }
     }
   }

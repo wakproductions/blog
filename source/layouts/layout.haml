@@ -13,11 +13,7 @@
 
   %body{ class: page_classes }
 
-    .jumbotron
-      .container
-        .col-lg-offset-6.col-lg-6.blog-title-box
-          .content
-            Winston Kotzan's Technology Blog
+    = partial "header"
 
     .container.content
       =yield
