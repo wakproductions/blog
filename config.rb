@@ -62,6 +62,7 @@ page "/feed.xml", layout: false
 
 # Build-specific configuration
 configure :build do
+  activate :relative_assets
   # Minify CSS on build
   # activate :minify_css
 
@@ -74,5 +75,6 @@ set :markdown_engine, :redcarpet
 set :markdown, :fenced_code_blocks => true#, :smartypants => true
 
 set :relative_links, true
+
 
 Time.zone = "EST"

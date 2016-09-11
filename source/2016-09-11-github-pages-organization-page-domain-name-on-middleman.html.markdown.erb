@@ -25,8 +25,8 @@ differences between organization and project pages
 Upon the first upload of my blog, I had this problem with the blog pages using the wrong style sheet. This is how my
 website looked:
 
-<%= image_tag('2016/Screen_Shot_2016-09-11_at_3.01.42_PM.png', style: 'width: 700px') %>
+<%= image_tag('2016/Screen_Shot_2016-09-11_at_3.01.42_PM.png', style: 'width: 700px', relative: true) %>
 
 I was able to fix the problem by using the relative links identifiers in the page template.
 
-<%= image_tag('2016/Pasted_Image_9_11_16__3_18_PM.png', style: 'width: 700px') %>
+<%= image_tag('2016/Pasted_Image_9_11_16__3_18_PM.png', style: 'width: 700px', relative: true) %>
