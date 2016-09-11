@@ -67,13 +67,12 @@ configure :build do
 
   # Minify Javascript on build
   # activate :minify_javascript
-
-  set :haml
 end
 
 # Redcarpet better for syntax highlighting in codeblocks
 set :markdown_engine, :redcarpet
 set :markdown, :fenced_code_blocks => true#, :smartypants => true
+
 set :relative_links, true
 
 Time.zone = "EST"
