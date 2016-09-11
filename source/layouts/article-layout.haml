@@ -19,16 +19,20 @@
     %title= "#{current_article.nil? ? 'Winston Kotzan\'s Technology Blog' : current_article.title}"
     =feed_tag(:atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed")
 
-    =stylesheet_link_tag :site
-    =javascript_include_tag :all
-    =javascript_include_tag "jquery-2.2.3.min.js"
+    =stylesheet_link_tag :site, relative: true
+    =javascript_include_tag :all, relative: true
+    =javascript_include_tag "jquery-2.2.3.min.js", relative: true
+
+    =partial 'google_analytics'
 
   %body{ class: page_classes }
     = partial "header"
 
-    .container
+    .container.content
       .col-md-8
         .main{ role: "main" }
+          %h2= current_article.title
+          = "#{current_article.date.strftime('%m/%d/%Y')}"
           = yield
 
       .col-md-4

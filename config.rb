@@ -24,7 +24,7 @@ page '/*.txt', layout: false
 
 activate :blog do |blog|
   # This will add a prefix to all links, template references and source paths
-  blog.prefix = "blog"
+  # blog.prefix = "blog"
 
   # blog.permalink = "{year}/{month}/{day}/{title}.html"
   # Matcher for blog source files
@@ -74,5 +74,6 @@ end
 # Redcarpet better for syntax highlighting in codeblocks
 set :markdown_engine, :redcarpet
 set :markdown, :fenced_code_blocks => true#, :smartypants => true
+set :relative_links, true
 
 Time.zone = "EST"
