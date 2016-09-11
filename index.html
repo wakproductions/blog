@@ -30,6 +30,47 @@
       </div>
     </div>
     <div class='container content'>
+      <h2><a href="2016/09/11/middleman-middleman-gh-pages-first-publish-error-src-refspec-gh-pages-does-not-match-any.html">Receiving 'error: src refspec gh-pages does not match any' on first publish with Middleman/middleman-gh-pages</a></h2>
+      09/11/2016 <ol>
+      <li>Created blank repository for new blog website using Middleman, Github Pages, and the <code>middleman-gh-pages</code> gem.</li>
+      <li>Tried to upload my blog for the first time using the following sequence of commands and received the following error:</li>
+      </ol>
+      
+      <pre><code> (master)$ git init
+       (master)$ git add . 
+       (master)$ git commit -m &quot;Initial commit; first blog post&quot; 
+       (master)$ remote add origin git@github.com:wakproductions/blog.git 
+       (master)$ rake publish  
+      cd /Users/wkotzan/Development/wakproductions-tech-blog
+      cd -
+      cd /Users/wkotzan/Development/wakproductions-tech-blog/build
+      git init
+      Initialized empty Git repository in /Users/wkotzan/Development/wakproductions-tech-blog/build/.git/
+      git remote add origin git@github.com:wakproductions/blog.git
+      git fetch --depth 1 origin gh-pages
+      fatal: Couldn&#39;t find remote ref gh-pages
+      rake aborted!
+      Command failed with status (128): [git fetch --depth 1 origin gh-pages...]
+      /Users/wkotzan/.rvm/gems/ruby-2.3.0/gems/middleman-gh-pages-0.3.0/lib/middleman-gh-pages/tasks/gh-pages.rake:42:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      /Users/wkotzan/.rvm/gems/ruby-2.3.0/gems/middleman-gh-pages-0.3.0/lib/middleman-gh-pages/tasks/gh-pages.rake:39:in `block in &lt;top (required)&gt;&#39;
+      /Users/wkotzan/.rvm/gems/ruby-2.3.0/gems/rake-11.2.2/exe/rake:27:in `&lt;top (required)&gt;&#39;
+      /Users/wkotzan/.rvm/gems/ruby-2.3.0/bin/ruby_executable_hooks:15:in `eval&#39;
+      /Users/wkotzan/.rvm/gems/ruby-2.3.0/bin/ruby_executable_hooks:15:in `&lt;main&gt;&#39;
+      Tasks: TOP =&gt; publish =&gt; sync_build_dir =&gt; prepare_build_dir =&gt; /Users/wkotzan/Development/wakproductions-tech-blog/build/.git/refs/remotes/origin/gh-pages
+      (See full trace by running task with --trace) 
+      </code></pre>
+      
+      <p>This error occurs because you need to have the gh-pages branch existing already. Fixed the error by creating the branch:</p>
+      
+      <pre><code> (master)$ git checkout -b gh-pages
+      Switched to a new branch &#39;gh-pages&#39;
+       (gh-pages)$ git checkout master
+      Switched to branch &#39;master&#39;
+       (master)$ rake publish
+      
+      </code></pre>
+      
+      <p>The publish operation then worked.</p>
       <h2><a href="2016/09/10/first-post.html">First Post</a></h2>
       09/10/2016 <p>Welcome to my blog, where I will be covering technical topics encountered in my work as a software engineer. This is
       to act as a reference for myself, my team, and others who may be facing similar technical challenges. This won&#39;t be a

@@ -5,10 +5,61 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-09-10T02:11:00-04:00</updated>
+  <updated>2016-09-11T01:59:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Receiving 'error: src refspec gh-pages does not match any' on first publish with Middleman/middleman-gh-pages</title>
+    <link rel="alternate" href="http://blog.url.com/2016/09/11/middleman-middleman-gh-pages-first-publish-error-src-refspec-gh-pages-does-not-match-any.html"/>
+    <id>http://blog.url.com/2016/09/11/middleman-middleman-gh-pages-first-publish-error-src-refspec-gh-pages-does-not-match-any.html</id>
+    <published>2016-09-11T01:59:00-04:00</published>
+    <updated>2016-09-11T14:59:44-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;ol&gt;
+&lt;li&gt;Created blank repository for new blog website using Middleman, Github Pages, and the &lt;code&gt;middleman-gh-pages&lt;/code&gt; gem.&lt;/li&gt;
+&lt;li&gt;Tried to upload my blog for the first time using the following sequence of commands and received the following error:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt; (master)$ git init
+ (master)$ git add . 
+ (master)$ git commit -m &amp;quot;Initial commit; first blog post&amp;quot; 
+ (master)$ remote add origin git@github.com:wakproductions/blog.git 
+ (master)$ rake publish  
+cd /Users/wkotzan/Development/wakproductions-tech-blog
+cd -
+cd /Users/wkotzan/Development/wakproductions-tech-blog/build
+git init
+Initialized empty Git repository in /Users/wkotzan/Development/wakproductions-tech-blog/build/.git/
+git remote add origin git@github.com:wakproductions/blog.git
+git fetch --depth 1 origin gh-pages
+fatal: Couldn&amp;#39;t find remote ref gh-pages
+rake aborted!
+Command failed with status (128): [git fetch --depth 1 origin gh-pages...]
+/Users/wkotzan/.rvm/gems/ruby-2.3.0/gems/middleman-gh-pages-0.3.0/lib/middleman-gh-pages/tasks/gh-pages.rake:42:in `block (2 levels) in &amp;lt;top (required)&amp;gt;&amp;#39;
+/Users/wkotzan/.rvm/gems/ruby-2.3.0/gems/middleman-gh-pages-0.3.0/lib/middleman-gh-pages/tasks/gh-pages.rake:39:in `block in &amp;lt;top (required)&amp;gt;&amp;#39;
+/Users/wkotzan/.rvm/gems/ruby-2.3.0/gems/rake-11.2.2/exe/rake:27:in `&amp;lt;top (required)&amp;gt;&amp;#39;
+/Users/wkotzan/.rvm/gems/ruby-2.3.0/bin/ruby_executable_hooks:15:in `eval&amp;#39;
+/Users/wkotzan/.rvm/gems/ruby-2.3.0/bin/ruby_executable_hooks:15:in `&amp;lt;main&amp;gt;&amp;#39;
+Tasks: TOP =&amp;gt; publish =&amp;gt; sync_build_dir =&amp;gt; prepare_build_dir =&amp;gt; /Users/wkotzan/Development/wakproductions-tech-blog/build/.git/refs/remotes/origin/gh-pages
+(See full trace by running task with --trace) 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This error occurs because you need to have the gh-pages branch existing already. Fixed the error by creating the branch:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; (master)$ git checkout -b gh-pages
+Switched to a new branch &amp;#39;gh-pages&amp;#39;
+ (gh-pages)$ git checkout master
+Switched to branch &amp;#39;master&amp;#39;
+ (master)$ rake publish
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The publish operation then worked.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>First Post</title>
     <link rel="alternate" href="http://blog.url.com/2016/09/10/first-post.html"/>
