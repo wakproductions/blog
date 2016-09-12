@@ -1,0 +1,123 @@
+---
+title: Graylog + Apache + Docker, Using GELF
+date: 2016-09-12 03:24 EST
+tags:
+---
+
+**Objective**: Configure a Graylog server to accept GELF-formatted logs from an Apache web server. Both servers
+will be running on Docker, although we will adapt the Apache Docker setup instructions to set up an existing
+(non-Docker) Apache server running on Ubuntu 14.04. The logs are going to be sent to the Graylog server using
+UDP port 12201.
+
+### Docker Setup
+
+~~~yaml
+version: '2'
+services:
+  apache:
+    depends_on:
+      - graylog
+    image: "wakproductions/apache2-graylog-config"
+    volumes:
+      - ~/Development/graylog-local/install-demos/apache2/etc/apache2/mods-enabled/log_gelf.conf:/etc/apache2/mods-enabled/log_gelf.conf
+    ports:
+      - "3000:80"
+  mongo:
+    image: "mongo:3"
+    volumes:
+      - ~/Development/graylog-local/data/mongo:/data/db
+  elasticsearch:
+    image: "elasticsearch:2"
+    command: "elasticsearch -Des.cluster.name='graylog'"
+    volumes:
+      - ~/Development/graylog-local/data/elasticsearch:/usr/share/elasticsearch/data
+  graylog:
+    image: "graylog2/server"
+    volumes:
+      - ~/Development/graylog-local/data/journal:/usr/share/graylog/data/journal
+      - ~/Development/graylog-local/config:/usr/share/graylog/data/config
+    environment:
+      # GRAYLOG_WEB_ENDPOINT_URI: "http://127.0.0.1:9000/api/" # didn't like having this config here (tried looking for REST server at this address) - could be a bug
+      GRAYLOG_REST_TRANSPORT_URI: "http://127.0.0.1:12900"
+    depends_on:
+      - mongo
+      - elasticsearch
+    ports:
+      - "9000:9000"
+      - "12900:12900"
+      - "5555:5555"
+      - "12201:12201/udp"
+      - "12201:12201"
+~~~
+**docker-compose.yml**
+
+If using a preexisting Apache server, you could remove the `apache` block and dependency from the file. You'll just
+have to mirror the image setup instructions below to get the GELF module installed on your Apache server.
+
+### Apache Docker Image Setup (wakproductions/apache2-graylog-config)
+
+For Apache to submit GELF logs to Graylog, there is a community-supported module named [apache-mod\_log\_gelf](https://github.com/Graylog2/apache-mod_log_gelf).
+
+~~~
+FROM webdevops/apache:ubuntu-14.04
+
+ENV WEB_DOCUMENT_INDEX index.html
+ADD app /app
+
+RUN apt-get update && apt-get upgrade
+
+RUN a2dismod mpm_event
+RUN a2enmod mpm_prefork && apt-get install libjson-c2 zlib1g
+
+RUN wget https://github.com/Graylog2/apache-mod_log_gelf/releases/download/0.2.0/libapache2-mod-gelf_0.2.0-1_amd64.ubuntu.deb
+RUN dpkg -i libapache2-mod-gelf_0.2.0-1_amd64.ubuntu.deb
+RUN a2enmod log_gelf && restart apache
+~~~
+**Dockerfile**
+
+~~~
+GelfEnabled On
+GelfUrl "udp://graylog:12201"
+~~~
+**/etc/apache2/mods-enabled/log_gelf.conf** [Reference](https://github.com/Graylog2/apache-mod_log_gelf#configuration)
+
+#### Troubleshooting `docker build`
+
+**ERROR: Module mpm_event is enabled - cannot proceed due to conflicts. It needs to be disabled first!**
+
+I found a clue to fixing this problem [here](http://askubuntu.com/questions/528866/apache-2-4-cannot-proceed-due-to-conflicts-with-module-mpm-prefork).
+It was resolved by disabling `mpm_event` via the command `a2dismod mpm_event`.
+
+**dpkg: error processing archive libapache2-mod-gelf_0.1.0-1_amd64.deb (--install):**
+  **cannot access archive: No such file or directory**
+
+The instructions on the apache-mod\_log\_gelf page were misleading. I overlooked the part that read: "Download a package
+for your operating system from [here](https://github.com/Graylog2/apache-mod_log_gelf/releases) Update Apache2 to the
+latests version and use mpm_prefork."
+
+To fix the error you have to follow that link and download the latest version of module into the working directory on
+the Apache server. So I added the following line:
+
+`RUN wget https://github.com/Graylog2/apache-mod_log_gelf/releases/download/0.2.0/libapache2-mod-gelf_0.2.0-1_amd64.ubuntu.deb`
+
+### Docker Networking Gotcha
+
+#### Getting the Apache server to see the Graylog server
+
+It took me a while to figure out how to get the Apache server to talk to the Graylog server. Initially, I set the
+`GelfUrl "udp:127.0.0.1:12201"` but the Graylog server was not receiving anything. The problem was that this was the
+equivalent to the Apache server trying to connect to itself on UDP 12201. You have to use the bridge network IP
+address of the Graylog server, or refer to it by the network hostname assigned by the Docker network. Each
+container has a hostname respective to the name you assign it in the `docker-compose.yml` file.
+
+### Useful Terminal Commands
+
+Build Apache server image:
+`docker build -t wakproductions/apache2-graylog-config .`
+
+### Sample Graylog Configuration
+
+<%= partial 'image', locals: { filename: '2016/Pasted_Image_9_12_16__8_18_AM.png', caption: ''} %>
+
+
+

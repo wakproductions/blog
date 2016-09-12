@@ -1,0 +1,10 @@
+<div class="image-box">
+  <div class="image-box-content">
+    <%= link_to(image_tag(filename), "images/#{filename}") %>
+  </div>
+  <% unless caption.empty? %>
+    <div class="image-box-caption">
+      <%= caption %>
+    </div>
+  <% end %>
+</div>

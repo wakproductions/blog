@@ -30,10 +30,10 @@
 
     .container.content
       .col-md-8
-        .main{ role: "main" }
-          %h2= current_article.title
-          = "#{current_article.date.strftime('%m/%d/%Y')}"
-          = yield
+        .main.article-content{ role: "main" }
+          %h2.article-title= current_article.title
+          .article-date= "#{current_article.date.strftime('%m/%d/%Y')}"
+          .article-body~ yield
 
       .col-md-4
         %aside
