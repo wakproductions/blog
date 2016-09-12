@@ -1,5 +1,5 @@
 ---
-title: Graylog + Apache + Docker, Using GELF
+title: Feeding Apache log files to Graylog with Docker and apache-mod_log_gelf
 date: 2016-09-12 03:24 EST
 tags:
 ---
@@ -114,6 +114,12 @@ container has a hostname respective to the name you assign it in the `docker-com
 
 Build Apache server image:
 `docker build -t wakproductions/apache2-graylog-config .`
+
+Send test message on port 5555 to Graylog (non-GELF) from Apache docker server
+`echo "hello from apache" | nc -vz graylog 5555`
+
+Send GELF test message on port 12201 to Graylog from Apache docker server
+echo -e '{"version": "1.1","host":"example.org","short_message":"Short message","full_message":"Backtrace here\n\nmore stuff","level":1,"_user_id":9001,"_some_info":"foo","_some_env_var":"bar"}\0' | nc -u graylog 12201
 
 ### Sample Graylog Configuration
 
