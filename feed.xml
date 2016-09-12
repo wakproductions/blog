@@ -10,11 +10,11 @@
     <name>Blog Author</name>
   </author>
   <entry>
-    <title>Graylog + Apache + Docker, Using GELF</title>
+    <title>Feeding Apache log files to Graylog with Docker and apache-mod_log_gelf</title>
     <link rel="alternate" href="http://blog.url.com/2016/09/12/graylog-apache-docker-using-gelf.html"/>
     <id>http://blog.url.com/2016/09/12/graylog-apache-docker-using-gelf.html</id>
     <published>2016-09-12T04:24:00-04:00</published>
-    <updated>2016-09-12T08:23:16-04:00</updated>
+    <updated>2016-09-12T18:25:59-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -129,6 +129,12 @@ container has a hostname respective to the name you assign it in the &lt;code&gt
 &lt;p&gt;Build Apache server image:
 &lt;code&gt;docker build -t wakproductions/apache2-graylog-config .&lt;/code&gt;&lt;/p&gt;
 
+&lt;p&gt;Send test message on port 5555 to Graylog (non-GELF) from Apache docker server
+&lt;code&gt;echo &amp;quot;hello from apache&amp;quot; | nc -vz graylog 5555&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Send GELF test message on port 12201 to Graylog from Apache docker server
+echo -e &amp;#39;{&amp;quot;version&amp;quot;: &amp;quot;1.1&amp;quot;,&amp;quot;host&amp;quot;:&amp;quot;example.org&amp;quot;,&amp;quot;short&lt;em&gt;message&amp;quot;:&amp;quot;Short message&amp;quot;,&amp;quot;full&lt;/em&gt;message&amp;quot;:&amp;quot;Backtrace here\n\nmore stuff&amp;quot;,&amp;quot;level&amp;quot;:1,&amp;quot;&lt;em&gt;user&lt;/em&gt;id&amp;quot;:9001,&amp;quot;&lt;em&gt;some&lt;/em&gt;info&amp;quot;:&amp;quot;foo&amp;quot;,&amp;quot;&lt;em&gt;some&lt;/em&gt;env_var&amp;quot;:&amp;quot;bar&amp;quot;}\0&amp;#39; | nc -u graylog 12201&lt;/p&gt;
+
 &lt;h3&gt;Sample Graylog Configuration&lt;/h3&gt;
 
 &lt;div class="image-box"&gt;
@@ -139,11 +145,11 @@ container has a hostname respective to the name you assign it in the &lt;code&gt
 </content>
   </entry>
   <entry>
-    <title>Separate Github Pages + Organization Page + Domain Name on Middleman</title>
+    <title>Github Organization and Project Pages under a single domain with Middleman</title>
     <link rel="alternate" href="http://blog.url.com/2016/09/11/github-pages-organization-page-domain-name-on-middleman.html"/>
     <id>http://blog.url.com/2016/09/11/github-pages-organization-page-domain-name-on-middleman.html</id>
     <published>2016-09-11T15:50:00-04:00</published>
-    <updated>2016-09-11T16:54:03-04:00</updated>
+    <updated>2016-09-12T18:21:10-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
