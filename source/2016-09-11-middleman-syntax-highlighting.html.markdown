@@ -1,5 +1,5 @@
 ---
-title: Middleman Syntax Highlighting
+title: Adding syntax highlighting to Middleman blog using redcarpet
 date: 2016-09-11
 tags:
 published: false
