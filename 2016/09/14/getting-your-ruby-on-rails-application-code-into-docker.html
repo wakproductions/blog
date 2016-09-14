@@ -1,0 +1,141 @@
+<!--<html>-->
+<!--<head>-->
+<!--</head>-->
+<!--<body>-->
+<!--hello world-->
+<!--<%= yield %>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta charset='utf-8'>
+    <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
+    <title>Getting your Ruby on Rails application code into Docker</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+    <link href="../../../stylesheets/site.css" rel="stylesheet" />
+    <script src="../../../javascripts/all.js"></script>
+    <script src="../../../javascripts/jquery-2.2.3.min.js"></script>
+    
+    
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-46648633-1', 'winstonkotzan.com');
+        ga('send', 'pageview');
+    </script>
+  </head>
+  <body class='x2016 x2016_09 x2016_09_14 x2016_09_14_getting-your-ruby-on-rails-application-code-into-docker'>
+    <div class='jumbotron'>
+      <div class='container'>
+        <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
+          <div class='content'>
+            <a href="/blog/">Winston Kotzan's Technology Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container content'>
+      <div class='col-md-8'>
+        <div class='main article-content' role='main'>
+          <h2 class='article-title'>Getting your Ruby on Rails application code into Docker</h2>
+          <div class='article-date'>09/14/2016</div>
+          <div class='article-body'>
+            <p><strong>Objective:</strong> Get a Rails API app Docker-ready so that it can be run via a Docker container.</p>
+            
+            <p>This week I had to build a Rails API microservice that relays custom error messages to Honeybadger. It&#39;s a
+            self-contained Rails API application, no database, and only one route that accepts inputs, performs some
+            reformatting, and passes it on to the Honeybadger system. Here is how I got it running in its own Docker container.</p>
+            
+            <h4>1. Put a <code>Dockerfile</code> in the project base directory.</h4>
+            
+            <pre><code># Pull the Ruby base image from Dockerhub&#x000A;FROM ruby:2.3.1&#x000A;RUN apt-get update&#x000A;&#x000A;# This is where you are going to put your application code,&#x000A;# transferring it from the project directory into the Docker image&#x000A;RUN mkdir /app&#x000A;WORKDIR /app&#x000A;&#x000A;# Pull all the dependencies from Rubygems&#x000A;ADD Gemfile /app/Gemfile&#x000A;ADD Gemfile.lock /app/Gemfile.lock&#x000A;RUN bundle install&#x000A;&#x000A;# This line pulls the application code from the project folder and puts it into the Docker image&#x000A;ADD . /app&#x000A;</code></pre>
+            
+            <p><strong>/Dockerfile</strong></p>
+            
+            <p>Docker images are kind of like Virtual Machine images, but not. I think of them more as a lightweight virtual machine
+            that the Docker team has slimmed down by removing a lot of the bells and whistles that come in a full OS. If you look
+            at the Dockerfiles of most repositories on Dockerhub, they are all just descendants of a few base systems. For example,
+            looking at the <a href="https://github.com/docker-library/ruby/blob/2d6449f03976ededa14be5cac1e9e070b74e4de4/2.3/Dockerfile">Ruby 2.3 Dockerfile</a>
+            you will see that it&#39;s built on another Docker image called <a href="https://hub.docker.com/_/buildpack-deps/">buildpack-deps/jessie</a>,
+            which several layers deeper pulls from the <code>debian:jessie</code> base image. In this project, we are taking the <code>ruby:2.3.1</code>
+            prepackaged image from Dockerhub and adding another layer of configuration to it.</p>
+            
+            <h4>2. Make a <code>docker-compose.yml</code> file to more easily run the application.</h4>
+            
+            <pre><code>version: &#39;2&#39;&#x000A;services:&#x000A;  web:&#x000A;    build: .&#x000A;    command: bundle exec rails s -p 3000 -b &#39;0.0.0.0&#39;&#x000A;    environment:&#x000A;      - HONEYBADGER_API_KEY=${HONEYBADGER_API_KEY}&#x000A;    ports:&#x000A;      - &quot;3000:3000&quot;&#x000A;</code></pre>
+            
+            <p><strong>/docker-compose.yml</strong></p>
+            
+            <p>It can take some tedious command line options to run a Docker image the way you want it. To simplify that work there&#39;s
+            <code>docker-compose</code>. So in this file I have the configuration for running the application saved so that I don&#39;t have to
+            specify it every time on the command line. It tells Docker which command to run that will start the Rails server,
+            maps my ports from the host machine to the container, and set the environment variables.</p>
+            
+            <p>Notice that I can pull an environment variable from the host machine by using the <code>${*environment_variable_name*}</code>
+            format for the value. This is good practice because I can keep the API key a secret - it won&#39;t accidentally be committed anywhere on Github where
+            a malicious person can steal it. I can also change the API key on the server without having to modify any code.</p>
+            
+            <p>If I had the need for additional dependencies such as a postgres database, I could specify them here in the compose
+            file.</p>
+            
+            <h4>3. Run the application</h4>
+            
+            <p>At the command line all you have to do is:
+            <code>$ docker-compose up -d</code></p>
+            
+            <p>It will automatically build the image and run the container. The <code>-d</code> flag has it run in the background so that
+            I can have the command line back. But if you ran it without the <code>-d</code> flag, this is what the output should look like:</p>
+            
+            <pre><code>$ docker-compose up&#x000A;Building web&#x000A;Step 1 : FROM ruby:2.3.1&#x000A; ---&gt; 8576862d3442&#x000A;Step 2 : RUN apt-get update&#x000A; ---&gt; Running in 6602693ad6bc&#x000A;Get:1 http://security.debian.org jessie/updates InRelease [63.1 kB]&#x000A;Get:2 http://security.debian.org jessie/updates/main amd64 Packages [389 kB]&#x000A;Ign http://httpredir.debian.org jessie InRelease&#x000A;Get:3 http://httpredir.debian.org jessie-updates InRelease [142 kB]&#x000A;Get:4 http://httpredir.debian.org jessie-updates/main amd64 Packages [17.6 kB]&#x000A;Get:5 http://httpredir.debian.org jessie Release.gpg [2373 B]&#x000A;Get:6 http://httpredir.debian.org jessie Release [148 kB]&#x000A;Get:7 http://httpredir.debian.org jessie/main amd64 Packages [9032 kB]&#x000A;Fetched 9795 kB in 9s (1079 kB/s)&#x000A;Reading package lists...&#x000A; ---&gt; 1f578850fdb9&#x000A;Removing intermediate container 6602693ad6bc&#x000A;Step 3 : RUN mkdir /app&#x000A; ---&gt; Running in 61f9bf5d0951&#x000A; ---&gt; 4c32b4640e6a&#x000A;Removing intermediate container 61f9bf5d0951&#x000A;Step 4 : WORKDIR /app&#x000A; ---&gt; Running in bdf44232fda8&#x000A; ---&gt; 60c1a7381154&#x000A;Removing intermediate container bdf44232fda8&#x000A;Step 5 : ADD Gemfile /app/Gemfile&#x000A; ---&gt; 1c6ff0d80fb7&#x000A;Removing intermediate container 33c8bfdbdafb&#x000A;Step 6 : ADD Gemfile.lock /app/Gemfile.lock&#x000A; ---&gt; aa82e7727c4d&#x000A;Removing intermediate container c6d328043b8b&#x000A;Step 7 : RUN bundle install&#x000A; ---&gt; Running in e8509116977f&#x000A;Fetching gem metadata from https://rubygems.org/.........&#x000A;Fetching version metadata from https://rubygems.org/..&#x000A;Fetching dependency metadata from https://rubygems.org/.&#x000A;Installing rake 11.2.2&#x000A;&#x000A;  &lt;omitted for brevity&gt;&#x000A;&#x000A;Bundle complete! 9 Gemfile dependencies, 58 gems now installed.&#x000A;Bundled gems are installed into /usr/local/bundle.&#x000A; ---&gt; 2d36ee11a6f5&#x000A;Removing intermediate container e8509116977f&#x000A;Step 8 : ADD . /app&#x000A; ---&gt; 0d686b7bf04e&#x000A;Removing intermediate container 5d323b8c0044&#x000A;Successfully built 0d686b7bf04e&#x000A;WARNING: Image for service web was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.&#x000A;Creating honeybadgernotifier_web_1&#x000A;Attaching to honeybadgernotifier_web_1&#x000A;web_1  | =&gt; Booting Puma&#x000A;web_1  | =&gt; Rails 5.0.0.1 application starting in development on http://0.0.0.0:3000&#x000A;web_1  | =&gt; Run `rails server -h` for more startup options&#x000A;web_1  | Puma starting in single mode...&#x000A;web_1  | * Version 3.6.0 (ruby 2.3.1-p112), codename: Sleepy Sunday Serenity&#x000A;web_1  | * Min threads: 5, max threads: 5&#x000A;web_1  | * Environment: development&#x000A;web_1  | * Listening on tcp://0.0.0.0:3000&#x000A;web_1  | Use Ctrl-C to stop&#x000A;</code></pre>
+            
+            <h4>4. Checking that the tests work</h4>
+            
+            <p>I can now console into the running docker container to double check that the test suite passes. First, I open
+            a bash console with <code>docker exec -i -t honeybadgernotifier_web_1 /bin/bash</code> and then I can do whatever I want
+            from inside that docker container as if I was logged onto that machine. So once I&#39;m in I run the <code>rspec</code> command:</p>
+            
+            <pre><code>$ docker exec -i -t honeybadgernotifier_web_1 /bin/bash&#x000A;Error response from daemon: Container c860eda8947a817c1743ebac9fa3fa282efca41c3ed31e639a41235e2266a11b is not running&#x000A;$ rspec&#x000A;&#x000A;Notification API&#x000A;  POST /api/v1/notification&#x000A;DEPRECATION WARNING: ActionDispatch::IntegrationTest HTTP request methods will accept only&#x000A;the following keyword arguments in future Rails versions:&#x000A;params, headers, env, xhr, as&#x000A;&#x000A;Examples:&#x000A;&#x000A;get &#39;/profile&#39;,&#x000A;  params: { id: 1 },&#x000A;  headers: { &#39;X-Extra-Header&#39; =&gt; &#39;123&#39; },&#x000A;  env: { &#39;action_dispatch.custom&#39; =&gt; &#39;custom&#39; },&#x000A;  xhr: true,&#x000A;  as: :json&#x000A; (called from api_post at /Users/wkotzan/Development/honeybadger_notifier/spec/helpers/api_helper.rb:7)&#x000A;    relays the message to Honeybadger&#x000A;&#x000A;HoneybadgerNotifier::Notify&#x000A;  forward the data through the Honeybadger API gem&#x000A;  Honeybadger API key configuration&#x000A;    should not be nil&#x000A;&#x000A;Finished in 0.30018 seconds (files took 1.08 seconds to load)&#x000A;3 examples, 0 failures&#x000A;</code></pre>
+            
+            <p>Tests are passing!</p>
+            
+            <h2>Terminology Tip</h2>
+            
+            <p>Don&#39;t forget - A Docker <strong>image</strong> is like a virtual machine that&#39;s not running. It&#39;s like a computer
+            hard drive with all the software and configuration in it. A <strong>container</strong> is a running image. You can have more than
+            one container running at the same time from the same image.</p>
+            
+            <h2>Additional Resources</h2>
+            
+            <p><a href="https://docs.docker.com/compose/rails/">Docker official: Docker Compose and Rails Quickstart</a></p>
+            
+            <p><a href="https://docs.docker.com/engine/reference/commandline/run/#/set-environment-variables-e-env-env-file">Docker official: setting environment variables</a></p>
+            
+            <p><a href="https://robots.thoughtbot.com/rails-on-docker">Thoughtbot: Rails on Docker</a></p>
+            
+            <p><a href="http://stackoverflow.com/questions/30494050/how-to-pass-environment-variables-to-docker-containers">Stackoverflow: How to pass environment variables to docker containers</a></p>
+          </div>
+        </div>
+      </div>
+      <div class='col-md-4'>
+        <aside>
+          <h2>Recent Articles</h2>
+          <ol>
+            <li><a href="getting-your-ruby-on-rails-application-code-into-docker.html">Getting your Ruby on Rails application code into Docker</a> <span>Sep 14</span></li>
+            <li><a href="../12/graylog-apache-docker-using-gelf.html">Feeding Apache log files to Graylog with Docker and apache-mod_log_gelf</a> <span>Sep 12</span></li>
+            <li><a href="../11/github-pages-organization-page-domain-name-on-middleman.html">Github Organization and Project Pages under a single domain with Middleman</a> <span>Sep 11</span></li>
+            <li><a href="../11/middleman-middleman-gh-pages-first-publish-error-src-refspec-gh-pages-does-not-match-any.html">Receiving 'error: src refspec gh-pages does not match any' on first publish with Middleman/middleman-gh-pages</a> <span>Sep 11</span></li>
+            <li><a href="../10/first-post.html">First Post</a> <span>Sep 10</span></li>
+          </ol>
+          <h2>By Year</h2>
+          <ol>
+            <li><a href="../../../2016.html">2016 (5)</a></li>
+          </ol>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>
