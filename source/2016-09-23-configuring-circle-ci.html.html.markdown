@@ -6,7 +6,7 @@ tags:
 
 I'm setting up CI for my employer using Circle-CI. Here are some of the issues I'm running into.
 
-1. `bundle install` fails.
+1\. `bundle install` fails.
 
 On the first run, we got the following error message:
 
@@ -56,7 +56,7 @@ in my project root that looks like this:
 Note the `dependencies` section which runs the command to install bundler first. After this change, bundle install
 ran correctly.
 
-2. Loading of the database schema fails (fail at `rake db:create db:schema:load ts:configure ts:index ts:start`)
+2\. Loading of the database schema fails (fail at `rake db:create db:schema:load ts:configure ts:index ts:start`)
 
 So the bundle was fixed. Now I was getting a new error:
 
@@ -312,3 +312,74 @@ config.active_record.schema_format = :sql
 I then ran `rake db:structure:dump` and checked the changes into source control. This resolved the database
 setup issue in Circle-CI. The CI server was smart enough to know based on the `application.rb` setting, to
 use `rake db:structure:load` in its initialization process.
+
+3\. Schema migrations were not populated
+
+I ran into one final issue.
+
+```
+bundle exec rspec
+DEPRECATION WARNING: The configuration option `config.serve_static_assets` has been renamed to `config.serve_static_files` to clarify its role (it merely enables serving everything in the `public` folder and is unrelated to the asset pipeline). The `serve_static_assets` alias will be removed in Rails 5.0. Please migrate your configuration files accordingly. (called from block in <top (required)> at /home/ubuntu/banks/config/environments/test.rb:16)
+DEPRECATION WARNING: Currently, Active Record suppresses errors raised within `after_rollback`/`after_commit` callbacks and only print them to the logs. In the next version, these errors will no longer be suppressed. Instead, the errors will propagate normally just like in other Active Record callbacks.
+
+You can opt into the new behavior and remove this warning by setting:
+
+  config.active_record.raise_in_transactional_callbacks = true
+
+ (called from block in tsort_each at /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:228)
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
+in LoadError rescue statement
+DEPRECATION WARNING: The configuration option `config.serve_static_assets` has been renamed to `config.serve_static_files` to clarify its role (it merely enables serving everything in the `public` folder and is unrelated to the asset pipeline). The `serve_static_assets` alias will be removed in Rails 5.0. Please migrate your configuration files accordingly. (called from block in <top (required)> at /home/ubuntu/banks/config/environments/test.rb:16)
+DEPRECATION WARNING: Currently, Active Record suppresses errors raised within `after_rollback`/`after_commit` callbacks and only print them to the logs. In the next version, these errors will no longer be suppressed. Instead, the errors will propagate normally just like in other Active Record callbacks.
+
+You can opt into the new behavior and remove this warning by setting:
+
+  config.active_record.raise_in_transactional_callbacks = true
+
+ (called from block in tsort_each at /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:228)
+bundler: failed to load command: rspec (/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rspec)
+ActiveRecord::PendingMigrationError: 
+
+Migrations are pending. To resolve this issue, run:
+
+	bin/rake db:migrate RAILS_ENV=test
+
+
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:392:in `check_pending!'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:405:in `load_schema_if_pending!'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:411:in `block in maintain_test_schema!'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:642:in `suppress_messages'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:416:in `method_missing'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:411:in `maintain_test_schema!'
+  /home/ubuntu/banks/spec/rails_helper.rb:18:in `<top (required)>'
+  /home/ubuntu/banks/spec/controllers/admin/crawl_status_controller_spec.rb:1:in `require'
+  /home/ubuntu/banks/spec/controllers/admin/crawl_status_controller_spec.rb:1:in `<top (required)>'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/configuration.rb:1058:in `load'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/configuration.rb:1058:in `block in load_spec_files'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/configuration.rb:1058:in `each'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/configuration.rb:1058:in `load_spec_files'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/runner.rb:97:in `setup'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/runner.rb:85:in `run'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/runner.rb:70:in `run'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/runner.rb:38:in `invoke'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/exe/rspec:4:in `<top (required)>'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rspec:23:in `load'
+  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rspec:23:in `<top (required)>'
+Coverage report generated for RSpec to /home/ubuntu/banks/coverage. 165 / 710 LOC (23.24%) covered.
+
+bundle exec rspec returned exit code 1
+```
+
+I found out that this was caused by the `schema_migrations` table not being populated on my local development 
+system. As mentioned above, when I initially set up my local environment, I was given a data dump of the schema 
+to get my database up and running. This lacked the migration numbers. I pulled the data from the `schema_migrations`
+table from another environment, rebuilt `structure.sql` using `rake db:migrate`, and pushed out the changes.
+The test suite ran!   
