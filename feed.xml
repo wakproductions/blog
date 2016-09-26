@@ -14,7 +14,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html"/>
     <id>http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html</id>
     <published>2016-09-26T11:30:00-04:00</published>
-    <updated>2016-09-26T16:23:04-04:00</updated>
+    <updated>2016-09-26T16:44:23-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -93,6 +93,12 @@ no changes added to commit
 
 &lt;p&gt;A disadvantage of using submodules is that your commit history will get dirty with &amp;quot;Update submodule&amp;quot; style commits
 in the parent project repo. You won&amp;#39;t have specific information on the version bumps happening within the submodule.&lt;/p&gt;
+
+&lt;p&gt;One of the things that I like about packaging via Ruby gem vs using a library as a submodule is that you can manage
+meaningful version numbers in a Ruby gem whereas all you have to go by in a submodule is a commit hash. This could
+make it difficult to track the changes to the shared repo that breaks other systems dependent on it. Let&amp;#39;s say you make
+a change to a shared repo, then updated other projects using that shared repo. Things break in those other projects.
+How do you roll back? How do you identify which version of the shared repo each of your projects is running on?&lt;/p&gt;
 
 &lt;h2&gt;2. How to Push Changes from Parent Project Repo to Shared Repo&lt;/h2&gt;
 
