@@ -67,6 +67,7 @@ index 9dd60f8..e3bedf9 160000
 -Subproject commit 9dd60f8fc47f089dd5081a0ed73efb7cc923fd9c
 +Subproject commit e3bedf9137028aa63dd88ff1e708ce08e921cc99
 ```
+
 ** Note that the commit reference in the submodule has changed and needs to be committed in the parent repo**
 
 ```
@@ -81,6 +82,12 @@ no changes added to commit
 
 A disadvantage of using submodules is that your commit history will get dirty with "Update submodule" style commits
 in the parent project repo. You won't have specific information on the version bumps happening within the submodule.
+
+One of the things that I like about packaging via Ruby gem vs using a library as a submodule is that you can manage
+meaningful version numbers in a Ruby gem whereas all you have to go by in a submodule is a commit hash. This could
+make it difficult to track the changes to the shared repo that breaks other systems dependent on it. Let's say you make
+a change to a shared repo, then updated other projects using that shared repo. Things break in those other projects.
+How do you roll back? How do you identify which version of the shared repo each of your projects is running on?
 
 
 ## 2. How to Push Changes from Parent Project Repo to Shared Repo 
