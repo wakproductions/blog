@@ -5,10 +5,107 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-09-23T11:30:00-04:00</updated>
+  <updated>2016-09-26T11:30:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Git Submodule vs. Subtree</title>
+    <link rel="alternate" href="http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html"/>
+    <id>http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html</id>
+    <published>2016-09-26T11:30:00-04:00</published>
+    <updated>2016-09-26T16:23:04-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;&lt;strong&gt;&amp;quot;Shared Repo&amp;quot;&lt;/strong&gt; refers to the code which is shared and will be packaged in a submodule or subtree.
+&lt;strong&gt;&amp;quot;Parent Project Repo&amp;quot;&lt;/strong&gt; refers to the project that is going to be including the &lt;em&gt;Shared Repo&lt;/em&gt; as
+a submodule or subtree. &lt;/p&gt;
+
+&lt;h2&gt;1. How to Pull Changes from Shared Repo into Parent Project Repo&lt;/h2&gt;
+
+&lt;h3&gt;Submodule&lt;/h3&gt;
+
+&lt;p&gt;You can work in the submodule as if it were its own Git Repo. First you have to go into the submodule
+directory:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;cd lib/gitsub-submodule &amp;amp;&amp;amp; git fetch &amp;amp;&amp;amp; git merge origin/master&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; (master)$ git fetch
+remote: Counting objects: 3, done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), done.
+From github.com:wakproductions/gitsub-submodule
+   9dd60f8..e3bedf9  master     -&amp;gt; origin/master
+ (master)$ git merge origin/master
+Updating 9dd60f8..e3bedf9
+Fast-forward
+ submodule-library.rb | 4 ++++
+ 1 file changed, 4 insertions(+)
+ (master)$ git log
+commit e3bedf9137028aa63dd88ff1e708ce08e921cc99
+Author: Winston Kotzan &amp;lt;wak@wakproductions.com&amp;gt;
+Date:   Mon Sep 26 15:40:17 2016 -0400
+
+    Add change to shared repo
+
+commit 9dd60f8fc47f089dd5081a0ed73efb7cc923fd9c
+Author: Winston Kotzan &amp;lt;wak@wakproductions.com&amp;gt;
+Date:   Wed Sep 21 10:25:56 2016 -0400
+
+    First commit - submodule
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You also need to update the parent repo:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; (master)$ git status
+On branch master
+Changes not staged for commit:
+  (use &amp;quot;git add &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
+  (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
+  (commit or discard the untracked or modified content in submodules)
+
+    modified:   lib/gitsub-submodule (new commits, modified content)
+
+ (master)$ git diff
+diff --git a/lib/gitsub-submodule b/lib/gitsub-submodule
+index 9dd60f8..e3bedf9 160000
+--- a/lib/gitsub-submodule
++++ b/lib/gitsub-submodule
+@@ -1 +1 @@
+-Subproject commit 9dd60f8fc47f089dd5081a0ed73efb7cc923fd9c
++Subproject commit e3bedf9137028aa63dd88ff1e708ce08e921cc99
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;** Note that the commit reference in the submodule has changed and needs to be committed in the parent repo**&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; (master)$ gc &amp;quot;Update submodule&amp;quot;
+On branch master
+Changes not staged for commit:
+  modified:   lib/gitsub-submodule (new commits)
+
+no changes added to commit
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A disadvantage of using submodules is that your commit history will get dirty with &amp;quot;Update submodule&amp;quot; style commits
+in the parent project repo. You won&amp;#39;t have specific information on the version bumps happening within the submodule.&lt;/p&gt;
+
+&lt;h2&gt;2. How to Push Changes from Parent Project Repo to Shared Repo&lt;/h2&gt;
+
+&lt;h2&gt;Submodule Caveats&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;When you clone such a project with submodules, by default you get the directories 
+that contain submodules, but none of the files within them yet. (https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+To get around this, either do &lt;code&gt;git clone --recursive&lt;/code&gt; or do &lt;code&gt;git submodule init &amp;amp;&amp;amp; git submodule update&lt;/code&gt; after the 
+clone.&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+  </entry>
   <entry>
     <title>Configuring Circle-CI for the First Time</title>
     <link rel="alternate" href="http://blog.url.com/2016/09/23/configuring-circle-ci.html.html"/>
@@ -812,21 +909,6 @@ Switched to branch &amp;#39;master&amp;#39;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;The publish operation then worked.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>First Post</title>
-    <link rel="alternate" href="http://blog.url.com/2016/09/10/first-post.html"/>
-    <id>http://blog.url.com/2016/09/10/first-post.html</id>
-    <published>2016-09-10T02:11:00-04:00</published>
-    <updated>2016-09-11T14:44:26-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;Welcome to my blog, where I will be covering technical topics encountered in my work as a software engineer. This is
-to act as a reference for myself, my team, and others who may be facing similar technical challenges. This won&amp;#39;t be a
-traditional blog with static articles as I plan to retroactively update many of these posts. Think of it more as a
-Wiki on technical topics.  &lt;/p&gt;
 </content>
   </entry>
 </feed>
