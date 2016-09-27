@@ -48,7 +48,78 @@
             <strong>&quot;Parent Project Repo&quot;</strong> refers to the project that is going to be including the <em>Shared Repo</em> as
             a submodule or subtree. </p>
             
-            <h2>1. How to Pull Changes from Shared Repo into Parent Project Repo</h2>
+            <h2>Overview</h2>
+            
+            <h3>Submodule</h3>
+            
+            <p>Submodules behave like a separate repo within your parent repo. When you are in the submodule directory,
+            you can use Git commands as if you were working on the submodule repo directly. The parent repo only 
+            tracks the version of the submodule currently loaded by its commit hash. The parent repo therefore
+            only stays in sync with the shared repo via this reference. Any changes made within the submodule
+            directory cannot be committed by the parent repo. You have to go into the submodule directory and 
+            commit/push them from the shared repo.</p>
+            
+            <h3>Subtree</h3>
+            
+            <p>Subtree is just a set of macros that simplify Git tricks for merging a secondary shared code repo
+            into your parent project.</p>
+            
+            <h2>Initialization</h2>
+            
+            <h3>Submodule</h3>
+            
+            <p>To start the submodule, it&#39;s kind of like cloning another git repo: 
+            <code>git submodule add &lt;repo&gt; &lt;destination-dir&gt;</code>. </p>
+            
+            <p>Example:
+            ```
+             (master)$ git submodule add git@github.com:wakproductions/gitsub-submodule.git lib/gitsub-submodule
+            Cloning into &#39;/Users/wkotzan/Development/gitsub-base/lib/gitsub-submodule&#39;...
+            remote: Counting objects: 3, done.
+            remote: Compressing objects: 100% (2/2), done.
+            remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
+            Receiving objects: 100% (3/3), done.</p>
+            
+            <p>(master)$ git status
+            On branch master
+            Changes to be committed:
+              (use &quot;git reset HEAD <file>...&quot; to unstage)</p>
+            
+            <pre><code>new file:   .gitmodules&#x000A;new file:   lib/gitsub-submodule&#x000A;</code></pre>
+            
+            <p>(master)$ cat .gitmodules
+            [submodule &quot;lib/gitsub-submodule&quot;]
+                path = lib/gitsub-submodule
+                url = git@github.com:wakproductions/gitsub-submodule.git</p>
+            
+            <p>(master)$ git diff</p>
+            
+            <p>(master)$ git diff --cached
+            diff --git a/.gitmodules b/.gitmodules
+            new file mode 100644
+            index 0000000..dfc8421
+            --- /dev/null
+            +++ b/.gitmodules
+            @@ -0,0 +1,3 @@
+            +[submodule &quot;lib/gitsub-submodule&quot;]
+            +       path = lib/gitsub-submodule
+            +       url = git@github.com:wakproductions/gitsub-submodule.git
+            diff --git a/lib/gitsub-submodule b/lib/gitsub-submodule
+            new file mode 160000
+            index 0000000..9dd60f8
+            --- /dev/null
+            +++ b/lib/gitsub-submodule
+            @@ -0,0 +1 @@
+            +Subproject commit 9dd60f8fc47f089dd5081a0ed73efb7cc923fd9c
+            ```</p>
+            
+            <h3>Subtree</h3>
+            
+            <p>Use <code>git subtree add --prefix &lt;dest-dir&gt; &lt;remote-name&gt; &lt;remote-branch&gt;</code></p>
+            
+            <pre><code> (master)$ git remote add subtree-origin git@github.com:wakproductions/gitsub-subtree.git&#x000A; (master)$ git subtree add --prefix lib/github-subtree subtree-origin master&#x000A;git fetch subtree-origin master&#x000A;warning: no common commits&#x000A;remote: Counting objects: 3, done.&#x000A;remote: Compressing objects: 100% (2/2), done.&#x000A;remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0&#x000A;Unpacking objects: 100% (3/3), done.&#x000A;From github.com:wakproductions/gitsub-subtree&#x000A; * branch            master     -&gt; FETCH_HEAD&#x000A; * [new branch]      master     -&gt; subtree-origin/master&#x000A;Added dir &#39;lib/github-subtree&#39;&#x000A;&#x000A;</code></pre>
+            
+            <h2>How to Pull Changes from Shared Repo into Parent Project Repo</h2>
             
             <h3>Submodule</h3>
             
@@ -67,18 +138,37 @@
             
             <p>** Note that the commit reference in the submodule has changed and needs to be committed in the parent repo**</p>
             
-            <pre><code> (master)$ gc &quot;Update submodule&quot;&#x000A;On branch master&#x000A;Changes not staged for commit:&#x000A;  modified:   lib/gitsub-submodule (new commits)&#x000A;&#x000A;no changes added to commit&#x000A;&#x000A;</code></pre>
+            <pre><code> (master)$ gc &quot;Update submodule&quot;&#x000A;On branch master&#x000A;[master 673e460] Update submodule&#x000A; 1 file changed, 1 insertion(+), 1 deletion(-)&#x000A;</code></pre>
             
             <p>A disadvantage of using submodules is that your commit history will get dirty with &quot;Update submodule&quot; style commits
-            in the parent project repo. You won&#39;t have specific information on the version bumps happening within the submodule.</p>
+            in the parent project repo. See caveats section below for more details.</p>
             
-            <p>One of the things that I like about packaging via Ruby gem vs using a library as a submodule is that you can manage
-            meaningful version numbers in a Ruby gem whereas all you have to go by in a submodule is a commit hash. This could
-            make it difficult to track the changes to the shared repo that breaks other systems dependent on it. Let&#39;s say you make
-            a change to a shared repo, then updated other projects using that shared repo. Things break in those other projects.
-            How do you roll back? How do you identify which version of the shared repo each of your projects is running on?</p>
+            <h3>Subtree</h3>
             
-            <h2>2. How to Push Changes from Parent Project Repo to Shared Repo</h2>
+            <p>It works very similar to a Git fetch/merge or pull.</p>
+            
+            <pre><code> (master)$ git subtree pull --prefix lib/github-subtree subtree-origin master&#x000A;remote: Counting objects: 3, done.&#x000A;remote: Compressing objects: 100% (2/2), done.&#x000A;remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0&#x000A;Unpacking objects: 100% (3/3), done.&#x000A;From github.com:wakproductions/gitsub-subtree&#x000A; * branch            master     -&gt; FETCH_HEAD&#x000A;   5f12af3..b7631b5  master     -&gt; subtree-origin/master&#x000A;Merge made by the &#39;recursive&#39; strategy.&#x000A; lib/github-subtree/subtree-library.rb | 4 ++++&#x000A; 1 file changed, 4 insertions(+)&#x000A;</code></pre>
+            
+            <h2>How to Push Changes from Parent Project Repo to Shared Repo</h2>
+            
+            <h3>Submodule</h3>
+            
+            <p>What happens if you modify the code in the submodule from the parent project? It labels that commit
+            pointer as &quot;dirty&quot;, and you can&#39;t commit the change from the parent repo.</p>
+            
+            <pre><code> (master)$ git status&#x000A;On branch master&#x000A;Changes not staged for commit:&#x000A;  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)&#x000A;  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)&#x000A;  (commit or discard the untracked or modified content in submodules)&#x000A;&#x000A;    modified:   lib/gitsub-submodule (modified content)&#x000A;&#x000A;no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)&#x000A; (master)$ git diff&#x000A;diff --git a/lib/gitsub-submodule b/lib/gitsub-submodule&#x000A;--- a/lib/gitsub-submodule&#x000A;+++ b/lib/gitsub-submodule&#x000A;@@ -1 +1 @@&#x000A;-Subproject commit e3bedf9137028aa63dd88ff1e708ce08e921cc99&#x000A;+Subproject commit e3bedf9137028aa63dd88ff1e708ce08e921cc99-dirty&#x000A; (master)$ git add .&#x000A; (master)$ git status&#x000A;On branch master&#x000A;Changes not staged for commit:&#x000A;  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)&#x000A;  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)&#x000A;  (commit or discard the untracked or modified content in submodules)&#x000A;&#x000A;    modified:   lib/gitsub-submodule (modified content)&#x000A;&#x000A;no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)&#x000A;</code></pre>
+            
+            <p>You have to go into the submodule directory and work with it there. In this case, I&#39;m going to make a new
+            branch/pull request for the submodule.</p>
+            
+            <pre><code> (master)$ cd lib/gitsub-submodule&#x000A; (master)$ pwd&#x000A;/Users/wkotzan/Development/gitsub-base/lib/gitsub-submodule&#x000A; (master)$ git status&#x000A;On branch master&#x000A;Your branch is up-to-date with &#39;origin/master&#39;.&#x000A;Changes not staged for commit:&#x000A;  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)&#x000A;  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)&#x000A;&#x000A;    modified:   submodule-library.rb&#x000A;&#x000A;no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)&#x000A; (master)$ git diff&#x000A;diff --git a/submodule-library.rb b/submodule-library.rb&#x000A;index 07692ef..fc6589a 100644&#x000A;--- a/submodule-library.rb&#x000A;+++ b/submodule-library.rb&#x000A;@@ -5,7 +5,11 @@ class MySubmoduleLibrary&#x000A;   end&#x000A;&#x000A;   def code_change_in_shared_repo&#x000A;-    puts &quot;This code was added from the shared repo&quot;&#x000A;+    puts &quot;This code was modified from the parent repo&quot;&#x000A;+  end&#x000A;+&#x000A;+  def code_change_from_parent_repo&#x000A;+    puts &quot;This code was added from the parent repo&quot;&#x000A;   end&#x000A;&#x000A; end&#x000A;\ No newline at end of file&#x000A; (master)$ git stash&#x000A;Saved working directory and index state WIP on master: e3bedf9 Add change to shared repo&#x000A;HEAD is now at e3bedf9 Add change to shared repo&#x000A; (master)$ git status&#x000A;On branch master&#x000A;Your branch is up-to-date with &#39;origin/master&#39;.&#x000A;nothing to commit, working tree clean&#x000A; (master)$ git checkout -b changes_from_parent_repo&#x000A;Switched to a new branch &#39;changes_from_parent_repo&#39;&#x000A; (changes_from_parent_repo)$ git stash pop&#x000A;On branch changes_from_parent_repo&#x000A;Changes not staged for commit:&#x000A;  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)&#x000A;  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)&#x000A;&#x000A;    modified:   submodule-library.rb&#x000A;&#x000A;no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)&#x000A;Dropped refs/stash@{0} (b0c7a7936dda06e25049f121207eff7599d084f7)&#x000A; (changes_from_parent_repo)$ git add .&#x000A; (changes_from_parent_repo)$ git commit -m &quot;New method and modifications from parent repo&quot;&#x000A;[changes_from_parent_repo 60c13b2] New method and modifications from parent repo&#x000A; 1 file changed, 5 insertions(+), 1 deletion(-)&#x000A; (changes_from_parent_repo)$ git push origin changes_from_parent_repo&#x000A;Counting objects: 3, done.&#x000A;Delta compression using up to 4 threads.&#x000A;Compressing objects: 100% (2/2), done.&#x000A;Writing objects: 100% (3/3), 379 bytes | 0 bytes/s, done.&#x000A;Total 3 (delta 1), reused 0 (delta 0)&#x000A;remote: Resolving deltas: 100% (1/1), completed with 1 local objects.&#x000A;To github.com:wakproductions/gitsub-submodule.git&#x000A; * [new branch]      changes_from_parent_repo -&gt; changes_from_parent_repo&#x000A; (changes_from_parent_repo)$ git checkout master&#x000A;Switched to branch &#39;master&#39;&#x000A;Your branch is up-to-date with &#39;origin/master&#39;.&#x000A;&#x000A;****** CHANGES IN BRANCH changes_from_parent_repo MERGED VIA PULL REQUEST ****** &#x000A;&#x000A; (master)$ git pull&#x000A;remote: Counting objects: 1, done.&#x000A;remote: Total 1 (delta 0), reused 0 (delta 0), pack-reused 0&#x000A;Unpacking objects: 100% (1/1), done.&#x000A;From github.com:wakproductions/gitsub-submodule&#x000A;   e3bedf9..f34c1aa  master     -&gt; origin/master&#x000A;Updating e3bedf9..f34c1aa&#x000A;Fast-forward&#x000A; submodule-library.rb | 6 +++++-&#x000A; 1 file changed, 5 insertions(+), 1 deletion(-)&#x000A;</code></pre>
+            
+            <h3>Subtree</h3>
+            
+            <p>By opening a new branch, when you push it up you can merge it into the shared repo just like any other
+            pull request.</p>
+            
+            <pre><code> (master)$ git checkout -b backported_changes_to_subtree&#x000A;Switched to a new branch &#39;backported_changes_to_subtree&#39;&#x000A; (backported_changes_to_subtree)$ git status&#x000A;On branch backported_changes_to_subtree&#x000A;Changes not staged for commit:&#x000A;  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)&#x000A;  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)&#x000A;&#x000A;    modified:   lib/github-subtree/subtree-library.rb&#x000A;&#x000A;no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)&#x000A; (backported_changes_to_subtree)$ git diff&#x000A;diff --git a/lib/github-subtree/subtree-library.rb b/lib/github-subtree/subtree-library.rb&#x000A;index efb4e2b..e5a2916 100644&#x000A;--- a/lib/github-subtree/subtree-library.rb&#x000A;+++ b/lib/github-subtree/subtree-library.rb&#x000A;@@ -4,8 +4,8 @@ class MySubTree&#x000A;     puts &quot;hello from subtree&quot;&#x000A;   end&#x000A;&#x000A;-  def update_from_subtree_project&#x000A;-    puts &quot;this is an update from the subtree project&quot;&#x000A;+  def update_from_parent_project&#x000A;+    puts &quot;this is an update from the parent project&quot;&#x000A;   end&#x000A;&#x000A; end&#x000A;\ No newline at end of file&#x000A; (backported_changes_to_subtree)$ git add .&#x000A; (backported_changes_to_subtree)$ git commit -m &quot;Implement modification to subtree&quot;&#x000A;[backported_changes_to_subtree 672332e] Implement modification to subtree&#x000A; 1 file changed, 2 insertions(+), 2 deletions(-)&#x000A; (backported_changes_to_subtree)$ git subtree push --prefix lib/github-subtree subtree-origin backported_changes_to_subtree&#x000A;git push using:  subtree-origin backported_changes_to_subtree&#x000A;Counting objects: 3, done.&#x000A;Delta compression using up to 4 threads.&#x000A;Compressing objects: 100% (2/2), done.&#x000A;Writing objects: 100% (3/3), 336 bytes | 0 bytes/s, done.&#x000A;Total 3 (delta 1), reused 0 (delta 0)&#x000A;remote: Resolving deltas: 100% (1/1), completed with 1 local objects.&#x000A;To github.com:wakproductions/gitsub-subtree.git&#x000A; * [new branch]      8f79e421908a5d2ab2e6554c6b4535e5b5a83bac -&gt; backported_changes_to_subtree&#x000A;</code></pre>
             
             <h2>Submodule Caveats</h2>
             
@@ -87,6 +177,41 @@
             that contain submodules, but none of the files within them yet. (https://git-scm.com/book/en/v2/Git-Tools-Submodules)
             To get around this, either do <code>git clone --recursive</code> or do <code>git submodule init &amp;&amp; git submodule update</code> after the 
             clone.</li>
+            <li>A disadvantage of using submodules is that your commit history will get dirty with &quot;Update submodule&quot; style commits
+            in the parent project repo. You won&#39;t have specific information on the version bumps happening within the submodule.
+            One of the things that I like about packaging via Ruby gem vs using a library as a submodule is that you can manage
+            meaningful version numbers in a Ruby gem whereas all you have to go by in a submodule is a commit hash. This could
+            make it difficult to track the changes to the shared repo that breaks other systems dependent on it. Let&#39;s say you make
+            a change to a shared repo, then updated other projects using that shared repo. Things break in those other projects.
+            How do you roll back? How do you identify which version of the shared repo each of your projects is running on?</li>
+            <li>When using CI, some additional configuration may be needed: https://circleci.com/docs/external-resources/
+            https://circleci.com/docs/configuration/#checkout</li>
+            <li>In comparison to subtree, there&#39;s an extra step in that you have to commit your updates to the submodule
+            and then go into the parent repository and make another commit to update the submodule reference. So
+            every update to the submodule consists of a two-step process.</li>
+            </ul>
+            
+            <h2>Subtree Caveats</h2>
+            
+            <ul>
+            <li>Because subtree is based on a combination of other Git routines, the command sequences are less
+            straightforward.</li>
+            <li>I recommend immediately pushing up any changes in the subtree because if you make a lot of changes
+            to the parent repo and forget about updating the shared repo origin of the subtree, then you&#39;ll eventually
+            end up with a very large pull request with a lot of divergence in the shared repo. </li>
+            </ul>
+            
+            <h2>Subtree Advantages</h2>
+            
+            <ul>
+            <li>The subtree code is considered a part of the parent repository, so you don&#39;t require special configuration
+            the way you do with a submodule.</li>
+            </ul>
+            
+            <h2>Resources</h2>
+            
+            <ul>
+            <li>https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec#.zias44kio<br></li>
             </ul>
           </div>
         </div>
