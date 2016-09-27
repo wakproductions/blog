@@ -392,4 +392,6 @@ To github.com:wakproductions/gitsub-subtree.git
 
 ## Resources
 
-* https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec#.zias44kio  
+* [Official Subtree Documentation](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt)
+* [Mastering Git Subtrees (excellent resource)](https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec#.zias44kio)
+* [Atlassian Subtree Guide](http://blogs.atlassian.com/2013/05/alternatives-to-git-submodule-git-subtree/)  
