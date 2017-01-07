@@ -1,5 +1,5 @@
 ---
-title: Ruby: Don't Freeze User-Defined Strings!
+title: Ruby - Don't Freeze User-Defined Strings!
 date: 2017-01-07 01:30 EST
 tags:
 ---
