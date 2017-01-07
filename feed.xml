@@ -5,16 +5,16 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-01-07T00:00:00-05:00</updated>
+  <updated>2017-01-07T01:30:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
-    <title/>
+    <title>Ruby - Don't Freeze User-Defined Strings!</title>
     <link rel="alternate" href="http://blog.url.com/2017/01/07/ruby-string-freeze-memory.html"/>
     <id>http://blog.url.com/2017/01/07/ruby-string-freeze-memory.html</id>
-    <published>2017-01-07T00:00:00-05:00</published>
-    <updated>2017-01-07T14:47:48-05:00</updated>
+    <published>2017-01-07T01:30:00-05:00</published>
+    <updated>2017-01-07T14:53:00-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
