@@ -44,3 +44,52 @@ Switched to branch 'master'
 ```
 
 The publish operation then worked.
+
+I later ran into the following error:
+
+```
+ (master)$ rake publish
+cd /Users/wkotzan/Development/wakproductions-tech-blog/build
+git fetch --depth 1 origin gh-pages
+remote: Total 0 (delta 0), reused 0 (delta 0), pack-reused 0
+From github.com:wakproductions/blog
+ * branch            gh-pages   -> FETCH_HEAD
+git reset --hard origin/gh-pages
+HEAD is now at b0a5c51 Site updated to 5026e1c
+cd -
+mv /Users/wkotzan/Development/wakproductions-tech-blog/build/.git /var/folders/j0/16g0mm8506n123wd4pwt8nmc0000gn/T/d20170113-33919-upb9fz
+cd /Users/wkotzan/Development/wakproductions-tech-blog
+bundle exec middleman build --clean
+== Blog Sources: {year}-{month}-{day}-{title}.html (:prefix + :sources)
+
+   ...omitted...
+
+Project built successfully.
+cd -
+mv /var/folders/j0/16g0mm8506n123wd4pwt8nmc0000gn/T/d20170113-33919-upb9fz/.git /Users/wkotzan/Development/wakproductions-tech-blog/build
+cd /Users/wkotzan/Development/wakproductions-tech-blog
+cd -
+cd /Users/wkotzan/Development/wakproductions-tech-blog/build
+git add --all
+git commit -m "Site updated to 61dbbd5"
+[master 3b55444] Site updated to 61dbbd5
+ 14 files changed, 276 insertions(+), 51 deletions(-)
+ create mode 100644 2017/01/12.html
+ create mode 100644 2017/01/12/s3-code-examples.html
+git push origin gh-pages
+error: src refspec gh-pages does not match any.
+error: failed to push some refs to 'git@github.com:wakproductions/blog.git'
+rake aborted!
+Command failed with status (1): [git push origin gh-pages...]
+/Users/wkotzan/.rvm/gems/ruby-2.3.1/gems/middleman-gh-pages-0.3.1/lib/middleman-gh-pages/tasks/gh-pages.rake:101:in `block (2 levels) in <top (required)>'
+/Users/wkotzan/.rvm/gems/ruby-2.3.1/gems/middleman-gh-pages-0.3.1/lib/middleman-gh-pages/tasks/gh-pages.rake:94:in `block in <top (required)>'
+/Users/wkotzan/.rvm/gems/ruby-2.3.1/gems/rake-11.2.2/exe/rake:27:in `<top (required)>'
+/Users/wkotzan/.rvm/gems/ruby-2.3.1/bin/ruby_executable_hooks:15:in `eval'
+/Users/wkotzan/.rvm/gems/ruby-2.3.1/bin/ruby_executable_hooks:15:in `<main>'
+Tasks: TOP => publish
+(See full trace by running task with --trace)
+
+```
+
+This problem `error: src refspec gh-pages does not match any.` was resolved by deleting the `build` directory and
+trying `rake publish` again.

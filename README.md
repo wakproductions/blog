@@ -7,3 +7,6 @@ TODOs: FEATURES I WANT TO ADD
   * or, figure out how to activate coderay with redcarpet
 * Clean up "Recent Articles" in side bar aesthetic
 
+## Notes
+
+To publish: `rake publish`
