@@ -1,0 +1,101 @@
+<!--<html>-->
+<!--<head>-->
+<!--</head>-->
+<!--<body>-->
+<!--hello world-->
+<!--<%= yield %>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta charset='utf-8'>
+    <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
+    <title>AWS S3 Code Examples in Ruby (aws-sdk 2.0)</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+    <link href="../../../stylesheets/site.css" rel="stylesheet" />
+    <script src="../../../javascripts/all.js"></script>
+    <script src="../../../javascripts/jquery-2.2.3.min.js"></script>
+    
+    
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-46648633-1', 'winstonkotzan.com');
+        ga('send', 'pageview');
+    </script>
+  </head>
+  <body class='x2017 x2017_01 x2017_01_12 x2017_01_12_s3-code-examples'>
+    <div class='jumbotron'>
+      <div class='container'>
+        <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
+          <div class='content'>
+            <a href="/blog/">Winston Kotzan's Technology Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container content'>
+      <div class='col-md-8'>
+        <div class='main article-content' role='main'>
+          <h2 class='article-title'>AWS S3 Code Examples in Ruby (aws-sdk 2.0)</h2>
+          <div class='article-date'>01/12/2017</div>
+          <div class='article-body'>
+            <h3>Logging in and creating an S3 object. The environment variables are set via Figaro.</h3>
+            
+            <pre><code class="ruby">s3 = Aws::S3::Client.new(access_key_id: ENV[&#39;AMAZON_S3_KEY_ID&#39;], secret_access_key: ENV[&#39;AMAZON_S3_SECRET&#39;])&#x000A;s3.list_buckets&#x000A;=&gt; #&lt;struct Aws::S3::Types::ListBucketsOutput&#x000A; buckets=&#x000A;  [...]&#x000A;</code></pre>
+            
+            <h3>Create a bucket</h3>
+            
+            <pre><code class="ruby">resp = s3.create_bucket({ bucket: &quot;analytics-office-data&quot; })&#x000A;</code></pre>
+            
+            <h3>Upload a file</h3>
+            
+            <p>On S3 there&#39;s a limitation on the number of buckets you can use, and there&#39;s no such thing as a concept of a folder.
+            However, you can mimic folders using the <code>prefix</code> feature.</p>
+            
+            <pre><code class="ruby">file_name = &#39;SDI_Download_Data-20140930.csv&#39; &#x000A;prefix=&#39;downloaded_files&#39;&#x000A;&#x000A;file_path=File.join(SOURCE_DIR, file_name)&#x000A;contents = File.open(file_path,&#39;r&#39;) { |f| f.read }&#x000A;s3.put_object(bucket: &#39;analytics-office-data&#39;, key: &quot;#{prefix}/#{file_name}&quot;, body: contents)&#x000A;</code></pre>
+            
+            <p>or more conscise:</p>
+            
+            <pre><code class="ruby">File.open(file_path, &#39;rb&#39;) do |file|&#x000A;  s3.put_object(bucket: &#39;analytics-office-data&#39;, key: &quot;#{prefix}/#{file_name}&quot;, body: file)&#x000A;end&#x000A;</code></pre>
+            
+            <p><a href="https://aws.amazon.com/blogs/developer/uploading-files-to-amazon-s3/">Another good resource</a></p>
+            
+            <h3>Read back that file</h3>
+            
+            <pre><code class="ruby">prefix=&#39;downloaded_files&#39;&#x000A;s3.list_objects({ bucket: &#39;analytics-office-data&#39;, prefix: prefix })&#x000A;=&gt; #&lt;struct Aws::S3::Types::ListObjectsOutput&#x000A; is_truncated=false,&#x000A; marker=&quot;&quot;,&#x000A; next_marker=nil,&#x000A; contents=&#x000A;  [#&lt;struct Aws::S3::Types::Object&#x000A;    key=&quot;SDI_Download_Data-20140930.csv&quot;,&#x000A;    last_modified=2017-01-12 18:19:34 UTC,&#x000A;    etag=&quot;\&quot;411adb204166d574987bacde05b1d1dd\&quot;&quot;,&#x000A;    size=2404972,&#x000A;    storage_class=&quot;STANDARD&quot;,&#x000A;  ],&#x000A; name=&quot;analytics-office-data&quot;,&#x000A; prefix=&quot;&quot;,&#x000A; delimiter=nil,&#x000A; max_keys=1000,&#x000A; common_prefixes=[],&#x000A; encoding_type=&quot;url&quot;&gt;&#x000A;&#x000A; r = s3.get_object({ bucket: &#39;analytics-office-data&#39;, key: &quot;#{prefix}/SDI_Download_Data-20140930.csv&quot; })&#x000A; =&gt; #&lt;struct Aws::S3::Types::GetObjectOutput&#x000A;  body=#&lt;StringIO:0x007f808669ed40&gt;,&#x000A;  delete_marker=nil,&#x000A;  accept_ranges=&quot;bytes&quot;,&#x000A;  expiration=nil,&#x000A;  restore=nil,&#x000A;  last_modified=2017-01-12 19:13:50 +0000,&#x000A;  content_length=2404972,&#x000A;  etag=&quot;\&quot;411adb204166d574987bacde05b1d1dd\&quot;&quot;,&#x000A;  missing_meta=nil,&#x000A;  version_id=nil,&#x000A;  cache_control=nil,&#x000A;  content_disposition=nil,&#x000A;  content_encoding=nil,&#x000A;  content_language=nil,&#x000A;  content_range=nil,&#x000A;  content_type=&quot;&quot;,&#x000A;  expires=nil,&#x000A;  expires_string=nil,&#x000A;  website_redirect_location=nil,&#x000A;  server_side_encryption=nil,&#x000A;  metadata={},&#x000A;  sse_customer_algorithm=nil,&#x000A;  sse_customer_key_md5=nil,&#x000A;  ssekms_key_id=nil,&#x000A;  storage_class=nil,&#x000A;  request_charged=nil,&#x000A;  replication_status=nil&gt;&#x000A;&#x000A;file_contents = r.body.read  &#x000A;</code></pre>
+            
+            <p>An alternative way of reading is:</p>
+            
+            <pre><code class="ruby">file_contents = AWS::S3.new.buckets[&#39;analytics-office-data&#39;].objects[&#39;#{prefix}/SDI_Download_Data-20140930.csv&#39;].read&#x000A;</code></pre>
+          </div>
+        </div>
+      </div>
+      <div class='col-md-4'>
+        <aside>
+          <h2>Recent Articles</h2>
+          <ol>
+            <li><a href="s3-code-examples.html">AWS S3 Code Examples in Ruby (aws-sdk 2.0)</a> <span>Jan 12</span></li>
+            <li><a href="../07/ruby-string-freeze-memory.html">Ruby - Don't Freeze User-Defined Strings!</a> <span>Jan  7</span></li>
+            <li><a href="../../../2016/09/26/git-submodule-vs-subtree.html">Git Submodule vs. Subtree</a> <span>Sep 26</span></li>
+            <li><a href="../../../2016/09/23/configuring-circle-ci.html.html">Configuring Circle-CI for the First Time</a> <span>Sep 23</span></li>
+            <li><a href="../../../2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html">Getting your Ruby on Rails application code into Docker</a> <span>Sep 14</span></li>
+            <li><a href="../../../2016/09/12/graylog-apache-docker-using-gelf.html">Feeding Apache log files to Graylog with Docker and apache-mod_log_gelf</a> <span>Sep 12</span></li>
+            <li><a href="../../../2016/09/11/github-pages-organization-page-domain-name-on-middleman.html">Github Organization and Project Pages under a single domain with Middleman</a> <span>Sep 11</span></li>
+            <li><a href="../../../2016/09/11/middleman-middleman-gh-pages-first-publish-error-src-refspec-gh-pages-does-not-match-any.html">Receiving 'error: src refspec gh-pages does not match any' on first publish with Middleman/middleman-gh-pages</a> <span>Sep 11</span></li>
+            <li><a href="../../../2016/09/10/first-post.html">First Post</a> <span>Sep 10</span></li>
+          </ol>
+          <h2>By Year</h2>
+          <ol>
+            <li><a href="../../../2017.html">2017 (2)</a></li>
+            <li><a href="../../../2016.html">2016 (7)</a></li>
+          </ol>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>

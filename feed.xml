@@ -5,16 +5,123 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-01-07T01:30:00-05:00</updated>
+  <updated>2017-01-12T01:30:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>AWS S3 Code Examples in Ruby (aws-sdk 2.0)</title>
+    <link rel="alternate" href="http://blog.url.com/2017/01/12/s3-code-examples.html"/>
+    <id>http://blog.url.com/2017/01/12/s3-code-examples.html</id>
+    <published>2017-01-12T01:30:00-05:00</published>
+    <updated>2017-01-13T14:36:45-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h3&gt;Logging in and creating an S3 object. The environment variables are set via Figaro.&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;s3 = Aws::S3::Client.new(access_key_id: ENV[&amp;#39;AMAZON_S3_KEY_ID&amp;#39;], secret_access_key: ENV[&amp;#39;AMAZON_S3_SECRET&amp;#39;])
+s3.list_buckets
+=&amp;gt; #&amp;lt;struct Aws::S3::Types::ListBucketsOutput
+ buckets=
+  [...]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Create a bucket&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;resp = s3.create_bucket({ bucket: &amp;quot;analytics-office-data&amp;quot; })
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Upload a file&lt;/h3&gt;
+
+&lt;p&gt;On S3 there&amp;#39;s a limitation on the number of buckets you can use, and there&amp;#39;s no such thing as a concept of a folder.
+However, you can mimic folders using the &lt;code&gt;prefix&lt;/code&gt; feature.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;file_name = &amp;#39;SDI_Download_Data-20140930.csv&amp;#39; 
+prefix=&amp;#39;downloaded_files&amp;#39;
+
+file_path=File.join(SOURCE_DIR, file_name)
+contents = File.open(file_path,&amp;#39;r&amp;#39;) { |f| f.read }
+s3.put_object(bucket: &amp;#39;analytics-office-data&amp;#39;, key: &amp;quot;#{prefix}/#{file_name}&amp;quot;, body: contents)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;or more conscise:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;File.open(file_path, &amp;#39;rb&amp;#39;) do |file|
+  s3.put_object(bucket: &amp;#39;analytics-office-data&amp;#39;, key: &amp;quot;#{prefix}/#{file_name}&amp;quot;, body: file)
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href="https://aws.amazon.com/blogs/developer/uploading-files-to-amazon-s3/"&gt;Another good resource&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3&gt;Read back that file&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;prefix=&amp;#39;downloaded_files&amp;#39;
+s3.list_objects({ bucket: &amp;#39;analytics-office-data&amp;#39;, prefix: prefix })
+=&amp;gt; #&amp;lt;struct Aws::S3::Types::ListObjectsOutput
+ is_truncated=false,
+ marker=&amp;quot;&amp;quot;,
+ next_marker=nil,
+ contents=
+  [#&amp;lt;struct Aws::S3::Types::Object
+    key=&amp;quot;SDI_Download_Data-20140930.csv&amp;quot;,
+    last_modified=2017-01-12 18:19:34 UTC,
+    etag=&amp;quot;\&amp;quot;411adb204166d574987bacde05b1d1dd\&amp;quot;&amp;quot;,
+    size=2404972,
+    storage_class=&amp;quot;STANDARD&amp;quot;,
+  ],
+ name=&amp;quot;analytics-office-data&amp;quot;,
+ prefix=&amp;quot;&amp;quot;,
+ delimiter=nil,
+ max_keys=1000,
+ common_prefixes=[],
+ encoding_type=&amp;quot;url&amp;quot;&amp;gt;
+
+ r = s3.get_object({ bucket: &amp;#39;analytics-office-data&amp;#39;, key: &amp;quot;#{prefix}/SDI_Download_Data-20140930.csv&amp;quot; })
+ =&amp;gt; #&amp;lt;struct Aws::S3::Types::GetObjectOutput
+  body=#&amp;lt;StringIO:0x007f808669ed40&amp;gt;,
+  delete_marker=nil,
+  accept_ranges=&amp;quot;bytes&amp;quot;,
+  expiration=nil,
+  restore=nil,
+  last_modified=2017-01-12 19:13:50 +0000,
+  content_length=2404972,
+  etag=&amp;quot;\&amp;quot;411adb204166d574987bacde05b1d1dd\&amp;quot;&amp;quot;,
+  missing_meta=nil,
+  version_id=nil,
+  cache_control=nil,
+  content_disposition=nil,
+  content_encoding=nil,
+  content_language=nil,
+  content_range=nil,
+  content_type=&amp;quot;&amp;quot;,
+  expires=nil,
+  expires_string=nil,
+  website_redirect_location=nil,
+  server_side_encryption=nil,
+  metadata={},
+  sse_customer_algorithm=nil,
+  sse_customer_key_md5=nil,
+  ssekms_key_id=nil,
+  storage_class=nil,
+  request_charged=nil,
+  replication_status=nil&amp;gt;
+
+file_contents = r.body.read  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;An alternative way of reading is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;file_contents = AWS::S3.new.buckets[&amp;#39;analytics-office-data&amp;#39;].objects[&amp;#39;#{prefix}/SDI_Download_Data-20140930.csv&amp;#39;].read
+&lt;/code&gt;&lt;/pre&gt;
+</content>
+  </entry>
   <entry>
     <title>Ruby - Don't Freeze User-Defined Strings!</title>
     <link rel="alternate" href="http://blog.url.com/2017/01/07/ruby-string-freeze-memory.html"/>
     <id>http://blog.url.com/2017/01/07/ruby-string-freeze-memory.html</id>
     <published>2017-01-07T01:30:00-05:00</published>
-    <updated>2017-01-07T14:53:00-05:00</updated>
+    <updated>2017-01-13T14:36:45-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -79,7 +186,7 @@ are fine to freeze because there is a finite number of them in my program.&lt;/p
     <link rel="alternate" href="http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html"/>
     <id>http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html</id>
     <published>2016-09-26T11:30:00-04:00</published>
-    <updated>2016-09-27T11:40:09-04:00</updated>
+    <updated>2017-01-13T14:36:45-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -482,7 +589,7 @@ the way you do with a submodule.&lt;/li&gt;
     <link rel="alternate" href="http://blog.url.com/2016/09/23/configuring-circle-ci.html.html"/>
     <id>http://blog.url.com/2016/09/23/configuring-circle-ci.html.html</id>
     <published>2016-09-23T11:30:00-04:00</published>
-    <updated>2016-09-23T17:12:02-04:00</updated>
+    <updated>2017-01-13T14:36:45-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -866,7 +973,7 @@ The test suite ran!   &lt;/p&gt;
     <link rel="alternate" href="http://blog.url.com/2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html"/>
     <id>http://blog.url.com/2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html</id>
     <published>2016-09-14T17:19:00-04:00</published>
-    <updated>2016-09-14T18:43:55-04:00</updated>
+    <updated>2017-01-13T14:36:45-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -1064,7 +1171,7 @@ one container running at the same time from the same image.&lt;/p&gt;
     <link rel="alternate" href="http://blog.url.com/2016/09/12/graylog-apache-docker-using-gelf.html"/>
     <id>http://blog.url.com/2016/09/12/graylog-apache-docker-using-gelf.html</id>
     <published>2016-09-12T04:24:00-04:00</published>
-    <updated>2016-09-12T18:25:59-04:00</updated>
+    <updated>2017-01-13T14:36:45-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -1192,43 +1299,6 @@ echo -e &amp;#39;{&amp;quot;version&amp;quot;: &amp;quot;1.1&amp;quot;,&amp;quot
     &lt;a href="../../../images/2016/Pasted_Image_9_12_16__8_18_AM.png"&gt;&lt;img src="../../../images/2016/Pasted_Image_9_12_16__8_18_AM.png" alt="Pasted image 9 12 16  8 18 am" /&gt;&lt;/a&gt;
   &lt;/div&gt;
 &lt;/div&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Github Organization and Project Pages under a single domain with Middleman</title>
-    <link rel="alternate" href="http://blog.url.com/2016/09/11/github-pages-organization-page-domain-name-on-middleman.html"/>
-    <id>http://blog.url.com/2016/09/11/github-pages-organization-page-domain-name-on-middleman.html</id>
-    <published>2016-09-11T15:50:00-04:00</published>
-    <updated>2016-09-12T18:21:10-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;I have my primary website &lt;a href="http://www.winstonkotzan.com/"&gt;winstonkotzan.com&lt;/a&gt; set up as a Github Pages organization
-page. The repo is &lt;a href="https://github.com/wakproductions/wakproductions.github.io"&gt;wakproductions.github.io&lt;/a&gt;. However,
-to start this blog I decided to create a new Middleman repo to keep all the code separate from my base website
-and give me more flexibility between managing the blog component and my other content. So I created a new
-repo called &lt;a href="https://github.com/wakproductions/blog"&gt;blog&lt;/a&gt; which would host all the content in the folder
-&lt;a href="http://www.winstonkotzan.com/blog"&gt;winstonkotzan.com/blog&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;So Github pages have two different flavors. It&amp;#39;s got &lt;em&gt;organization&lt;/em&gt; pages and &lt;em&gt;project&lt;/em&gt; pages. The &lt;em&gt;organization&lt;/em&gt;
-page goes to your root at &lt;em&gt;myusername.github.io&lt;/em&gt; while project pages show up at &lt;em&gt;myusername.github.io/project&lt;/em&gt;name&lt;em&gt;.
-So basically my domain name winstonkotzan.com points to my _organization&lt;/em&gt; page and my blog is just a statically
-generated &lt;em&gt;project&lt;/em&gt; page with the project name &amp;quot;blog&amp;quot;. One of the things I always found weird about how to upload
-your static HTML pages is that the &lt;em&gt;organization&lt;/em&gt; page requires the static public web pages to be in the &lt;em&gt;master&lt;/em&gt;
-github branch, but the &lt;em&gt;project&lt;/em&gt; pages require the static public web pages to be in a branch named &lt;em&gt;gh-pages&lt;/em&gt;.
-It&amp;#39;s weird becuase for my &lt;em&gt;organization&lt;/em&gt; page I have to put all the source code in a branch called &lt;em&gt;source&lt;/em&gt;, whereas
-most other repositories use &lt;em&gt;master&lt;/em&gt; for the main branch of source code. You can read the full docs on the 
-differences between organization and project pages 
-&lt;a href="https://help.github.com/articles/user-organization-and-project-pages/"&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Upon the first upload of my blog, I had this problem with the blog pages using the wrong style sheet. This is how my
-website looked:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="../../../images/2016/Screen_Shot_2016-09-11_at_3.01.42_PM.png" style="width: 700px" relative="true" alt="Screen shot 2016 09 11 at 3.01.42 pm" /&gt;&lt;/p&gt;
-
-&lt;p&gt;I was able to fix the problem by using the relative links identifiers in the page template.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="../../../images/2016/Pasted_Image_9_11_16__3_18_PM.png" style="width: 700px" relative="true" alt="Pasted image 9 11 16  3 18 pm" /&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>
