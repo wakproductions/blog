@@ -5,16 +5,186 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-01-12T01:30:00-05:00</updated>
+  <updated>2017-01-14T01:30:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Better Bulk Inserts in Rails</title>
+    <link rel="alternate" href="http://blog.url.com/2017/01/14/bulk-insert-in-rails-and-mysql.html"/>
+    <id>http://blog.url.com/2017/01/14/bulk-insert-in-rails-and-mysql.html</id>
+    <published>2017-01-14T01:30:00-05:00</published>
+    <updated>2017-01-14T23:46:42-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;One of the limitations of Rails is that it doesn&amp;#39;t do a true bulk insert. For example, let&amp;#39;s say you have a &lt;code&gt;MenuItem&lt;/code&gt;
+model and pass it an array of objects to create like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;items_to_create = [
+  {
+    name: &amp;#39;Sandwich&amp;#39;,
+    description: &amp;#39;Chips included&amp;#39;,
+    price: 10.00,
+  },
+  {
+    name: &amp;#39;Soup&amp;#39;,
+    description: &amp;#39;Cream of mushroom&amp;#39;,
+    price: 3.00    
+  },
+  {
+    name: &amp;#39;Salmon&amp;#39;,
+    description: &amp;#39;Pan seared&amp;#39;,
+    price: 17.00
+  },
+]
+
+MenuItem.create!(items_to_create)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When you call &lt;code&gt;MenuItem.create!&lt;/code&gt;, ActiveRecord will actually perform 3 separate INSERT queries on the database rather 
+than one bulk insert query. It will look something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="sql"&gt;INSERT INTO models (...) VALUES (...);
+INSERT INTO models (...) VALUES (...);
+INSERT INTO models (...) VALUES (...);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The problem with this approach is that it is inefficient - DB engines are much faster at peforming INSERT when fed the 
+data all at once. I&amp;#39;m working on a project that requires a huge manipulation of data and thus many DB queries. To make 
+it run faster I&amp;#39;ve tried to minimize the number of individual queries. One way that I was able to speed this up is to 
+build my own native bulk insert routine for ActiveRecord that works with MySQL. Here is the code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;# app/models/concerns/has_bulk_insert.rb
+
+module HasBulkInsert
+  extend ActiveSupport::Concern
+
+  included do
+  end
+
+  class_methods do
+    BI_IGNORE_COLUMNS=%w(id)
+
+    def bulk_insert(values_array)
+      return if values_array.empty?
+      ActiveRecord::Base.connection.execute bi_sql(values_array)
+    end
+
+    protected
+    def bi_column_definitions
+      self
+        .columns_hash
+        .map {|col,props| BI_IGNORE_COLUMNS.include?(col) ? nil : {col=&amp;gt;props.type} }
+        .compact
+        .reduce({}, :merge)
+    end
+
+    def bi_escaped_column_names
+      bi_column_definitions.reduce([]) { |m,(k,v)| m &amp;lt;&amp;lt; &amp;quot;`#{k}`&amp;quot; }.join(&amp;#39;,&amp;#39;)
+    end
+
+    def bi_sql(values_array)
+      &amp;lt;&amp;lt;SQL
+INSERT INTO #{self.table_name} (#{bi_escaped_column_names}) VALUES
+#{bi_convert_values_array(values_array)};
+SQL
+    end
+
+    def bi_convert_values_array(values_array)
+      values_array.map do |values_hash|
+        line_values = bi_column_definitions.reduce([]) do |line, (col,definition)|
+          vh = values_hash.stringify_keys
+
+          next line &amp;lt;&amp;lt; &amp;#39;NULL&amp;#39; if vh[col].nil? &amp;amp;&amp;amp; !is_timestamp_column?(col)
+
+          case definition
+            when :string, :text
+              if is_enum_column?(col)
+                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{enum_value(col, vh[col])}&amp;#39;&amp;quot;
+              else
+                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{vh[col].gsub(&amp;quot;&amp;#39;&amp;quot;, &amp;quot;&amp;#39;&amp;#39;&amp;quot;)}&amp;#39;&amp;quot;
+              end
+            when :date
+              line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{vh[col].strftime(&amp;#39;%Y-%m-%d&amp;#39;)}&amp;#39;&amp;quot;
+            when :datetime
+              if is_timestamp_column?(col)
+                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{Time.now.strftime(&amp;#39;%Y-%m-%d %H:%M:%S&amp;#39;)}&amp;#39;&amp;quot;
+              else
+                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{vh[col].strftime(&amp;#39;%Y-%m-%d&amp;#39;)}&amp;#39;&amp;quot;
+              end
+            when :integer
+              if vh[col].is_a? Integer
+                line &amp;lt;&amp;lt; vh[col].to_s
+              elsif vh[col].is_a?(String) &amp;amp;&amp;amp; is_enum_column?(col)
+                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{enum_value(col, vh[col])}&amp;#39;&amp;quot;
+              else
+                raise &amp;quot;Unable to interpret data for column #{col}\n#{vh}&amp;quot;
+              end
+            when :decimal, :boolean
+              line &amp;lt;&amp;lt; vh[col].to_s
+            else
+              raise &amp;quot;Unknown data column type: #{definition}&amp;quot;
+          end
+        end
+        .join(&amp;#39;,&amp;#39;)
+
+        &amp;quot;(#{line_values})&amp;quot;
+      end
+      .join(&amp;quot;,\n&amp;quot;)
+    end
+
+    def enum_value(column_name, enumeration_value)
+      self.send(column_name.pluralize)[enumeration_value]
+    end
+
+    def is_enum_column?(column_name)
+      self.defined_enums.include?(column_name)
+    end
+
+    def is_timestamp_column?(column_name)
+      %w(created_at updated_at).include?(column_name)
+    end
+  end
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To use this, all you have to do is include the module in your model like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;class MenuItem &amp;lt; ApplicationRecord
+  include HasBulkInsert
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now you can call the method:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;MenuItem.bulk_insert(items_to_create)  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The SQL query used by ActiveRecord will be consolidated to look more like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="sql"&gt;INSERT INTO models (...) VALUES
+  (...),
+  (...),
+  (...),
+  (...),
+  ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;One limitation of my code module at this point is that it does not support serialized fields, but it is excellent for
+basic tables and speeds things up tremendously - by about 50% in my local bench tests!&lt;/p&gt;
+
+&lt;h3&gt;Related Links&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href="http://stackoverflow.com/questions/1793169/which-is-faster-multiple-single-inserts-or-one-multiple-row-insert"&gt;StackOverflow: Which is faster: single inserts or one multiple row insert?&lt;/a&gt; &lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>AWS S3 Code Examples in Ruby (aws-sdk 2.0)</title>
     <link rel="alternate" href="http://blog.url.com/2017/01/12/s3-code-examples.html"/>
     <id>http://blog.url.com/2017/01/12/s3-code-examples.html</id>
     <published>2017-01-12T01:30:00-05:00</published>
-    <updated>2017-01-13T14:36:45-05:00</updated>
+    <updated>2017-01-14T23:46:42-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -121,7 +291,7 @@ file_contents = r.body.read
     <link rel="alternate" href="http://blog.url.com/2017/01/07/ruby-string-freeze-memory.html"/>
     <id>http://blog.url.com/2017/01/07/ruby-string-freeze-memory.html</id>
     <published>2017-01-07T01:30:00-05:00</published>
-    <updated>2017-01-13T14:36:45-05:00</updated>
+    <updated>2017-01-14T23:46:42-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -186,7 +356,7 @@ are fine to freeze because there is a finite number of them in my program.&lt;/p
     <link rel="alternate" href="http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html"/>
     <id>http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html</id>
     <published>2016-09-26T11:30:00-04:00</published>
-    <updated>2017-01-13T14:36:45-05:00</updated>
+    <updated>2017-01-14T23:46:42-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -589,7 +759,7 @@ the way you do with a submodule.&lt;/li&gt;
     <link rel="alternate" href="http://blog.url.com/2016/09/23/configuring-circle-ci.html.html"/>
     <id>http://blog.url.com/2016/09/23/configuring-circle-ci.html.html</id>
     <published>2016-09-23T11:30:00-04:00</published>
-    <updated>2017-01-13T14:36:45-05:00</updated>
+    <updated>2017-01-14T23:46:42-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -973,7 +1143,7 @@ The test suite ran!   &lt;/p&gt;
     <link rel="alternate" href="http://blog.url.com/2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html"/>
     <id>http://blog.url.com/2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html</id>
     <published>2016-09-14T17:19:00-04:00</published>
-    <updated>2017-01-13T14:36:45-05:00</updated>
+    <updated>2017-01-14T23:46:42-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -1164,141 +1334,6 @@ one container running at the same time from the same image.&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://robots.thoughtbot.com/rails-on-docker"&gt;Thoughtbot: Rails on Docker&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href="http://stackoverflow.com/questions/30494050/how-to-pass-environment-variables-to-docker-containers"&gt;Stackoverflow: How to pass environment variables to docker containers&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Feeding Apache log files to Graylog with Docker and apache-mod_log_gelf</title>
-    <link rel="alternate" href="http://blog.url.com/2016/09/12/graylog-apache-docker-using-gelf.html"/>
-    <id>http://blog.url.com/2016/09/12/graylog-apache-docker-using-gelf.html</id>
-    <published>2016-09-12T04:24:00-04:00</published>
-    <updated>2017-01-13T14:36:45-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Objective&lt;/strong&gt;: Configure a Graylog server to accept GELF-formatted logs from an Apache web server. Both servers
-will be running on Docker, although we will adapt the Apache Docker setup instructions to set up an existing
-(non-Docker) Apache server running on Ubuntu 14.04. The logs are going to be sent to the Graylog server using
-UDP port 12201.&lt;/p&gt;
-
-&lt;h3&gt;Docker Setup&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class="yaml"&gt;version: &amp;#39;2&amp;#39;
-services:
-  apache:
-    depends_on:
-      - graylog
-    image: &amp;quot;wakproductions/apache2-graylog-config&amp;quot;
-    volumes:
-      - ~/Development/graylog-local/install-demos/apache2/etc/apache2/mods-enabled/log_gelf.conf:/etc/apache2/mods-enabled/log_gelf.conf
-    ports:
-      - &amp;quot;3000:80&amp;quot;
-  mongo:
-    image: &amp;quot;mongo:3&amp;quot;
-    volumes:
-      - ~/Development/graylog-local/data/mongo:/data/db
-  elasticsearch:
-    image: &amp;quot;elasticsearch:2&amp;quot;
-    command: &amp;quot;elasticsearch -Des.cluster.name=&amp;#39;graylog&amp;#39;&amp;quot;
-    volumes:
-      - ~/Development/graylog-local/data/elasticsearch:/usr/share/elasticsearch/data
-  graylog:
-    image: &amp;quot;graylog2/server&amp;quot;
-    volumes:
-      - ~/Development/graylog-local/data/journal:/usr/share/graylog/data/journal
-      - ~/Development/graylog-local/config:/usr/share/graylog/data/config
-    environment:
-      # GRAYLOG_WEB_ENDPOINT_URI: &amp;quot;http://127.0.0.1:9000/api/&amp;quot; # didn&amp;#39;t like having this config here (tried looking for REST server at this address) - could be a bug
-      GRAYLOG_REST_TRANSPORT_URI: &amp;quot;http://127.0.0.1:12900&amp;quot;
-    depends_on:
-      - mongo
-      - elasticsearch
-    ports:
-      - &amp;quot;9000:9000&amp;quot;
-      - &amp;quot;12900:12900&amp;quot;
-      - &amp;quot;5555:5555&amp;quot;
-      - &amp;quot;12201:12201/udp&amp;quot;
-      - &amp;quot;12201:12201&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;docker-compose.yml&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;If using a preexisting Apache server, you could remove the &lt;code&gt;apache&lt;/code&gt; block and dependency from the file. You&amp;#39;ll just
-have to mirror the image setup instructions below to get the GELF module installed on your Apache server.&lt;/p&gt;
-
-&lt;h3&gt;Apache Docker Image Setup (wakproductions/apache2-graylog-config)&lt;/h3&gt;
-
-&lt;p&gt;For Apache to submit GELF logs to Graylog, there is a community-supported module named &lt;a href="https://github.com/Graylog2/apache-mod_log_gelf"&gt;apache-mod_log_gelf&lt;/a&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM webdevops/apache:ubuntu-14.04
-
-ENV WEB_DOCUMENT_INDEX index.html
-ADD app /app
-
-RUN apt-get update &amp;amp;&amp;amp; apt-get upgrade
-
-RUN a2dismod mpm_event
-RUN a2enmod mpm_prefork &amp;amp;&amp;amp; apt-get install libjson-c2 zlib1g
-
-RUN wget https://github.com/Graylog2/apache-mod_log_gelf/releases/download/0.2.0/libapache2-mod-gelf_0.2.0-1_amd64.ubuntu.deb
-RUN dpkg -i libapache2-mod-gelf_0.2.0-1_amd64.ubuntu.deb
-RUN a2enmod log_gelf &amp;amp;&amp;amp; restart apache
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Dockerfile&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;GelfEnabled On
-GelfUrl &amp;quot;udp://graylog:12201&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;/etc/apache2/mods-enabled/log_gelf.conf&lt;/strong&gt; &lt;a href="https://github.com/Graylog2/apache-mod_log_gelf#configuration"&gt;Reference&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4&gt;Troubleshooting &lt;code&gt;docker build&lt;/code&gt;&lt;/h4&gt;
-
-&lt;p&gt;&lt;strong&gt;ERROR: Module mpm_event is enabled - cannot proceed due to conflicts. It needs to be disabled first!&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;I found a clue to fixing this problem &lt;a href="http://askubuntu.com/questions/528866/apache-2-4-cannot-proceed-due-to-conflicts-with-module-mpm-prefork"&gt;here&lt;/a&gt;.
-It was resolved by disabling &lt;code&gt;mpm_event&lt;/code&gt; via the command &lt;code&gt;a2dismod mpm_event&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;dpkg: error processing archive libapache2-mod-gelf&lt;em&gt;0.1.0-1&lt;/em&gt;amd64.deb (--install):&lt;/strong&gt;
-  &lt;strong&gt;cannot access archive: No such file or directory&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;The instructions on the apache-mod_log_gelf page were misleading. I overlooked the part that read: &amp;quot;Download a package
-for your operating system from &lt;a href="https://github.com/Graylog2/apache-mod_log_gelf/releases"&gt;here&lt;/a&gt; Update Apache2 to the
-latests version and use mpm_prefork.&amp;quot;&lt;/p&gt;
-
-&lt;p&gt;To fix the error you have to follow that link and download the latest version of module into the working directory on
-the Apache server. So I added the following line:&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;RUN wget https://github.com/Graylog2/apache-mod_log_gelf/releases/download/0.2.0/libapache2-mod-gelf_0.2.0-1_amd64.ubuntu.deb&lt;/code&gt;&lt;/p&gt;
-
-&lt;h3&gt;Docker Networking Gotcha&lt;/h3&gt;
-
-&lt;h4&gt;Getting the Apache server to see the Graylog server&lt;/h4&gt;
-
-&lt;p&gt;It took me a while to figure out how to get the Apache server to talk to the Graylog server. Initially, I set the
-&lt;code&gt;GelfUrl &amp;quot;udp:127.0.0.1:12201&amp;quot;&lt;/code&gt; but the Graylog server was not receiving anything. The problem was that this was the
-equivalent to the Apache server trying to connect to itself on UDP 12201. You have to use the bridge network IP
-address of the Graylog server, or refer to it by the network hostname assigned by the Docker network. Each
-container has a hostname respective to the name you assign it in the &lt;code&gt;docker-compose.yml&lt;/code&gt; file.&lt;/p&gt;
-
-&lt;h3&gt;Useful Terminal Commands&lt;/h3&gt;
-
-&lt;p&gt;Build Apache server image:
-&lt;code&gt;docker build -t wakproductions/apache2-graylog-config .&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Send test message on port 5555 to Graylog (non-GELF) from Apache docker server
-&lt;code&gt;echo &amp;quot;hello from apache&amp;quot; | nc -vz graylog 5555&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Send GELF test message on port 12201 to Graylog from Apache docker server
-echo -e &amp;#39;{&amp;quot;version&amp;quot;: &amp;quot;1.1&amp;quot;,&amp;quot;host&amp;quot;:&amp;quot;example.org&amp;quot;,&amp;quot;short&lt;em&gt;message&amp;quot;:&amp;quot;Short message&amp;quot;,&amp;quot;full&lt;/em&gt;message&amp;quot;:&amp;quot;Backtrace here\n\nmore stuff&amp;quot;,&amp;quot;level&amp;quot;:1,&amp;quot;&lt;em&gt;user&lt;/em&gt;id&amp;quot;:9001,&amp;quot;&lt;em&gt;some&lt;/em&gt;info&amp;quot;:&amp;quot;foo&amp;quot;,&amp;quot;&lt;em&gt;some&lt;/em&gt;env_var&amp;quot;:&amp;quot;bar&amp;quot;}\0&amp;#39; | nc -u graylog 12201&lt;/p&gt;
-
-&lt;h3&gt;Sample Graylog Configuration&lt;/h3&gt;
-
-&lt;div class="image-box"&gt;
-  &lt;div class="image-box-content"&gt;
-    &lt;a href="../../../images/2016/Pasted_Image_9_12_16__8_18_AM.png"&gt;&lt;img src="../../../images/2016/Pasted_Image_9_12_16__8_18_AM.png" alt="Pasted image 9 12 16  8 18 am" /&gt;&lt;/a&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
 </content>
   </entry>
 </feed>
