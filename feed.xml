@@ -5,10 +5,75 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-01-14T01:30:00-05:00</updated>
+  <updated>2017-02-16T01:30:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Pretty Print a Really Big Hash in Ruby</title>
+    <link rel="alternate" href="http://blog.url.com/2017/02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html"/>
+    <id>http://blog.url.com/2017/02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html</id>
+    <published>2017-02-16T01:30:00-05:00</published>
+    <updated>2017-02-16T13:00:57-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h2&gt;Problem: Copy and paste a really big Ruby object so that it&amp;#39;s human readable&lt;/h2&gt;
+
+&lt;p&gt;Today I was building a fixture in one of my RSpec tests which consisted of a really big hash. It looked something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;really_big_hash =     {:Profile=&amp;gt;
+                         {:CharterNumber=&amp;gt;&amp;quot;68448&amp;quot;,
+                          :CreditUnionId=&amp;gt;&amp;quot;14241&amp;quot;,
+                          :CreditUnionName=&amp;gt;&amp;quot;CITIZENS EQUITY FIRST&amp;quot;,
+                          :CycleDate=&amp;gt;&amp;quot;12/31/2015&amp;quot;,
+                          :CreditUnionTypeID=&amp;gt;&amp;quot;FISCU&amp;quot;,
+                          :Region=&amp;gt;&amp;quot;4&amp;quot;,
+                          :CreditUnionStatus=&amp;gt;&amp;quot;Active&amp;quot;,
+                          :DateChartered=&amp;gt;&amp;quot;2000&amp;quot;,
+                          :DateInsured=&amp;gt;&amp;quot;1/2/1975&amp;quot;,
+                          :CharterStateCode=&amp;gt;&amp;quot;Illinois&amp;quot;,
+                          :TOM_CODE=&amp;gt;&amp;quot;99&amp;quot;,
+                          :State=&amp;gt;&amp;quot;IL&amp;quot;,
+                          :Acct_896=&amp;gt;&amp;quot;1&amp;quot;,
+                          :PeerGroup=&amp;gt;&amp;quot;6 - $500,000,000 and greater&amp;quot;,
+                          :Assets=&amp;gt;&amp;quot;5174819725&amp;quot;,
+                          :NumberOfMembers=&amp;gt;&amp;quot;312929&amp;quot;,
+                          :IsLowIncome=&amp;gt;&amp;quot;No&amp;quot;,
+                          :CertificationDate=&amp;gt;&amp;quot;1/22/2016 10:46:28 AM&amp;quot;,
+                          :HasWebSite=&amp;gt;&amp;quot;Yes&amp;quot;,
+                           ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When I tried to copy this fixture into my test file, I initially did this in console:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;require &amp;#39;clipboard&amp;#39; # use the Clipboard gem
+Clipboard.copy(really_big_hash)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The problem was that when I pasted the text it all ended up on one line like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;{:Profile=&amp;gt;{:CharterNumber=&amp;gt;&amp;quot;68448&amp;quot;, :CreditUnionId=&amp;gt;&amp;quot;14241&amp;quot;, :CreditUnionName=&amp;gt;&amp;quot;CITIZENS EQUITY FIRST&amp;quot;, :CycleDate=&amp;gt;...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Solution: Ruby&amp;#39;s &amp;#39;pp&amp;#39; module&lt;/h2&gt;
+
+&lt;p&gt;I discovered that the Ruby &amp;#39;pp&amp;#39; module could be used to format a Hash as a multiline output and I could capture the
+output. Here&amp;#39;s what I did:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="ruby"&gt;require &amp;#39;pp&amp;#39;
+cap = StringIO.new
+$stdout = cap
+pp(r)
+$stdout = STDOUT
+
+Clipboard.copy(cap.string)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I was then able to paste my Hash as a more human-readable multi-line string. Note that because &lt;code&gt;pp&lt;/code&gt; prints to screen
+by default, I had to reroute &lt;code&gt;$stdout&lt;/code&gt; temporarily to capture the output via a &lt;code&gt;StringIO&lt;/code&gt; object.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Better Bulk Inserts in Rails</title>
     <link rel="alternate" href="http://blog.url.com/2017/01/14/bulk-insert-in-rails-and-mysql.html"/>
@@ -1136,204 +1201,6 @@ system. As mentioned above, when I initially set up my local environment, I was 
 to get my database up and running. This lacked the migration numbers. I pulled the data from the &lt;code&gt;schema_migrations&lt;/code&gt;
 table from another environment, rebuilt &lt;code&gt;structure.sql&lt;/code&gt; using &lt;code&gt;rake db:migrate&lt;/code&gt;, and pushed out the changes.
 The test suite ran!   &lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Getting your Ruby on Rails application code into Docker</title>
-    <link rel="alternate" href="http://blog.url.com/2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html"/>
-    <id>http://blog.url.com/2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html</id>
-    <published>2016-09-14T17:19:00-04:00</published>
-    <updated>2017-01-14T23:46:42-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Objective:&lt;/strong&gt; Get a Rails API app Docker-ready so that it can be run via a Docker container.&lt;/p&gt;
-
-&lt;p&gt;This week I had to build a Rails API microservice that relays custom error messages to Honeybadger. It&amp;#39;s a
-self-contained Rails API application, no database, and only one route that accepts inputs, performs some
-reformatting, and passes it on to the Honeybadger system. Here is how I got it running in its own Docker container.&lt;/p&gt;
-
-&lt;h4&gt;1. Put a &lt;code&gt;Dockerfile&lt;/code&gt; in the project base directory.&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;# Pull the Ruby base image from Dockerhub
-FROM ruby:2.3.1
-RUN apt-get update
-
-# This is where you are going to put your application code,
-# transferring it from the project directory into the Docker image
-RUN mkdir /app
-WORKDIR /app
-
-# Pull all the dependencies from Rubygems
-ADD Gemfile /app/Gemfile
-ADD Gemfile.lock /app/Gemfile.lock
-RUN bundle install
-
-# This line pulls the application code from the project folder and puts it into the Docker image
-ADD . /app
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;/Dockerfile&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;Docker images are kind of like Virtual Machine images, but not. I think of them more as a lightweight virtual machine
-that the Docker team has slimmed down by removing a lot of the bells and whistles that come in a full OS. If you look
-at the Dockerfiles of most repositories on Dockerhub, they are all just descendants of a few base systems. For example,
-looking at the &lt;a href="https://github.com/docker-library/ruby/blob/2d6449f03976ededa14be5cac1e9e070b74e4de4/2.3/Dockerfile"&gt;Ruby 2.3 Dockerfile&lt;/a&gt;
-you will see that it&amp;#39;s built on another Docker image called &lt;a href="https://hub.docker.com/_/buildpack-deps/"&gt;buildpack-deps/jessie&lt;/a&gt;,
-which several layers deeper pulls from the &lt;code&gt;debian:jessie&lt;/code&gt; base image. In this project, we are taking the &lt;code&gt;ruby:2.3.1&lt;/code&gt;
-prepackaged image from Dockerhub and adding another layer of configuration to it.&lt;/p&gt;
-
-&lt;h4&gt;2. Make a &lt;code&gt;docker-compose.yml&lt;/code&gt; file to more easily run the application.&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;version: &amp;#39;2&amp;#39;
-services:
-  web:
-    build: .
-    command: bundle exec rails s -p 3000 -b &amp;#39;0.0.0.0&amp;#39;
-    environment:
-      - HONEYBADGER_API_KEY=${HONEYBADGER_API_KEY}
-    ports:
-      - &amp;quot;3000:3000&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;/docker-compose.yml&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;It can take some tedious command line options to run a Docker image the way you want it. To simplify that work there&amp;#39;s
-&lt;code&gt;docker-compose&lt;/code&gt;. So in this file I have the configuration for running the application saved so that I don&amp;#39;t have to
-specify it every time on the command line. It tells Docker which command to run that will start the Rails server,
-maps my ports from the host machine to the container, and set the environment variables.&lt;/p&gt;
-
-&lt;p&gt;Notice that I can pull an environment variable from the host machine by using the &lt;code&gt;${*environment_variable_name*}&lt;/code&gt;
-format for the value. This is good practice because I can keep the API key a secret - it won&amp;#39;t accidentally be committed anywhere on Github where
-a malicious person can steal it. I can also change the API key on the server without having to modify any code.&lt;/p&gt;
-
-&lt;p&gt;If I had the need for additional dependencies such as a postgres database, I could specify them here in the compose
-file.&lt;/p&gt;
-
-&lt;h4&gt;3. Run the application&lt;/h4&gt;
-
-&lt;p&gt;At the command line all you have to do is:
-&lt;code&gt;$ docker-compose up -d&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;It will automatically build the image and run the container. The &lt;code&gt;-d&lt;/code&gt; flag has it run in the background so that
-I can have the command line back. But if you ran it without the &lt;code&gt;-d&lt;/code&gt; flag, this is what the output should look like:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker-compose up
-Building web
-Step 1 : FROM ruby:2.3.1
- ---&amp;gt; 8576862d3442
-Step 2 : RUN apt-get update
- ---&amp;gt; Running in 6602693ad6bc
-Get:1 http://security.debian.org jessie/updates InRelease [63.1 kB]
-Get:2 http://security.debian.org jessie/updates/main amd64 Packages [389 kB]
-Ign http://httpredir.debian.org jessie InRelease
-Get:3 http://httpredir.debian.org jessie-updates InRelease [142 kB]
-Get:4 http://httpredir.debian.org jessie-updates/main amd64 Packages [17.6 kB]
-Get:5 http://httpredir.debian.org jessie Release.gpg [2373 B]
-Get:6 http://httpredir.debian.org jessie Release [148 kB]
-Get:7 http://httpredir.debian.org jessie/main amd64 Packages [9032 kB]
-Fetched 9795 kB in 9s (1079 kB/s)
-Reading package lists...
- ---&amp;gt; 1f578850fdb9
-Removing intermediate container 6602693ad6bc
-Step 3 : RUN mkdir /app
- ---&amp;gt; Running in 61f9bf5d0951
- ---&amp;gt; 4c32b4640e6a
-Removing intermediate container 61f9bf5d0951
-Step 4 : WORKDIR /app
- ---&amp;gt; Running in bdf44232fda8
- ---&amp;gt; 60c1a7381154
-Removing intermediate container bdf44232fda8
-Step 5 : ADD Gemfile /app/Gemfile
- ---&amp;gt; 1c6ff0d80fb7
-Removing intermediate container 33c8bfdbdafb
-Step 6 : ADD Gemfile.lock /app/Gemfile.lock
- ---&amp;gt; aa82e7727c4d
-Removing intermediate container c6d328043b8b
-Step 7 : RUN bundle install
- ---&amp;gt; Running in e8509116977f
-Fetching gem metadata from https://rubygems.org/.........
-Fetching version metadata from https://rubygems.org/..
-Fetching dependency metadata from https://rubygems.org/.
-Installing rake 11.2.2
-
-  &amp;lt;omitted for brevity&amp;gt;
-
-Bundle complete! 9 Gemfile dependencies, 58 gems now installed.
-Bundled gems are installed into /usr/local/bundle.
- ---&amp;gt; 2d36ee11a6f5
-Removing intermediate container e8509116977f
-Step 8 : ADD . /app
- ---&amp;gt; 0d686b7bf04e
-Removing intermediate container 5d323b8c0044
-Successfully built 0d686b7bf04e
-WARNING: Image for service web was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
-Creating honeybadgernotifier_web_1
-Attaching to honeybadgernotifier_web_1
-web_1  | =&amp;gt; Booting Puma
-web_1  | =&amp;gt; Rails 5.0.0.1 application starting in development on http://0.0.0.0:3000
-web_1  | =&amp;gt; Run `rails server -h` for more startup options
-web_1  | Puma starting in single mode...
-web_1  | * Version 3.6.0 (ruby 2.3.1-p112), codename: Sleepy Sunday Serenity
-web_1  | * Min threads: 5, max threads: 5
-web_1  | * Environment: development
-web_1  | * Listening on tcp://0.0.0.0:3000
-web_1  | Use Ctrl-C to stop
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4&gt;4. Checking that the tests work&lt;/h4&gt;
-
-&lt;p&gt;I can now console into the running docker container to double check that the test suite passes. First, I open
-a bash console with &lt;code&gt;docker exec -i -t honeybadgernotifier_web_1 /bin/bash&lt;/code&gt; and then I can do whatever I want
-from inside that docker container as if I was logged onto that machine. So once I&amp;#39;m in I run the &lt;code&gt;rspec&lt;/code&gt; command:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker exec -i -t honeybadgernotifier_web_1 /bin/bash
-Error response from daemon: Container c860eda8947a817c1743ebac9fa3fa282efca41c3ed31e639a41235e2266a11b is not running
-$ rspec
-
-Notification API
-  POST /api/v1/notification
-DEPRECATION WARNING: ActionDispatch::IntegrationTest HTTP request methods will accept only
-the following keyword arguments in future Rails versions:
-params, headers, env, xhr, as
-
-Examples:
-
-get &amp;#39;/profile&amp;#39;,
-  params: { id: 1 },
-  headers: { &amp;#39;X-Extra-Header&amp;#39; =&amp;gt; &amp;#39;123&amp;#39; },
-  env: { &amp;#39;action_dispatch.custom&amp;#39; =&amp;gt; &amp;#39;custom&amp;#39; },
-  xhr: true,
-  as: :json
- (called from api_post at /Users/wkotzan/Development/honeybadger_notifier/spec/helpers/api_helper.rb:7)
-    relays the message to Honeybadger
-
-HoneybadgerNotifier::Notify
-  forward the data through the Honeybadger API gem
-  Honeybadger API key configuration
-    should not be nil
-
-Finished in 0.30018 seconds (files took 1.08 seconds to load)
-3 examples, 0 failures
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Tests are passing!&lt;/p&gt;
-
-&lt;h2&gt;Terminology Tip&lt;/h2&gt;
-
-&lt;p&gt;Don&amp;#39;t forget - A Docker &lt;strong&gt;image&lt;/strong&gt; is like a virtual machine that&amp;#39;s not running. It&amp;#39;s like a computer
-hard drive with all the software and configuration in it. A &lt;strong&gt;container&lt;/strong&gt; is a running image. You can have more than
-one container running at the same time from the same image.&lt;/p&gt;
-
-&lt;h2&gt;Additional Resources&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href="https://docs.docker.com/compose/rails/"&gt;Docker official: Docker Compose and Rails Quickstart&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="https://docs.docker.com/engine/reference/commandline/run/#/set-environment-variables-e-env-env-file"&gt;Docker official: setting environment variables&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="https://robots.thoughtbot.com/rails-on-docker"&gt;Thoughtbot: Rails on Docker&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://stackoverflow.com/questions/30494050/how-to-pass-environment-variables-to-docker-containers"&gt;Stackoverflow: How to pass environment variables to docker containers&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>
