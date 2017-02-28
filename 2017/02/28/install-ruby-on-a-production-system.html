@@ -1,0 +1,102 @@
+<!--<html>-->
+<!--<head>-->
+<!--</head>-->
+<!--<body>-->
+<!--hello world-->
+<!--<%= yield %>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta charset='utf-8'>
+    <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
+    <title>How to Install Ruby on a Production System with Ansible</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+    <link href="../../../stylesheets/site.css" rel="stylesheet" />
+    <script src="../../../javascripts/all.js"></script>
+    <script src="../../../javascripts/jquery-2.2.3.min.js"></script>
+    
+    
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-46648633-1', 'winstonkotzan.com');
+        ga('send', 'pageview');
+    </script>
+  </head>
+  <body class='x2017 x2017_02 x2017_02_28 x2017_02_28_install-ruby-on-a-production-system'>
+    <div class='jumbotron'>
+      <div class='container'>
+        <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
+          <div class='content'>
+            <a href="/blog/">Winston Kotzan's Technology Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container content'>
+      <div class='col-md-8'>
+        <div class='main article-content' role='main'>
+          <h2 class='article-title'>How to Install Ruby on a Production System with Ansible</h2>
+          <div class='article-date'>02/28/2017</div>
+          <div class='article-body'>
+            <p>I recently had to set up a production server to run Ruby. Surprisingly there are many opinions on how to do it. Some
+            people use RVM or RBenv, but I&#39;ve been told by other people who have tried that that in a production system the system
+            hacks those package managers use to get the magic to work can have unintended side effects. For example, RVM&#39;s override
+            of the shell causes problems when trying to use Ruby with UNIX cron jobs.</p>
+            
+            <p>Doing the build-from-scratch install of system Ruby seems to be the best option for setting up a production server.
+            <a href="http://robmclarty.com/blog/how-to-setup-a-production-server-for-rails-4">I found this useful blog article</a>, which I&#39;m reposting an excerpt here in case it ever disappears from the Internet. The setup
+            process should be largely the same for any other versions of Ruby.</p>
+            
+            <h3>Excerpt from robmclarty.com</h3>
+            
+            <p>I wanted to setup the bleeding edge on this server, so I went with a source code install process for Ruby rather than a pre-existing package. I installed Ruby 2.0 and Rails 4.beta. What I usually do to keep track of my source-code-installed components is create a src directory in my user&#39;s home folder inside which I store all my source code folders for compilation, installation, and later, any uninstallation I might need to do.</p>
+            
+            <p>But before that, I needed to install a few more dependencies so my server environment was ready for it.</p>
+            
+            <pre><code>sudo apt-get install build-essential libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion&#x000A;Next, inside /home/bill/src and got the latest Ruby, decompressed it, configured, compiled, and installed.&#x000A;&#x000A;wget ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p0.tar.gz&#x000A;tar xzvf ruby-2.0.0-p0.tar.gz&#x000A;cd ruby-2.0.0-p0&#x000A;./configure&#x000A;make&#x000A;sudo make install&#x000A;</code></pre>
+            
+            <p>Next, I made a symbolic link from /usr/local/bin/ruby to /usr/bin/ruby because some programs look for it there.</p>
+            
+            <pre><code>sudo ln -s /usr/local/bin/ruby /usr/bin/ruby&#x000A;The newer Rubies come with rubygems so you don&#39;t need to worry about installing that separately anymore. But before installing any new gems (like Rails) it&#39;s always a good idea to make sure it&#39;s up to date.&#x000A;&#x000A;sudo gem update --system&#x000A;Finally, now that there was a convenient beta1 branch for the Rails gem, all I needed to do was install the latest Rails was the following.&#x000A;&#x000A;sudo gem install rails --version 4.0.0.beta1&#x000A;</code></pre>
+            
+            <p>I encountered some weird issues with rdoc and ri where I had to answer &quot;yes&quot; to overwrite the existing versions. I just went with it since this is a dedicated server and I care more about the app working than some documentation that isn&#39;t necessary for me in production. I&#39;m sure this will be fixed in the final release.</p>
+            
+            <p>Update: @kaspergrubbe gave me a great little tweak so you don&#39;t need to specify --no-ri --no-rdoc every time you install a gem in production: just add gem: --no-rdoc --no-ri to ~/.gemrc (create that file if it doesn&#39;t already exist) and don&#39;t worry about ri or rdoc again in production.</p>
+            
+            <h1>Throw in some Ansible</h1>
+            
+            <p>I automated these steps using Ansible to install Ruby 2.3.3 on my system. <a href="https://github.com/wakproductions/ansible-examples/blob/master/roles/web/tasks/install_ruby233.yml">Here&#39;s the playbook.</a></p>
+          </div>
+        </div>
+      </div>
+      <div class='col-md-4'>
+        <aside>
+          <h2>Recent Articles</h2>
+          <ol>
+            <li><a href="install-ruby-on-a-production-system.html">How to Install Ruby on a Production System with Ansible</a> <span>Feb 28</span></li>
+            <li><a href="../16/pretty-print-a-really-big-hash-to-string-in-ruby.html">Pretty Print a Really Big Hash in Ruby</a> <span>Feb 16</span></li>
+            <li><a href="../../01/14/bulk-insert-in-rails-and-mysql.html">Better Bulk Inserts in Rails</a> <span>Jan 14</span></li>
+            <li><a href="../../01/12/s3-code-examples.html">AWS S3 Code Examples in Ruby (aws-sdk 2.0)</a> <span>Jan 12</span></li>
+            <li><a href="../../01/07/ruby-string-freeze-memory.html">Ruby - Don't Freeze User-Defined Strings!</a> <span>Jan  7</span></li>
+            <li><a href="../../../2016/09/26/git-submodule-vs-subtree.html">Git Submodule vs. Subtree</a> <span>Sep 26</span></li>
+            <li><a href="../../../2016/09/23/configuring-circle-ci.html.html">Configuring Circle-CI for the First Time</a> <span>Sep 23</span></li>
+            <li><a href="../../../2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html">Getting your Ruby on Rails application code into Docker</a> <span>Sep 14</span></li>
+            <li><a href="../../../2016/09/12/graylog-apache-docker-using-gelf.html">Feeding Apache log files to Graylog with Docker and apache-mod_log_gelf</a> <span>Sep 12</span></li>
+            <li><a href="../../../2016/09/11/github-pages-organization-page-domain-name-on-middleman.html">Github Organization and Project Pages under a single domain with Middleman</a> <span>Sep 11</span></li>
+          </ol>
+          <h2>By Year</h2>
+          <ol>
+            <li><a href="../../../2017.html">2017 (5)</a></li>
+            <li><a href="../../../2016.html">2016 (7)</a></li>
+          </ol>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>

@@ -5,10 +5,65 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-02-16T01:30:00-05:00</updated>
+  <updated>2017-02-28T01:30:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>How to Install Ruby on a Production System with Ansible</title>
+    <link rel="alternate" href="http://blog.url.com/2017/02/28/install-ruby-on-a-production-system.html"/>
+    <id>http://blog.url.com/2017/02/28/install-ruby-on-a-production-system.html</id>
+    <published>2017-02-28T01:30:00-05:00</published>
+    <updated>2017-02-28T09:58:22-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;I recently had to set up a production server to run Ruby. Surprisingly there are many opinions on how to do it. Some
+people use RVM or RBenv, but I&amp;#39;ve been told by other people who have tried that that in a production system the system
+hacks those package managers use to get the magic to work can have unintended side effects. For example, RVM&amp;#39;s override
+of the shell causes problems when trying to use Ruby with UNIX cron jobs.&lt;/p&gt;
+
+&lt;p&gt;Doing the build-from-scratch install of system Ruby seems to be the best option for setting up a production server.
+&lt;a href="http://robmclarty.com/blog/how-to-setup-a-production-server-for-rails-4"&gt;I found this useful blog article&lt;/a&gt;, which I&amp;#39;m reposting an excerpt here in case it ever disappears from the Internet. The setup
+process should be largely the same for any other versions of Ruby.&lt;/p&gt;
+
+&lt;h3&gt;Excerpt from robmclarty.com&lt;/h3&gt;
+
+&lt;p&gt;I wanted to setup the bleeding edge on this server, so I went with a source code install process for Ruby rather than a pre-existing package. I installed Ruby 2.0 and Rails 4.beta. What I usually do to keep track of my source-code-installed components is create a src directory in my user&amp;#39;s home folder inside which I store all my source code folders for compilation, installation, and later, any uninstallation I might need to do.&lt;/p&gt;
+
+&lt;p&gt;But before that, I needed to install a few more dependencies so my server environment was ready for it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo apt-get install build-essential libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion
+Next, inside /home/bill/src and got the latest Ruby, decompressed it, configured, compiled, and installed.
+
+wget ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p0.tar.gz
+tar xzvf ruby-2.0.0-p0.tar.gz
+cd ruby-2.0.0-p0
+./configure
+make
+sudo make install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Next, I made a symbolic link from /usr/local/bin/ruby to /usr/bin/ruby because some programs look for it there.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo ln -s /usr/local/bin/ruby /usr/bin/ruby
+The newer Rubies come with rubygems so you don&amp;#39;t need to worry about installing that separately anymore. But before installing any new gems (like Rails) it&amp;#39;s always a good idea to make sure it&amp;#39;s up to date.
+
+sudo gem update --system
+Finally, now that there was a convenient beta1 branch for the Rails gem, all I needed to do was install the latest Rails was the following.
+
+sudo gem install rails --version 4.0.0.beta1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I encountered some weird issues with rdoc and ri where I had to answer &amp;quot;yes&amp;quot; to overwrite the existing versions. I just went with it since this is a dedicated server and I care more about the app working than some documentation that isn&amp;#39;t necessary for me in production. I&amp;#39;m sure this will be fixed in the final release.&lt;/p&gt;
+
+&lt;p&gt;Update: @kaspergrubbe gave me a great little tweak so you don&amp;#39;t need to specify --no-ri --no-rdoc every time you install a gem in production: just add gem: --no-rdoc --no-ri to ~/.gemrc (create that file if it doesn&amp;#39;t already exist) and don&amp;#39;t worry about ri or rdoc again in production.&lt;/p&gt;
+
+&lt;h1&gt;Throw in some Ansible&lt;/h1&gt;
+
+&lt;p&gt;I automated these steps using Ansible to install Ruby 2.3.3 on my system. &lt;a href="https://github.com/wakproductions/ansible-examples/blob/master/roles/web/tasks/install_ruby233.yml"&gt;Here&amp;#39;s the playbook.&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Pretty Print a Really Big Hash in Ruby</title>
     <link rel="alternate" href="http://blog.url.com/2017/02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html"/>
@@ -817,390 +872,6 @@ the way you do with a submodule.&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec#.zias44kio"&gt;Mastering Git Subtrees (excellent resource)&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://blogs.atlassian.com/2013/05/alternatives-to-git-submodule-git-subtree/"&gt;Atlassian Subtree Guide&lt;/a&gt;&lt;br&gt;&lt;/li&gt;
 &lt;/ul&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Configuring Circle-CI for the First Time</title>
-    <link rel="alternate" href="http://blog.url.com/2016/09/23/configuring-circle-ci.html.html"/>
-    <id>http://blog.url.com/2016/09/23/configuring-circle-ci.html.html</id>
-    <published>2016-09-23T11:30:00-04:00</published>
-    <updated>2017-01-14T23:46:42-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;I&amp;#39;m setting up CI for my employer using Circle-CI. Here are some of the issues I&amp;#39;m running into.&lt;/p&gt;
-
-&lt;p&gt;1. &lt;code&gt;bundle install&lt;/code&gt; fails.&lt;/p&gt;
-
-&lt;p&gt;On the first run, we got the following error message:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
-ruby-2.3.1 - #gemset created /opt/circleci/.rvm/gems/ruby-2.3.1@banks
-ruby-2.3.1 - #generating banks wrappers|�/�-�\�|�/�-�\�|�.-�\�|�/�-�\�|�/�-�.|�/�-�\�|�/�-�\�|�.-�\�|�/�-�\�|�/�-�.|�/�-�\�|�/�-�\�|�.-�\�|�/�-�\�|�/�-�.|�/�-�\�|�/�-�\�|�.-�\�|�/�-�\�|�/�-�.|�/�-�\�|�/�-�\�|�.-�\�|�/�-�\�|�/�-�.|�/�-�\�|�/�-�\�|�.-�\�|�/�-�\�|�/�-�.|�/�-�\�|�/�-�\�|�.-�\�|�/�-�\�|�/�-�.|�/�-�\�|�/�-�\�|�.-�\�|�/�-�\�|�/�-�..
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/rubygems/dependency.rb:319:in `to_specs&amp;#39;: Could not find &amp;#39;bundler&amp;#39; (&amp;gt;= 0.a) among 6 total gem(s) (Gem::LoadError)
-Checked in &amp;#39;GEM_PATH=/opt/circleci/.rvm/gems/ruby-2.3.1@banks:/opt/circleci/.rvm/gems/ruby-2.3.1@global&amp;#39;, execute `gem env` for more information
-    from /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/rubygems/dependency.rb:328:in `to_spec&amp;#39;
-    from /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/rubygems/core_ext/kernel_gem.rb:65:in `gem&amp;#39;
-    from /opt/circleci/.rvm/rubies/ruby-2.3.1/bin/bundle:22:in `&amp;lt;main&amp;gt;&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/rubygems/dependency.rb:319:in `to_specs&amp;#39;: Could not find &amp;#39;bundler&amp;#39; (&amp;gt;= 0.a) among 6 total gem(s) (Gem::LoadError)
-Checked in &amp;#39;GEM_PATH=/opt/circleci/.rvm/gems/ruby-2.3.1@banks:/opt/circleci/.rvm/gems/ruby-2.3.1@global&amp;#39;, execute `gem env` for more information
-    from /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/rubygems/dependency.rb:328:in `to_spec&amp;#39;
-    from /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/rubygems/core_ext/kernel_gem.rb:65:in `gem&amp;#39;
-    from /opt/circleci/.rvm/rubies/ruby-2.3.1/bin/bundle:22:in `&amp;lt;main&amp;gt;&amp;#39;
-
-bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3  returned exit code 1
-
-Action failed: bundle install
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The important line is here:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/rubygems/dependency.rb:319:in `to_specs&amp;#39;: Could not find &amp;#39;bundler&amp;#39; (&amp;gt;= 0.a) among 6 total gem(s) (Gem::LoadError)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Unfortunately, CI platforms don&amp;#39;t always run out of the box very well. You need to tell Circle-CI some basic
-setup instructions like to first install bundler. So the remedy for this issue was to create a &lt;code&gt;circle.yml&lt;/code&gt; file
-in my project root that looks like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;  general:
-    branches:
-      ignore:
-        - /^deploy-.*/ # list of branches to ignore
-  dependencies:
-    pre:
-      - gem install bundler -v 1.13.1
-  test:
-    override:
-      - bundle exec rspec
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Note the &lt;code&gt;dependencies&lt;/code&gt; section which runs the command to install bundler first. After this change, bundle install
-ran correctly.&lt;/p&gt;
-
-&lt;p&gt;2. Loading of the database schema fails (fail at &lt;code&gt;rake db:create db:schema:load ts:configure ts:index ts:start&lt;/code&gt;)&lt;/p&gt;
-
-&lt;p&gt;So the bundle was fixed. Now I was getting a new error:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;export RAILS_ENV=&amp;quot;test&amp;quot;
-export RACK_ENV=&amp;quot;test&amp;quot;
-bundle exec rake db:create db:schema:load ts:configure ts:index ts:start --trace
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-in LoadError rescue statement
-** Invoke db:create (first_time)
-** Invoke db:load_config (first_time)
-** Execute db:load_config
-** Execute db:create
-** Invoke db:schema:load (first_time)
-** Invoke environment (first_time)
-** Execute environment
-DEPRECATION WARNING: The configuration option `config.serve_static_assets` has been renamed to `config.serve_static_files` to clarify its role (it merely enables serving everything in the `public` folder and is unrelated to the asset pipeline). The `serve_static_assets` alias will be removed in Rails 5.0. Please migrate your configuration files accordingly. (called from block in &amp;lt;top (required)&amp;gt; at /home/ubuntu/banks/config/environments/test.rb:16)
-DEPRECATION WARNING: Currently, Active Record suppresses errors raised within `after_rollback`/`after_commit` callbacks and only print them to the logs. In the next version, these errors will no longer be suppressed. Instead, the errors will propagate normally just like in other Active Record callbacks.
-
-You can opt into the new behavior and remove this warning by setting:
-
-  config.active_record.raise_in_transactional_callbacks = true
-
- (called from block in tsort_each at /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:228)
-rake aborted!
-ActiveRecord::StatementInvalid: Mysql2::Error: Table &amp;#39;circle_ruby_test.bank_details&amp;#39; doesn&amp;#39;t exist: SHOW FULL FIELDS FROM `bank_details`
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/mysql2-0.4.4/lib/mysql2/client.rb:107:in `_query&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/mysql2-0.4.4/lib/mysql2/client.rb:107:in `block in query&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/mysql2-0.4.4/lib/mysql2/client.rb:106:in `handle_interrupt&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/mysql2-0.4.4/lib/mysql2/client.rb:106:in `query&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_mysql_adapter.rb:309:in `block in execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_adapter.rb:484:in `block in log&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/notifications/instrumenter.rb:20:in `instrument&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_adapter.rb:478:in `log&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_mysql_adapter.rb:309:in `execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/mysql2_adapter.rb:231:in `execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_mysql_adapter.rb:316:in `execute_and_free&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_mysql_adapter.rb:463:in `columns&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/schema_cache.rb:43:in `columns&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/attributes.rb:93:in `columns&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/model_schema.rb:260:in `column_names&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:232:in `aggregate_column&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:258:in `execute_simple_calculation&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:227:in `perform_calculation&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:133:in `calculate&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:80:in `maximum&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/querying.rb:13:in `maximum&amp;#39;
-/home/ubuntu/banks/config/initializers/constants.rb:9:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:268:in `load&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:268:in `block in load&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:240:in `load_dependency&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:268:in `load&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:652:in `block in load_config_initializer&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/notifications.rb:166:in `instrument&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:651:in `load_config_initializer&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:616:in `block (2 levels) in &amp;lt;class:Engine&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:615:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:615:in `block in &amp;lt;class:Engine&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:30:in `instance_exec&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:30:in `run&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:55:in `block in run_initializers&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:228:in `block in tsort_each&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:350:in `block (2 levels) in each_strongly_connected_component&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:422:in `block (2 levels) in each_strongly_connected_component_from&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:431:in `each_strongly_connected_component_from&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:421:in `block in each_strongly_connected_component_from&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:44:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:44:in `tsort_each_child&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:415:in `call&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:415:in `each_strongly_connected_component_from&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:349:in `block in each_strongly_connected_component&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:347:in `each&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:347:in `call&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:347:in `each_strongly_connected_component&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:226:in `tsort_each&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:205:in `tsort_each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:54:in `run_initializers&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/application.rb:352:in `initialize!&amp;#39;
-/home/ubuntu/banks/config/environment.rb:5:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:274:in `require&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:274:in `block in require&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:240:in `load_dependency&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:274:in `require&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/application.rb:328:in `require_environment!&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/application.rb:457:in `block in run_tasks_blocks&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:248:in `block in execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:243:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:243:in `execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:187:in `block in invoke_with_call_chain&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/monitor.rb:214:in `mon_synchronize&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:180:in `invoke_with_call_chain&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:209:in `block in invoke_prerequisites&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:207:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:207:in `invoke_prerequisites&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:186:in `block in invoke_with_call_chain&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/monitor.rb:214:in `mon_synchronize&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:180:in `invoke_with_call_chain&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:173:in `invoke&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:152:in `invoke_task&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:108:in `block (2 levels) in top_level&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:108:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:108:in `block in top_level&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:117:in `run_with_threads&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:102:in `top_level&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:80:in `block in run&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:178:in `standard_exception_handling&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:77:in `run&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/exe/rake:27:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rake:23:in `load&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rake:23:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli/exec.rb:74:in `load&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli/exec.rb:74:in `kernel_load&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli/exec.rb:27:in `run&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli.rb:332:in `exec&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/vendor/thor/lib/thor/command.rb:27:in `run&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/vendor/thor/lib/thor/invocation.rb:126:in `invoke_command&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/vendor/thor/lib/thor.rb:359:in `dispatch&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli.rb:20:in `dispatch&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/vendor/thor/lib/thor/base.rb:440:in `start&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli.rb:11:in `start&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/exe/bundle:34:in `block in &amp;lt;top (required)&amp;gt;&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/friendly_errors.rb:100:in `with_friendly_errors&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/exe/bundle:26:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/bin/bundle:23:in `load&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/bin/bundle:23:in `&amp;lt;main&amp;gt;&amp;#39;
-Mysql2::Error: Table &amp;#39;circle_ruby_test.bank_details&amp;#39; doesn&amp;#39;t exist
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/mysql2-0.4.4/lib/mysql2/client.rb:107:in `_query&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/mysql2-0.4.4/lib/mysql2/client.rb:107:in `block in query&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/mysql2-0.4.4/lib/mysql2/client.rb:106:in `handle_interrupt&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/mysql2-0.4.4/lib/mysql2/client.rb:106:in `query&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_mysql_adapter.rb:309:in `block in execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_adapter.rb:484:in `block in log&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/notifications/instrumenter.rb:20:in `instrument&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_adapter.rb:478:in `log&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_mysql_adapter.rb:309:in `execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/mysql2_adapter.rb:231:in `execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_mysql_adapter.rb:316:in `execute_and_free&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/abstract_mysql_adapter.rb:463:in `columns&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/connection_adapters/schema_cache.rb:43:in `columns&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/attributes.rb:93:in `columns&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/model_schema.rb:260:in `column_names&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:232:in `aggregate_column&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:258:in `execute_simple_calculation&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:227:in `perform_calculation&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:133:in `calculate&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/relation/calculations.rb:80:in `maximum&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/querying.rb:13:in `maximum&amp;#39;
-/home/ubuntu/banks/config/initializers/constants.rb:9:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:268:in `load&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:268:in `block in load&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:240:in `load_dependency&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:268:in `load&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:652:in `block in load_config_initializer&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/notifications.rb:166:in `instrument&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:651:in `load_config_initializer&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:616:in `block (2 levels) in &amp;lt;class:Engine&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:615:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/engine.rb:615:in `block in &amp;lt;class:Engine&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:30:in `instance_exec&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:30:in `run&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:55:in `block in run_initializers&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:228:in `block in tsort_each&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:350:in `block (2 levels) in each_strongly_connected_component&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:422:in `block (2 levels) in each_strongly_connected_component_from&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:431:in `each_strongly_connected_component_from&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:421:in `block in each_strongly_connected_component_from&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:44:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:44:in `tsort_each_child&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:415:in `call&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:415:in `each_strongly_connected_component_from&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:349:in `block in each_strongly_connected_component&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:347:in `each&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:347:in `call&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:347:in `each_strongly_connected_component&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:226:in `tsort_each&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:205:in `tsort_each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/initializable.rb:54:in `run_initializers&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/application.rb:352:in `initialize!&amp;#39;
-/home/ubuntu/banks/config/environment.rb:5:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:274:in `require&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:274:in `block in require&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:240:in `load_dependency&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activesupport-4.2.7/lib/active_support/dependencies.rb:274:in `require&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/application.rb:328:in `require_environment!&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/railties-4.2.7/lib/rails/application.rb:457:in `block in run_tasks_blocks&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:248:in `block in execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:243:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:243:in `execute&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:187:in `block in invoke_with_call_chain&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/monitor.rb:214:in `mon_synchronize&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:180:in `invoke_with_call_chain&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:209:in `block in invoke_prerequisites&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:207:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:207:in `invoke_prerequisites&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:186:in `block in invoke_with_call_chain&amp;#39;
-/opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/monitor.rb:214:in `mon_synchronize&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:180:in `invoke_with_call_chain&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/task.rb:173:in `invoke&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:152:in `invoke_task&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:108:in `block (2 levels) in top_level&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:108:in `each&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:108:in `block in top_level&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:117:in `run_with_threads&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:102:in `top_level&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:80:in `block in run&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:178:in `standard_exception_handling&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/lib/rake/application.rb:77:in `run&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rake-11.3.0/exe/rake:27:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rake:23:in `load&amp;#39;
-/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rake:23:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli/exec.rb:74:in `load&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli/exec.rb:74:in `kernel_load&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli/exec.rb:27:in `run&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli.rb:332:in `exec&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/vendor/thor/lib/thor/command.rb:27:in `run&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/vendor/thor/lib/thor/invocation.rb:126:in `invoke_command&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/vendor/thor/lib/thor.rb:359:in `dispatch&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli.rb:20:in `dispatch&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/vendor/thor/lib/thor/base.rb:440:in `start&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/cli.rb:11:in `start&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/exe/bundle:34:in `block in &amp;lt;top (required)&amp;gt;&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/lib/bundler/friendly_errors.rb:100:in `with_friendly_errors&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/gems/bundler-1.13.1/exe/bundle:26:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/bin/bundle:23:in `load&amp;#39;
-/opt/circleci/.rvm/gems/ruby-2.3.1@banks/bin/bundle:23:in `&amp;lt;main&amp;gt;&amp;#39;
-Tasks: TOP =&amp;gt; db:schema:load =&amp;gt; environment
-
-export RAILS_ENV=&amp;quot;test&amp;quot;
-export RACK_ENV=&amp;quot;test&amp;quot;
-bundle exec rake db:create db:schema:load ts:configure ts:index ts:start --trace
- returned exit code 1
-
-Action failed: rake db:create db:schema:load ts:configure ts:index ts:start
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now I think this has to do with &lt;code&gt;schema.rb&lt;/code&gt; not working. When I first set up this project, I had to do a
-MySQL load of the database schema from the production system in order to get my local dev environment working.
-Trying to avoid going too far into a rabbit hole, I tried switching the load process from &lt;code&gt;schema.rb&lt;/code&gt; to 
-&lt;code&gt;structure.sql&lt;/code&gt; by adding the following line to our application&amp;#39;s config file:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;config.active_record.schema_format = :sql
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;I then ran &lt;code&gt;rake db:structure:dump&lt;/code&gt; and checked the changes into source control. This resolved the database
-setup issue in Circle-CI. The CI server was smart enough to know based on the &lt;code&gt;application.rb&lt;/code&gt; setting, to
-use &lt;code&gt;rake db:structure:load&lt;/code&gt; in its initialization process.&lt;/p&gt;
-
-&lt;p&gt;3. Schema migrations were not populated&lt;/p&gt;
-
-&lt;p&gt;I ran into one final issue.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bundle exec rspec
-DEPRECATION WARNING: The configuration option `config.serve_static_assets` has been renamed to `config.serve_static_files` to clarify its role (it merely enables serving everything in the `public` folder and is unrelated to the asset pipeline). The `serve_static_assets` alias will be removed in Rails 5.0. Please migrate your configuration files accordingly. (called from block in &amp;lt;top (required)&amp;gt; at /home/ubuntu/banks/config/environments/test.rb:16)
-DEPRECATION WARNING: Currently, Active Record suppresses errors raised within `after_rollback`/`after_commit` callbacks and only print them to the logs. In the next version, these errors will no longer be suppressed. Instead, the errors will propagate normally just like in other Active Record callbacks.
-
-You can opt into the new behavior and remove this warning by setting:
-
-  config.active_record.raise_in_transactional_callbacks = true
-
- (called from block in tsort_each at /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:228)
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-[DEPRECATION] `last_comment` is deprecated.  Please use `last_description` instead.
-in LoadError rescue statement
-DEPRECATION WARNING: The configuration option `config.serve_static_assets` has been renamed to `config.serve_static_files` to clarify its role (it merely enables serving everything in the `public` folder and is unrelated to the asset pipeline). The `serve_static_assets` alias will be removed in Rails 5.0. Please migrate your configuration files accordingly. (called from block in &amp;lt;top (required)&amp;gt; at /home/ubuntu/banks/config/environments/test.rb:16)
-DEPRECATION WARNING: Currently, Active Record suppresses errors raised within `after_rollback`/`after_commit` callbacks and only print them to the logs. In the next version, these errors will no longer be suppressed. Instead, the errors will propagate normally just like in other Active Record callbacks.
-
-You can opt into the new behavior and remove this warning by setting:
-
-  config.active_record.raise_in_transactional_callbacks = true
-
- (called from block in tsort_each at /opt/circleci/ruby/ruby-2.3.1/lib/ruby/2.3.0/tsort.rb:228)
-bundler: failed to load command: rspec (/home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rspec)
-ActiveRecord::PendingMigrationError: 
-
-Migrations are pending. To resolve this issue, run:
-
-    bin/rake db:migrate RAILS_ENV=test
-
-
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:392:in `check_pending!&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:405:in `load_schema_if_pending!&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:411:in `block in maintain_test_schema!&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:642:in `suppress_messages&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:416:in `method_missing&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/activerecord-4.2.7/lib/active_record/migration.rb:411:in `maintain_test_schema!&amp;#39;
-  /home/ubuntu/banks/spec/rails_helper.rb:18:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-  /home/ubuntu/banks/spec/controllers/admin/crawl_status_controller_spec.rb:1:in `require&amp;#39;
-  /home/ubuntu/banks/spec/controllers/admin/crawl_status_controller_spec.rb:1:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/configuration.rb:1058:in `load&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/configuration.rb:1058:in `block in load_spec_files&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/configuration.rb:1058:in `each&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/configuration.rb:1058:in `load_spec_files&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/runner.rb:97:in `setup&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/runner.rb:85:in `run&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/runner.rb:70:in `run&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/lib/rspec/core/runner.rb:38:in `invoke&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/gems/rspec-core-3.0.4/exe/rspec:4:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rspec:23:in `load&amp;#39;
-  /home/ubuntu/banks/vendor/bundle/ruby/2.3.0/bin/rspec:23:in `&amp;lt;top (required)&amp;gt;&amp;#39;
-Coverage report generated for RSpec to /home/ubuntu/banks/coverage. 165 / 710 LOC (23.24%) covered.
-
-bundle exec rspec returned exit code 1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;I found out that this was caused by the &lt;code&gt;schema_migrations&lt;/code&gt; table not being populated on my local development 
-system. As mentioned above, when I initially set up my local environment, I was given a data dump of the schema 
-to get my database up and running. This lacked the migration numbers. I pulled the data from the &lt;code&gt;schema_migrations&lt;/code&gt;
-table from another environment, rebuilt &lt;code&gt;structure.sql&lt;/code&gt; using &lt;code&gt;rake db:migrate&lt;/code&gt;, and pushed out the changes.
-The test suite ran!   &lt;/p&gt;
 </content>
   </entry>
 </feed>
