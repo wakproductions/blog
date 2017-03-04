@@ -5,10 +5,56 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-02-28T01:30:00-05:00</updated>
+  <updated>2017-03-03T01:30:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>How to Resize a Volume in AWS</title>
+    <link rel="alternate" href="http://blog.url.com/2017/03/03/how-to-resize-a-volume-in-aws.html"/>
+    <id>http://blog.url.com/2017/03/03/how-to-resize-a-volume-in-aws.html</id>
+    <published>2017-03-03T01:30:00-05:00</published>
+    <updated>2017-03-03T19:08:04-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/1Brbqkzqvjw" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;h1&gt;Useful Unix Commands&lt;/h1&gt;
+
+&lt;p&gt;&lt;code&gt;$ df -h&lt;/code&gt; - gives the disk usage&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            7.5G   12K  7.5G   1% /dev
+tmpfs           1.5G  392K  1.5G   1% /run
+/dev/xvda1      7.8G  5.9G  1.6G  80% /
+none            4.0K     0  4.0K   0% /sys/fs/cgroup
+none            5.0M     0  5.0M   0% /run/lock
+none            7.5G     0  7.5G   0% /run/shm
+none            100M     0  100M   0% /run/user
+/dev/xvdc       296G  136G  147G  49% /mnt/mysql
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;$ sudo file -s /dev/xvd*&lt;/code&gt; - gives information about the available volumes&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo file -s /dev/xvd*
+/dev/xvda:  x86 boot sector
+/dev/xvda1: Linux rev 1.0 ext4 filesystem data, UUID=240ad8b1-c46c-4ed6-b233-02b4d2a7ede3, volume name &amp;quot;cloudimg-rootfs&amp;quot; (needs journal recovery) (extents) (large files) (huge files)
+/dev/xvdb:  FoxPro FPT, blocks size 0, next free block index 1664118375
+/dev/xvdc:  Linux rev 1.0 ext4 filesystem data, UUID=72ebf16a-eedc-432a-9364-1e4a9f311aad (needs journal recovery) (extents) (large files) (huge files)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;$ sudo resize2fs /dev/xvda1&lt;/code&gt; - expands the given volume xvda1 to take up the newly allocated space (works only on ext4) file system&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo resize2fs /dev/xvdc
+resize2fs 1.42.9 (4-Feb-2014)
+Filesystem at /dev/xvdc is mounted on /mnt/mysql; on-line resizing required
+old_desc_blocks = 19, new_desc_blocks = 69
+The filesystem on /dev/xvdc is now 288358400 blocks long.
+&lt;/code&gt;&lt;/pre&gt;
+</content>
+  </entry>
   <entry>
     <title>How to Install Ruby on a Production System with Ansible</title>
     <link rel="alternate" href="http://blog.url.com/2017/02/28/install-ruby-on-a-production-system.html"/>
@@ -469,409 +515,6 @@ I would instead use a chain of keys:&lt;/p&gt;
 
 &lt;p&gt;All it took was a small modification of the fetch methods wrapping my Hash to implement this. &lt;code&gt;element_name&lt;/code&gt; and &lt;code&gt;span&lt;/code&gt; 
 are fine to freeze because there is a finite number of them in my program.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Git Submodule vs. Subtree</title>
-    <link rel="alternate" href="http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html"/>
-    <id>http://blog.url.com/2016/09/26/git-submodule-vs-subtree.html</id>
-    <published>2016-09-26T11:30:00-04:00</published>
-    <updated>2017-01-14T23:46:42-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;&lt;strong&gt;&amp;quot;Shared Repo&amp;quot;&lt;/strong&gt; refers to the code which is shared and will be packaged in a submodule or subtree.
-&lt;strong&gt;&amp;quot;Parent Project Repo&amp;quot;&lt;/strong&gt; refers to the project that is going to be including the &lt;em&gt;Shared Repo&lt;/em&gt; as
-a submodule or subtree. &lt;/p&gt;
-
-&lt;h2&gt;Overview&lt;/h2&gt;
-
-&lt;h3&gt;Submodule&lt;/h3&gt;
-
-&lt;p&gt;Submodules behave like a separate repo within your parent repo. When you are in the submodule directory,
-you can use Git commands as if you were working on the submodule repo directly. The parent repo only 
-tracks the version of the submodule currently loaded by its commit hash. The parent repo therefore
-only stays in sync with the shared repo via this reference. Any changes made within the submodule
-directory cannot be committed by the parent repo. You have to go into the submodule directory and 
-commit/push them from the shared repo.&lt;/p&gt;
-
-&lt;h3&gt;Subtree&lt;/h3&gt;
-
-&lt;p&gt;Subtree is just a set of macros that simplify Git tricks for merging a secondary shared code repo
-into your parent project.&lt;/p&gt;
-
-&lt;h2&gt;Initialization&lt;/h2&gt;
-
-&lt;h3&gt;Submodule&lt;/h3&gt;
-
-&lt;p&gt;To start the submodule, it&amp;#39;s kind of like cloning another git repo: 
-&lt;code&gt;git submodule add &amp;lt;repo&amp;gt; &amp;lt;destination-dir&amp;gt;&lt;/code&gt;. &lt;/p&gt;
-
-&lt;p&gt;Example:
-```
- (master)$ git submodule add git@github.com:wakproductions/gitsub-submodule.git lib/gitsub-submodule
-Cloning into &amp;#39;/Users/wkotzan/Development/gitsub-base/lib/gitsub-submodule&amp;#39;...
-remote: Counting objects: 3, done.
-remote: Compressing objects: 100% (2/2), done.
-remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
-Receiving objects: 100% (3/3), done.&lt;/p&gt;
-
-&lt;p&gt;(master)$ git status
-On branch master
-Changes to be committed:
-  (use &amp;quot;git reset HEAD &lt;file&gt;...&amp;quot; to unstage)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;new file:   .gitmodules
-new file:   lib/gitsub-submodule
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;(master)$ cat .gitmodules
-[submodule &amp;quot;lib/gitsub-submodule&amp;quot;]
-    path = lib/gitsub-submodule
-    url = git@github.com:wakproductions/gitsub-submodule.git&lt;/p&gt;
-
-&lt;p&gt;(master)$ git diff&lt;/p&gt;
-
-&lt;p&gt;(master)$ git diff --cached
-diff --git a/.gitmodules b/.gitmodules
-new file mode 100644
-index 0000000..dfc8421
---- /dev/null
-+++ b/.gitmodules
-@@ -0,0 +1,3 @@
-+[submodule &amp;quot;lib/gitsub-submodule&amp;quot;]
-+       path = lib/gitsub-submodule
-+       url = git@github.com:wakproductions/gitsub-submodule.git
-diff --git a/lib/gitsub-submodule b/lib/gitsub-submodule
-new file mode 160000
-index 0000000..9dd60f8
---- /dev/null
-+++ b/lib/gitsub-submodule
-@@ -0,0 +1 @@
-+Subproject commit 9dd60f8fc47f089dd5081a0ed73efb7cc923fd9c
-```&lt;/p&gt;
-
-&lt;h3&gt;Subtree&lt;/h3&gt;
-
-&lt;p&gt;Use &lt;code&gt;git subtree add --prefix &amp;lt;dest-dir&amp;gt; &amp;lt;remote-name&amp;gt; &amp;lt;remote-branch&amp;gt;&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; (master)$ git remote add subtree-origin git@github.com:wakproductions/gitsub-subtree.git
- (master)$ git subtree add --prefix lib/github-subtree subtree-origin master
-git fetch subtree-origin master
-warning: no common commits
-remote: Counting objects: 3, done.
-remote: Compressing objects: 100% (2/2), done.
-remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
-Unpacking objects: 100% (3/3), done.
-From github.com:wakproductions/gitsub-subtree
- * branch            master     -&amp;gt; FETCH_HEAD
- * [new branch]      master     -&amp;gt; subtree-origin/master
-Added dir &amp;#39;lib/github-subtree&amp;#39;
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2&gt;How to Pull Changes from Shared Repo into Parent Project Repo&lt;/h2&gt;
-
-&lt;h3&gt;Submodule&lt;/h3&gt;
-
-&lt;p&gt;You can work in the submodule as if it were its own Git Repo. First you have to go into the submodule
-directory:&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;cd lib/gitsub-submodule &amp;amp;&amp;amp; git fetch &amp;amp;&amp;amp; git merge origin/master&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Example:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; (master)$ git fetch
-remote: Counting objects: 3, done.
-remote: Compressing objects: 100% (2/2), done.
-remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
-Unpacking objects: 100% (3/3), done.
-From github.com:wakproductions/gitsub-submodule
-   9dd60f8..e3bedf9  master     -&amp;gt; origin/master
- (master)$ git merge origin/master
-Updating 9dd60f8..e3bedf9
-Fast-forward
- submodule-library.rb | 4 ++++
- 1 file changed, 4 insertions(+)
- (master)$ git log
-commit e3bedf9137028aa63dd88ff1e708ce08e921cc99
-Author: Winston Kotzan &amp;lt;wak@wakproductions.com&amp;gt;
-Date:   Mon Sep 26 15:40:17 2016 -0400
-
-    Add change to shared repo
-
-commit 9dd60f8fc47f089dd5081a0ed73efb7cc923fd9c
-Author: Winston Kotzan &amp;lt;wak@wakproductions.com&amp;gt;
-Date:   Wed Sep 21 10:25:56 2016 -0400
-
-    First commit - submodule
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;You also need to update the parent repo:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; (master)$ git status
-On branch master
-Changes not staged for commit:
-  (use &amp;quot;git add &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
-  (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
-  (commit or discard the untracked or modified content in submodules)
-
-    modified:   lib/gitsub-submodule (new commits, modified content)
-
- (master)$ git diff
-diff --git a/lib/gitsub-submodule b/lib/gitsub-submodule
-index 9dd60f8..e3bedf9 160000
---- a/lib/gitsub-submodule
-+++ b/lib/gitsub-submodule
-@@ -1 +1 @@
--Subproject commit 9dd60f8fc47f089dd5081a0ed73efb7cc923fd9c
-+Subproject commit e3bedf9137028aa63dd88ff1e708ce08e921cc99
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;** Note that the commit reference in the submodule has changed and needs to be committed in the parent repo**&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; (master)$ gc &amp;quot;Update submodule&amp;quot;
-On branch master
-[master 673e460] Update submodule
- 1 file changed, 1 insertion(+), 1 deletion(-)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;A disadvantage of using submodules is that your commit history will get dirty with &amp;quot;Update submodule&amp;quot; style commits
-in the parent project repo. See caveats section below for more details.&lt;/p&gt;
-
-&lt;h3&gt;Subtree&lt;/h3&gt;
-
-&lt;p&gt;It works very similar to a Git fetch/merge or pull.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; (master)$ git subtree pull --prefix lib/github-subtree subtree-origin master
-remote: Counting objects: 3, done.
-remote: Compressing objects: 100% (2/2), done.
-remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
-Unpacking objects: 100% (3/3), done.
-From github.com:wakproductions/gitsub-subtree
- * branch            master     -&amp;gt; FETCH_HEAD
-   5f12af3..b7631b5  master     -&amp;gt; subtree-origin/master
-Merge made by the &amp;#39;recursive&amp;#39; strategy.
- lib/github-subtree/subtree-library.rb | 4 ++++
- 1 file changed, 4 insertions(+)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2&gt;How to Push Changes from Parent Project Repo to Shared Repo&lt;/h2&gt;
-
-&lt;h3&gt;Submodule&lt;/h3&gt;
-
-&lt;p&gt;What happens if you modify the code in the submodule from the parent project? It labels that commit
-pointer as &amp;quot;dirty&amp;quot;, and you can&amp;#39;t commit the change from the parent repo.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; (master)$ git status
-On branch master
-Changes not staged for commit:
-  (use &amp;quot;git add &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
-  (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
-  (commit or discard the untracked or modified content in submodules)
-
-    modified:   lib/gitsub-submodule (modified content)
-
-no changes added to commit (use &amp;quot;git add&amp;quot; and/or &amp;quot;git commit -a&amp;quot;)
- (master)$ git diff
-diff --git a/lib/gitsub-submodule b/lib/gitsub-submodule
---- a/lib/gitsub-submodule
-+++ b/lib/gitsub-submodule
-@@ -1 +1 @@
--Subproject commit e3bedf9137028aa63dd88ff1e708ce08e921cc99
-+Subproject commit e3bedf9137028aa63dd88ff1e708ce08e921cc99-dirty
- (master)$ git add .
- (master)$ git status
-On branch master
-Changes not staged for commit:
-  (use &amp;quot;git add &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
-  (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
-  (commit or discard the untracked or modified content in submodules)
-
-    modified:   lib/gitsub-submodule (modified content)
-
-no changes added to commit (use &amp;quot;git add&amp;quot; and/or &amp;quot;git commit -a&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;You have to go into the submodule directory and work with it there. In this case, I&amp;#39;m going to make a new
-branch/pull request for the submodule.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; (master)$ cd lib/gitsub-submodule
- (master)$ pwd
-/Users/wkotzan/Development/gitsub-base/lib/gitsub-submodule
- (master)$ git status
-On branch master
-Your branch is up-to-date with &amp;#39;origin/master&amp;#39;.
-Changes not staged for commit:
-  (use &amp;quot;git add &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
-  (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
-
-    modified:   submodule-library.rb
-
-no changes added to commit (use &amp;quot;git add&amp;quot; and/or &amp;quot;git commit -a&amp;quot;)
- (master)$ git diff
-diff --git a/submodule-library.rb b/submodule-library.rb
-index 07692ef..fc6589a 100644
---- a/submodule-library.rb
-+++ b/submodule-library.rb
-@@ -5,7 +5,11 @@ class MySubmoduleLibrary
-   end
-
-   def code_change_in_shared_repo
--    puts &amp;quot;This code was added from the shared repo&amp;quot;
-+    puts &amp;quot;This code was modified from the parent repo&amp;quot;
-+  end
-+
-+  def code_change_from_parent_repo
-+    puts &amp;quot;This code was added from the parent repo&amp;quot;
-   end
-
- end
-\ No newline at end of file
- (master)$ git stash
-Saved working directory and index state WIP on master: e3bedf9 Add change to shared repo
-HEAD is now at e3bedf9 Add change to shared repo
- (master)$ git status
-On branch master
-Your branch is up-to-date with &amp;#39;origin/master&amp;#39;.
-nothing to commit, working tree clean
- (master)$ git checkout -b changes_from_parent_repo
-Switched to a new branch &amp;#39;changes_from_parent_repo&amp;#39;
- (changes_from_parent_repo)$ git stash pop
-On branch changes_from_parent_repo
-Changes not staged for commit:
-  (use &amp;quot;git add &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
-  (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
-
-    modified:   submodule-library.rb
-
-no changes added to commit (use &amp;quot;git add&amp;quot; and/or &amp;quot;git commit -a&amp;quot;)
-Dropped refs/stash@{0} (b0c7a7936dda06e25049f121207eff7599d084f7)
- (changes_from_parent_repo)$ git add .
- (changes_from_parent_repo)$ git commit -m &amp;quot;New method and modifications from parent repo&amp;quot;
-[changes_from_parent_repo 60c13b2] New method and modifications from parent repo
- 1 file changed, 5 insertions(+), 1 deletion(-)
- (changes_from_parent_repo)$ git push origin changes_from_parent_repo
-Counting objects: 3, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (2/2), done.
-Writing objects: 100% (3/3), 379 bytes | 0 bytes/s, done.
-Total 3 (delta 1), reused 0 (delta 0)
-remote: Resolving deltas: 100% (1/1), completed with 1 local objects.
-To github.com:wakproductions/gitsub-submodule.git
- * [new branch]      changes_from_parent_repo -&amp;gt; changes_from_parent_repo
- (changes_from_parent_repo)$ git checkout master
-Switched to branch &amp;#39;master&amp;#39;
-Your branch is up-to-date with &amp;#39;origin/master&amp;#39;.
-
-****** CHANGES IN BRANCH changes_from_parent_repo MERGED VIA PULL REQUEST ****** 
-
- (master)$ git pull
-remote: Counting objects: 1, done.
-remote: Total 1 (delta 0), reused 0 (delta 0), pack-reused 0
-Unpacking objects: 100% (1/1), done.
-From github.com:wakproductions/gitsub-submodule
-   e3bedf9..f34c1aa  master     -&amp;gt; origin/master
-Updating e3bedf9..f34c1aa
-Fast-forward
- submodule-library.rb | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3&gt;Subtree&lt;/h3&gt;
-
-&lt;p&gt;By opening a new branch, when you push it up you can merge it into the shared repo just like any other
-pull request.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; (master)$ git checkout -b backported_changes_to_subtree
-Switched to a new branch &amp;#39;backported_changes_to_subtree&amp;#39;
- (backported_changes_to_subtree)$ git status
-On branch backported_changes_to_subtree
-Changes not staged for commit:
-  (use &amp;quot;git add &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
-  (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
-
-    modified:   lib/github-subtree/subtree-library.rb
-
-no changes added to commit (use &amp;quot;git add&amp;quot; and/or &amp;quot;git commit -a&amp;quot;)
- (backported_changes_to_subtree)$ git diff
-diff --git a/lib/github-subtree/subtree-library.rb b/lib/github-subtree/subtree-library.rb
-index efb4e2b..e5a2916 100644
---- a/lib/github-subtree/subtree-library.rb
-+++ b/lib/github-subtree/subtree-library.rb
-@@ -4,8 +4,8 @@ class MySubTree
-     puts &amp;quot;hello from subtree&amp;quot;
-   end
-
--  def update_from_subtree_project
--    puts &amp;quot;this is an update from the subtree project&amp;quot;
-+  def update_from_parent_project
-+    puts &amp;quot;this is an update from the parent project&amp;quot;
-   end
-
- end
-\ No newline at end of file
- (backported_changes_to_subtree)$ git add .
- (backported_changes_to_subtree)$ git commit -m &amp;quot;Implement modification to subtree&amp;quot;
-[backported_changes_to_subtree 672332e] Implement modification to subtree
- 1 file changed, 2 insertions(+), 2 deletions(-)
- (backported_changes_to_subtree)$ git subtree push --prefix lib/github-subtree subtree-origin backported_changes_to_subtree
-git push using:  subtree-origin backported_changes_to_subtree
-Counting objects: 3, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (2/2), done.
-Writing objects: 100% (3/3), 336 bytes | 0 bytes/s, done.
-Total 3 (delta 1), reused 0 (delta 0)
-remote: Resolving deltas: 100% (1/1), completed with 1 local objects.
-To github.com:wakproductions/gitsub-subtree.git
- * [new branch]      8f79e421908a5d2ab2e6554c6b4535e5b5a83bac -&amp;gt; backported_changes_to_subtree
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2&gt;Submodule Caveats&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;When you clone such a project with submodules, by default you get the directories 
-that contain submodules, but none of the files within them yet. (https://git-scm.com/book/en/v2/Git-Tools-Submodules)
-To get around this, either do &lt;code&gt;git clone --recursive&lt;/code&gt; or do &lt;code&gt;git submodule init &amp;amp;&amp;amp; git submodule update&lt;/code&gt; after the 
-clone.&lt;/li&gt;
-&lt;li&gt;A disadvantage of using submodules is that your commit history will get dirty with &amp;quot;Update submodule&amp;quot; style commits
-in the parent project repo. You won&amp;#39;t have specific information on the version bumps happening within the submodule.
-One of the things that I like about packaging via Ruby gem vs using a library as a submodule is that you can manage
-meaningful version numbers in a Ruby gem whereas all you have to go by in a submodule is a commit hash. This could
-make it difficult to track the changes to the shared repo that breaks other systems dependent on it. Let&amp;#39;s say you make
-a change to a shared repo, then updated other projects using that shared repo. Things break in those other projects.
-How do you roll back? How do you identify which version of the shared repo each of your projects is running on?&lt;/li&gt;
-&lt;li&gt;When using CI, some additional configuration may be needed: https://circleci.com/docs/external-resources/
-https://circleci.com/docs/configuration/#checkout&lt;/li&gt;
-&lt;li&gt;In comparison to subtree, there&amp;#39;s an extra step in that you have to commit your updates to the submodule
-and then go into the parent repository and make another commit to update the submodule reference. So
-every update to the submodule consists of a two-step process.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;Subtree Caveats&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Because subtree is based on a combination of other Git routines, the command sequences are less
-straightforward.&lt;/li&gt;
-&lt;li&gt;I recommend immediately pushing up any changes in the subtree because if you make a lot of changes
-to the parent repo and forget about updating the shared repo origin of the subtree, then you&amp;#39;ll eventually
-end up with a very large pull request with a lot of divergence in the shared repo. &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;Subtree Advantages&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;The subtree code is considered a part of the parent repository, so you don&amp;#39;t require special configuration
-the way you do with a submodule.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;Resources&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt"&gt;Official Subtree Documentation&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec#.zias44kio"&gt;Mastering Git Subtrees (excellent resource)&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://blogs.atlassian.com/2013/05/alternatives-to-git-submodule-git-subtree/"&gt;Atlassian Subtree Guide&lt;/a&gt;&lt;br&gt;&lt;/li&gt;
-&lt;/ul&gt;
 </content>
   </entry>
 </feed>
