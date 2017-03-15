@@ -1,0 +1,102 @@
+<!--<html>-->
+<!--<head>-->
+<!--</head>-->
+<!--<body>-->
+<!--hello world-->
+<!--<%= yield %>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta charset='utf-8'>
+    <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
+    <title>Headers matter! Check that your MySQL configuration file is valid!</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+    <link href="../../../stylesheets/site.css" rel="stylesheet" />
+    <script src="../../../javascripts/all.js"></script>
+    <script src="../../../javascripts/jquery-2.2.3.min.js"></script>
+    
+    
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-46648633-1', 'winstonkotzan.com');
+        ga('send', 'pageview');
+    </script>
+  </head>
+  <body class='x2017 x2017_03 x2017_03_15 x2017_03_15_headers-matter-double-check-mysql-conf'>
+    <div class='jumbotron'>
+      <div class='container'>
+        <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
+          <div class='content'>
+            <a href="/blog/">Winston Kotzan's Technology Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container content'>
+      <div class='col-md-8'>
+        <div class='main article-content' role='main'>
+          <h2 class='article-title'>Headers matter! Check that your MySQL configuration file is valid!</h2>
+          <div class='article-date'>03/15/2017</div>
+          <div class='article-body'>
+            <p>This morning I discovered that a mysql database I was given management of was improperly configured. When the
+            database was built, a series of custom <code>innodb_*</code> settings was applied to the <code>my.cnf</code> configuration file. This morning
+            I had a need to change a few settings for performance tuning and discovered that all of these settings were invalid! 
+            What happened? When the file was originally created the <code>innodb_*</code> settings were placed in the wrong section. The
+            file looked something like this:</p>
+            
+            <pre><code>#&#x000A;# The MySQL database server configuration file.&#x000A;#&#x000A;[client]&#x000A;port        = 3306&#x000A;socket      = /var/run/mysqld/mysqld.sock&#x000A;&#x000A;[mysqld_safe]&#x000A;socket      = /var/run/mysqld/mysqld.sock&#x000A;nice        = 0&#x000A;&#x000A;[mysqld]&#x000A;user        = mysql&#x000A;pid-file    = /var/run/mysqld/mysqld.pid&#x000A;socket      = /var/run/mysqld/mysqld.sock&#x000A;port        = 3306&#x000A;basedir     = /usr&#x000A;datadir         = /mnt/mysql&#x000A;tmpdir      = /mnt/mysql/tmp&#x000A;lc-messages-dir = /usr/share/mysql&#x000A;skip-external-locking&#x000A;&#x000A;key_buffer      = 2048M&#x000A;max_allowed_packet  = 16M&#x000A;thread_stack        = 192K&#x000A;thread_cache_size       = 8&#x000A;myisam-recover         = BACKUP&#x000A;query_cache_limit   = 64M&#x000A;query_cache_size        = 32M&#x000A;log_error = /var/log/mysql/error.log&#x000A;expire_logs_days    = 10&#x000A;max_binlog_size         = 100M&#x000A;&#x000A;[mysqldump]&#x000A;quick&#x000A;quote-names&#x000A;max_allowed_packet  = 16M&#x000A;&#x000A;[mysql]&#x000A;&#x000A;[isamchk]&#x000A;key_buffer      = 16M&#x000A;&#x000A;innodb_buffer_pool_size           = 4G&#x000A;innodb_data_file_path             = ibdata1:10M:autoextend&#x000A;innodb_file_per_table = 1&#x000A;innodb_flush_method               = O_DIRECT&#x000A;innodb_flush_log_at_trx_commit=2&#x000A;innodb_support_xa = 0&#x000A;&#x000A;innodb_read_io_threads=8&#x000A;innodb_write_io_threads=8&#x000A;&#x000A;!includedir /etc/mysql/conf.d/&#x000A;&#x000A;</code></pre>
+            
+            <p>All of the <code>innodb_*</code> settings were placed under the <code>[isamchk]</code> section when they should have been placed
+            under the <code>[mysqld]</code> section. As a result, mysql was reading these these settings improperly.</p>
+            
+            <pre><code>MariaDB [(none)]&gt; SHOW VARIABLES LIKE &#39;innodb%&#39;;&#x000A;+-------------------------------------------+------------------------+&#x000A;| Variable_name                             | Value                  |&#x000A;+-------------------------------------------+------------------------+&#x000A;| innodb_buffer_pool_size                   | 134217728              | &lt;-- NOT 4G&#x000A;| innodb_data_file_path                     | ibdata1:10M:autoextend |&#x000A;| innodb_file_per_table                     | OFF                    | &lt;-- NOT using one file per table&#x000A;| innodb_flush_log_at_trx_commit            | 1                      | &lt;-- NOT 2&#x000A;| innodb_flush_method                       |                        | &lt;-- NOT set&#x000A;| innodb_support_xa                         | ON                     | &lt;-- should be OFF&#x000A;| innodb_read_io_threads                    | 4                      | &lt;-- should be 8&#x000A;| innodb_write_io_threads                   | 4                      | &lt;-- should be 8&#x000A;+-------------------------------------------+------------------------+&#x000A;</code></pre>
+            
+            <p>Notably, due to the sheer size of the data to be processed we want this system to have a single InnoDB file per
+            table... but with these corrupted settings I discovered that all this time the DB was being writting in a single
+            <code>ibdata1</code> file:</p>
+            
+            <pre><code>__AWS_PRODUCTION__ ubuntu@ip-172-31-39-165:~$ ls /mnt/mysql -lh&#x000A;total 251G&#x000A;-rw-rw---- 1 mysql mysql  16K Mar 15 15:27 aria_log.00000001&#x000A;-rw-rw---- 1 mysql mysql   52 Mar 15 15:27 aria_log_control&#x000A;-rw-r--r-- 1 root  root     0 Feb  6 18:25 debian-5.5.flag&#x000A;-rw-r--r-- 1 root  root     0 Feb  6 18:33 foo.txt&#x000A;-rw-rw---- 1 mysql mysql 251G Mar 15 15:27 ibdata1&#x000A;-rw-rw---- 1 mysql mysql 5.0M Mar 15 15:28 ib_logfile0&#x000A;-rw-rw---- 1 mysql mysql 5.0M Mar 15 15:24 ib_logfile1&#x000A;drwx------ 2 root  root   16K Feb  6 18:33 lost+found&#x000A;drwxr-xr-x 2 mysql root  4.0K Feb  6 18:25 mysql&#x000A;-rw------- 1 root  root    14 Feb  6 18:25 mysql_upgrade_info&#x000A;drwx------ 2 mysql mysql 4.0K Feb  6 18:25 performance_schema&#x000A;drwx------ 2 mysql mysql 4.0K Mar 11 07:39 regdata_production&#x000A;drwxrwxrwx 2 root  root  4.0K Mar 15 15:28 tmp&#x000A;</code></pre>
+            
+            <h2>Converting the data tables to one-file-per-table</h2>
+            
+            <p>So once I fixed the settings I still had the problem of all of my data being in that single <code>ibdata1</code> file when we 
+            really wanted a single table per file. I found <a href="https://dev.mysql.com/doc/refman/5.6/en/tablespace-enabling.html">this article</a> which showed that converting each table was as 
+            easy as running an <code>ALTER TABLE</code> statement like this:</p>
+            
+            <pre><code>MariaDB [regdata_production]&gt; ALTER TABLE reporters ENGINE=InnoDB;&#x000A;Query OK, 249757 rows affected (7.99 sec)              &#x000A;Records: 249757  Duplicates: 0  Warnings: 0&#x000A;</code></pre>
+            
+            <p>Problem solved!</p>
+          </div>
+        </div>
+      </div>
+      <div class='col-md-4'>
+        <aside>
+          <h2>Recent Articles</h2>
+          <ol>
+            <li><a href="headers-matter-double-check-mysql-conf.html">Headers matter! Check that your MySQL configuration file is valid!</a> <span>Mar 15</span></li>
+            <li><a href="../03/how-to-resize-a-volume-in-aws.html">How to Resize a Volume in AWS</a> <span>Mar  3</span></li>
+            <li><a href="../../02/28/install-ruby-on-a-production-system.html">How to Install Ruby on a Production System with Ansible</a> <span>Feb 28</span></li>
+            <li><a href="../../02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html">Pretty Print a Really Big Hash in Ruby</a> <span>Feb 16</span></li>
+            <li><a href="../../01/14/bulk-insert-in-rails-and-mysql.html">Better Bulk Inserts in Rails</a> <span>Jan 14</span></li>
+            <li><a href="../../01/12/s3-code-examples.html">AWS S3 Code Examples in Ruby (aws-sdk 2.0)</a> <span>Jan 12</span></li>
+            <li><a href="../../01/07/ruby-string-freeze-memory.html">Ruby - Don't Freeze User-Defined Strings!</a> <span>Jan  7</span></li>
+            <li><a href="../../../2016/09/26/git-submodule-vs-subtree.html">Git Submodule vs. Subtree</a> <span>Sep 26</span></li>
+            <li><a href="../../../2016/09/23/configuring-circle-ci.html.html">Configuring Circle-CI for the First Time</a> <span>Sep 23</span></li>
+            <li><a href="../../../2016/09/14/getting-your-ruby-on-rails-application-code-into-docker.html">Getting your Ruby on Rails application code into Docker</a> <span>Sep 14</span></li>
+          </ol>
+          <h2>By Year</h2>
+          <ol>
+            <li><a href="../../../2017.html">2017 (7)</a></li>
+            <li><a href="../../../2016.html">2016 (7)</a></li>
+          </ol>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>
