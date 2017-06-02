@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 # Middleman Gems
-gem "middleman",            '~> 4.2' #path: '/Users/wkotzan/Development/middleman' # "~> 4.1"
+gem "middleman",            '~> 4.1' #path: '/Users/wkotzan/Development/middleman' # "~> 4.1"
 gem 'middleman-blog',       '>= 4.0.0'
 gem 'middleman-gh-pages',   '~> 0.3'
 

@@ -117,7 +117,7 @@ PLATFORMS
 
 DEPENDENCIES
   builder (~> 3.0)
-  middleman (~> 4.2)
+  middleman (~> 4.1)
   middleman-blog (>= 4.0.0)
   middleman-gh-pages (~> 0.3)
   pry
