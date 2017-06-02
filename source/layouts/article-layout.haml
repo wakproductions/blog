@@ -32,8 +32,10 @@
       .col-md-8
         .main.article-content{ role: "main" }
           %h2.article-title= current_article.title
+          =partial 'ad_article'
           .article-date= "#{current_article.date.strftime('%m/%d/%Y')}"
           .article-body~ yield
+          =partial 'ad_article_bottom'
 
       .col-md-4
         %aside
@@ -51,3 +53,5 @@
           %ol
             - blog.articles.group_by {|a| a.date.year }.each do |year, articles|
               %li= link_to("#{year} (#{articles.size})", blog_year_path(year))
+
+          =partial 'ad_sidebar'
