@@ -1,0 +1,48 @@
+<p>You would think something as simple as connecting to a database on the localhost would be a simple task in Docker. 
+Unfortunately, accessing resources the local machine requires some special settings because of the obfuscation caused
+by Docker&#39;s virtual networking. To access the Postgres database on my local machine, I had to route around localhost
+and connect to it via the machine&#39;s local IP address. The local IP address I pass in using an environment variable
+in the docker-compose file like this:</p>
+
+<pre><code>version: &#39;3&#39;
+services:
+  web:
+    container_name: myapplication
+    build: .
+    command: bundle exec rails s -p 3000
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@localhost:5432/myapplication
+    extra_hosts:
+      - localhost:${LOCAL_IP}
+    ports:
+      - 3030:3000
+    tty: true
+
+</code></pre>
+
+<p>In my <code>.env</code> file I populated <code>LOCAL_IP</code> with my local IP address</p>
+
+<pre><code>LOCAL_IP=192.168.1.143
+</code></pre>
+
+<p>I had to make the following change to the <code>listen_addresses</code> part of my <code>postgresql.conf</code> file in the Postgres data directory:
+This enabled Postgres to bind to and listen in on connections coming through the local IP address.</p>
+
+<pre><code>#------------------------------------------------------------------------------
+# CONNECTIONS AND AUTHENTICATION
+#------------------------------------------------------------------------------
+
+# - Connection Settings -
+
+# what IP address(es) to listen on;
+listen_addresses = &#39;localhost,192.168.1.143&#39;
+                                        # comma-separated list of addresses;
+                                        # defaults to &#39;localhost&#39;; use &#39;*&#39; for all
+                                        # (change requires restart)
+
+</code></pre>
+
+<p>I also had to add the following line to <code>pg_hba.conf</code></p>
+
+<pre><code>host    all             all             192.168.1.143/32        trust
+</code></pre>
