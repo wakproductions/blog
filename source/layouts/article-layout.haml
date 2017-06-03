@@ -36,6 +36,7 @@
           .article-date= "#{current_article.date.strftime('%m/%d/%Y')}"
           .article-body~ yield
           =partial 'ad_article_bottom'
+          =partial 'disqus'
 
       .col-md-4
         %aside
