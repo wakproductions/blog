@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>How to connect to an external Postgres database from a Docker container</title>
+    <title>Why I Switched to Docker when Using AWS with Ruby on Rails</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2017 x2017_06 x2017_06_01 x2017_06_01_connecting-to-external-postgres-database-with-docker'>
+  <body class='x2017 x2017_06 x2017_06_03 x2017_06_03_why-I-use-docker-on-aws'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>How to connect to an external Postgres database from a Docker container</h2>
+          <h2 class='article-title'>Why I Switched to Docker when Using AWS with Ruby on Rails</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,28 +51,24 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>06/01/2017</div>
+          <div class='article-date'>06/03/2017</div>
           <div class='article-body'>
-            <p>You would think something as simple as connecting to a database on the localhost would be a simple task in Docker. 
-            Unfortunately, accessing resources the local machine requires some special settings because of the obfuscation caused
-            by Docker&#39;s virtual networking. To access the Postgres database on my local machine, I had to route around localhost
-            and connect to it via the machine&#39;s local IP address. The local IP address I pass in using an environment variable
-            in the docker-compose file like this:</p>
+            <h2>Why Do I Use Docker?</h2>
             
-            <pre><code>version: &#39;3&#39;&#x000A;services:&#x000A;  web:&#x000A;    container_name: myapplication&#x000A;    build: .&#x000A;    command: bundle exec rails s -p 3000&#x000A;    environment:&#x000A;      - DATABASE_URL=postgres://postgres:postgres@localhost:5432/myapplication&#x000A;    extra_hosts:&#x000A;      - localhost:${LOCAL_IP}&#x000A;    ports:&#x000A;      - 3030:3000&#x000A;    tty: true&#x000A;&#x000A;</code></pre>
+            <p>I am working on a Ruby on Rails app which will soon be up and running on AWS EC2. To my displeasure (as I&#39;m more of an app
+            developer than DevOps guy), I ran into numerous configuration problems setting up my production server. When building
+            Ruby I ran into permissions problems with the gems such as:</p>
             
-            <p>In my <code>.env</code> file I populated <code>LOCAL_IP</code> with my local IP address</p>
+            <p><code>&#x000A;ubuntu@ip-172-30-0-78:~$ gem install bundler&#x000A;   Fetching: bundler-1.15.0.gem (100%)&#x000A;   ERROR:  While executing gem ... (Gem::FilePermissionError)&#x000A;       You don&#39;t have write permissions for the /usr/local/lib/ruby/gems/2.4.0 directory.</code></p>
             
-            <pre><code>LOCAL_IP=192.168.1.143&#x000A;</code></pre>
+            <p>Not to mention unforseen missing dependency problems such as this one when building the gemset:</p>
             
-            <p>I had to make the following change to the <code>listen_addresses</code> part of my <code>postgresql.conf</code> file in the Postgres data directory:
-            This enabled Postgres to bind to and listen in on connections coming through the local IP address.</p>
+            <pre><code>Gem Load Error is: Could not find a JavaScript runtime. See https://github.com/rails/execjs for a list of available runtimes.&#x000A;</code></pre>
             
-            <pre><code>#------------------------------------------------------------------------------&#x000A;# CONNECTIONS AND AUTHENTICATION&#x000A;#------------------------------------------------------------------------------&#x000A;&#x000A;# - Connection Settings -&#x000A;&#x000A;# what IP address(es) to listen on;&#x000A;listen_addresses = &#39;localhost,192.168.1.143&#39;&#x000A;                                        # comma-separated list of addresses;&#x000A;                                        # defaults to &#39;localhost&#39;; use &#39;*&#39; for all&#x000A;                                        # (change requires restart)&#x000A;&#x000A;</code></pre>
-            
-            <p>I also had to add the following line to <code>pg_hba.conf</code></p>
-            
-            <pre><code>host    all             all             192.168.1.143/32        trust&#x000A;</code></pre>
+            <p>I could fiddle around for hours fixing these issues, but then what if I had to upgrade Ruby later on or add new
+            dependencies for new features? The last thing I would want is for my production system to go down due to unforeseen
+            differences between my development environment and production. Docker gives me a way to ensure consistency between
+            environments and swap dependencies. </p>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -89,9 +85,9 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../03/why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
-            <li><a href="../03/installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
-            <li><a href="connecting-to-external-postgres-database-with-docker.html">How to connect to an external Postgres database from a Docker container</a> <span>Jun  1</span></li>
+            <li><a href="why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
+            <li><a href="installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
+            <li><a href="../01/connecting-to-external-postgres-database-with-docker.html">How to connect to an external Postgres database from a Docker container</a> <span>Jun  1</span></li>
             <li><a href="../../03/15/headers-matter-double-check-mysql-conf.html">Headers matter! Check that your MySQL configuration file is valid!</a> <span>Mar 15</span></li>
             <li><a href="../../03/03/how-to-resize-a-volume-in-aws.html">How to Resize a Volume in AWS</a> <span>Mar  3</span></li>
             <li><a href="../../02/28/install-ruby-on-a-production-system.html">How to Install Ruby on a Production System with Ansible</a> <span>Feb 28</span></li>

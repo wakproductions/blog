@@ -5,10 +5,100 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-06-01T01:00:00-04:00</updated>
+  <updated>2017-06-03T01:00:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Why I Switched to Docker when Using AWS with Ruby on Rails</title>
+    <link rel="alternate" href="http://blog.url.com/2017/06/03/why-I-use-docker-on-aws.html"/>
+    <id>http://blog.url.com/2017/06/03/why-I-use-docker-on-aws.html</id>
+    <published>2017-06-03T01:00:00-04:00</published>
+    <updated>2017-06-03T13:53:40-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h2&gt;Why Do I Use Docker?&lt;/h2&gt;
+
+&lt;p&gt;I am working on a Ruby on Rails app which will soon be up and running on AWS EC2. To my displeasure (as I&amp;#39;m more of an app
+developer than DevOps guy), I ran into numerous configuration problems setting up my production server. When building
+Ruby I ran into permissions problems with the gems such as:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+ubuntu@ip-172-30-0-78:~$ gem install bundler
+   Fetching: bundler-1.15.0.gem (100%)
+   ERROR:  While executing gem ... (Gem::FilePermissionError)
+       You don&amp;#39;t have write permissions for the /usr/local/lib/ruby/gems/2.4.0 directory.
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Not to mention unforseen missing dependency problems such as this one when building the gemset:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Gem Load Error is: Could not find a JavaScript runtime. See https://github.com/rails/execjs for a list of available runtimes.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I could fiddle around for hours fixing these issues, but then what if I had to upgrade Ruby later on or add new
+dependencies for new features? The last thing I would want is for my production system to go down due to unforeseen
+differences between my development environment and production. Docker gives me a way to ensure consistency between
+environments and swap dependencies. &lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</title>
+    <link rel="alternate" href="http://blog.url.com/2017/06/03/installing-docker-on-ubuntu-with-ansible.html"/>
+    <id>http://blog.url.com/2017/06/03/installing-docker-on-ubuntu-with-ansible.html</id>
+    <published>2017-06-03T01:00:00-04:00</published>
+    <updated>2017-06-03T14:04:54-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Here is the Ansible role based &lt;a href="https://docs.docker.com/engine/installation/linux/ubuntu/#prerequisites"&gt;on the official Docker installation guide&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="yml"&gt;---
+# This is aimed towards Ubuntu Xenial 16
+
+- name: Uninstall Old Versions
+  apt:
+    pkg:          &amp;quot;{{ item }}&amp;quot;
+    state:        absent
+  with_items:
+    - docker
+    - docker-engine
+
+- name: Install dependencies
+  apt:
+    pkg:          &amp;quot;{{ item }}&amp;quot;
+    state:        present
+    update_cache: true
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: Install the GPG key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+- name: Add Docker repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+    state: present
+
+- name: Install Docker
+  apt:
+    pkg:          docker-ce=17.03.0~ce-0~ubuntu-xenial
+    state:        present
+    update_cache: yes
+
+- name: Install Docker compose
+  shell: &amp;gt;
+    curl -L https://github.com/docker/compose/releases/download/1.13.0/docker-compose-`uname -s`-`uname -m` &amp;gt; /usr/local/bin/docker-compose &amp;amp;&amp;amp;
+    sudo chmod +x /usr/local/bin/docker-compose
+  become: true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/wakproductions/ansible-examples"&gt;See my full ansible examples repository for more&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>How to connect to an external Postgres database from a Docker container</title>
     <link rel="alternate" href="http://blog.url.com/2017/06/01/connecting-to-external-postgres-database-with-docker.html"/>
@@ -292,241 +382,6 @@ sudo gem install rails --version 4.0.0.beta1
 &lt;h1&gt;Throw in some Ansible&lt;/h1&gt;
 
 &lt;p&gt;I automated these steps using Ansible to install Ruby 2.3.3 on my system. &lt;a href="https://github.com/wakproductions/ansible-examples/blob/master/roles/web/tasks/install_ruby233.yml"&gt;Here&amp;#39;s the playbook.&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Pretty Print a Really Big Hash in Ruby</title>
-    <link rel="alternate" href="http://blog.url.com/2017/02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html"/>
-    <id>http://blog.url.com/2017/02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html</id>
-    <published>2017-02-16T01:30:00-05:00</published>
-    <updated>2017-02-16T13:00:57-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h2&gt;Problem: Copy and paste a really big Ruby object so that it&amp;#39;s human readable&lt;/h2&gt;
-
-&lt;p&gt;Today I was building a fixture in one of my RSpec tests which consisted of a really big hash. It looked something like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="ruby"&gt;really_big_hash =     {:Profile=&amp;gt;
-                         {:CharterNumber=&amp;gt;&amp;quot;68448&amp;quot;,
-                          :CreditUnionId=&amp;gt;&amp;quot;14241&amp;quot;,
-                          :CreditUnionName=&amp;gt;&amp;quot;CITIZENS EQUITY FIRST&amp;quot;,
-                          :CycleDate=&amp;gt;&amp;quot;12/31/2015&amp;quot;,
-                          :CreditUnionTypeID=&amp;gt;&amp;quot;FISCU&amp;quot;,
-                          :Region=&amp;gt;&amp;quot;4&amp;quot;,
-                          :CreditUnionStatus=&amp;gt;&amp;quot;Active&amp;quot;,
-                          :DateChartered=&amp;gt;&amp;quot;2000&amp;quot;,
-                          :DateInsured=&amp;gt;&amp;quot;1/2/1975&amp;quot;,
-                          :CharterStateCode=&amp;gt;&amp;quot;Illinois&amp;quot;,
-                          :TOM_CODE=&amp;gt;&amp;quot;99&amp;quot;,
-                          :State=&amp;gt;&amp;quot;IL&amp;quot;,
-                          :Acct_896=&amp;gt;&amp;quot;1&amp;quot;,
-                          :PeerGroup=&amp;gt;&amp;quot;6 - $500,000,000 and greater&amp;quot;,
-                          :Assets=&amp;gt;&amp;quot;5174819725&amp;quot;,
-                          :NumberOfMembers=&amp;gt;&amp;quot;312929&amp;quot;,
-                          :IsLowIncome=&amp;gt;&amp;quot;No&amp;quot;,
-                          :CertificationDate=&amp;gt;&amp;quot;1/22/2016 10:46:28 AM&amp;quot;,
-                          :HasWebSite=&amp;gt;&amp;quot;Yes&amp;quot;,
-                           ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;When I tried to copy this fixture into my test file, I initially did this in console:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="ruby"&gt;require &amp;#39;clipboard&amp;#39; # use the Clipboard gem
-Clipboard.copy(really_big_hash)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The problem was that when I pasted the text it all ended up on one line like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="ruby"&gt;{:Profile=&amp;gt;{:CharterNumber=&amp;gt;&amp;quot;68448&amp;quot;, :CreditUnionId=&amp;gt;&amp;quot;14241&amp;quot;, :CreditUnionName=&amp;gt;&amp;quot;CITIZENS EQUITY FIRST&amp;quot;, :CycleDate=&amp;gt;...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2&gt;Solution: Ruby&amp;#39;s &amp;#39;pp&amp;#39; module&lt;/h2&gt;
-
-&lt;p&gt;I discovered that the Ruby &amp;#39;pp&amp;#39; module could be used to format a Hash as a multiline output and I could capture the
-output. Here&amp;#39;s what I did:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="ruby"&gt;require &amp;#39;pp&amp;#39;
-cap = StringIO.new
-$stdout = cap
-pp(r)
-$stdout = STDOUT
-
-Clipboard.copy(cap.string)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;I was then able to paste my Hash as a more human-readable multi-line string. Note that because &lt;code&gt;pp&lt;/code&gt; prints to screen
-by default, I had to reroute &lt;code&gt;$stdout&lt;/code&gt; temporarily to capture the output via a &lt;code&gt;StringIO&lt;/code&gt; object.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Better Bulk Inserts in Rails</title>
-    <link rel="alternate" href="http://blog.url.com/2017/01/14/bulk-insert-in-rails-and-mysql.html"/>
-    <id>http://blog.url.com/2017/01/14/bulk-insert-in-rails-and-mysql.html</id>
-    <published>2017-01-14T01:30:00-05:00</published>
-    <updated>2017-01-14T23:46:42-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;One of the limitations of Rails is that it doesn&amp;#39;t do a true bulk insert. For example, let&amp;#39;s say you have a &lt;code&gt;MenuItem&lt;/code&gt;
-model and pass it an array of objects to create like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="ruby"&gt;items_to_create = [
-  {
-    name: &amp;#39;Sandwich&amp;#39;,
-    description: &amp;#39;Chips included&amp;#39;,
-    price: 10.00,
-  },
-  {
-    name: &amp;#39;Soup&amp;#39;,
-    description: &amp;#39;Cream of mushroom&amp;#39;,
-    price: 3.00    
-  },
-  {
-    name: &amp;#39;Salmon&amp;#39;,
-    description: &amp;#39;Pan seared&amp;#39;,
-    price: 17.00
-  },
-]
-
-MenuItem.create!(items_to_create)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;When you call &lt;code&gt;MenuItem.create!&lt;/code&gt;, ActiveRecord will actually perform 3 separate INSERT queries on the database rather 
-than one bulk insert query. It will look something like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="sql"&gt;INSERT INTO models (...) VALUES (...);
-INSERT INTO models (...) VALUES (...);
-INSERT INTO models (...) VALUES (...);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The problem with this approach is that it is inefficient - DB engines are much faster at peforming INSERT when fed the 
-data all at once. I&amp;#39;m working on a project that requires a huge manipulation of data and thus many DB queries. To make 
-it run faster I&amp;#39;ve tried to minimize the number of individual queries. One way that I was able to speed this up is to 
-build my own native bulk insert routine for ActiveRecord that works with MySQL. Here is the code:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="ruby"&gt;# app/models/concerns/has_bulk_insert.rb
-
-module HasBulkInsert
-  extend ActiveSupport::Concern
-
-  included do
-  end
-
-  class_methods do
-    BI_IGNORE_COLUMNS=%w(id)
-
-    def bulk_insert(values_array)
-      return if values_array.empty?
-      ActiveRecord::Base.connection.execute bi_sql(values_array)
-    end
-
-    protected
-    def bi_column_definitions
-      self
-        .columns_hash
-        .map {|col,props| BI_IGNORE_COLUMNS.include?(col) ? nil : {col=&amp;gt;props.type} }
-        .compact
-        .reduce({}, :merge)
-    end
-
-    def bi_escaped_column_names
-      bi_column_definitions.reduce([]) { |m,(k,v)| m &amp;lt;&amp;lt; &amp;quot;`#{k}`&amp;quot; }.join(&amp;#39;,&amp;#39;)
-    end
-
-    def bi_sql(values_array)
-      &amp;lt;&amp;lt;SQL
-INSERT INTO #{self.table_name} (#{bi_escaped_column_names}) VALUES
-#{bi_convert_values_array(values_array)};
-SQL
-    end
-
-    def bi_convert_values_array(values_array)
-      values_array.map do |values_hash|
-        line_values = bi_column_definitions.reduce([]) do |line, (col,definition)|
-          vh = values_hash.stringify_keys
-
-          next line &amp;lt;&amp;lt; &amp;#39;NULL&amp;#39; if vh[col].nil? &amp;amp;&amp;amp; !is_timestamp_column?(col)
-
-          case definition
-            when :string, :text
-              if is_enum_column?(col)
-                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{enum_value(col, vh[col])}&amp;#39;&amp;quot;
-              else
-                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{vh[col].gsub(&amp;quot;&amp;#39;&amp;quot;, &amp;quot;&amp;#39;&amp;#39;&amp;quot;)}&amp;#39;&amp;quot;
-              end
-            when :date
-              line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{vh[col].strftime(&amp;#39;%Y-%m-%d&amp;#39;)}&amp;#39;&amp;quot;
-            when :datetime
-              if is_timestamp_column?(col)
-                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{Time.now.strftime(&amp;#39;%Y-%m-%d %H:%M:%S&amp;#39;)}&amp;#39;&amp;quot;
-              else
-                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{vh[col].strftime(&amp;#39;%Y-%m-%d&amp;#39;)}&amp;#39;&amp;quot;
-              end
-            when :integer
-              if vh[col].is_a? Integer
-                line &amp;lt;&amp;lt; vh[col].to_s
-              elsif vh[col].is_a?(String) &amp;amp;&amp;amp; is_enum_column?(col)
-                line &amp;lt;&amp;lt; &amp;quot;&amp;#39;#{enum_value(col, vh[col])}&amp;#39;&amp;quot;
-              else
-                raise &amp;quot;Unable to interpret data for column #{col}\n#{vh}&amp;quot;
-              end
-            when :decimal, :boolean
-              line &amp;lt;&amp;lt; vh[col].to_s
-            else
-              raise &amp;quot;Unknown data column type: #{definition}&amp;quot;
-          end
-        end
-        .join(&amp;#39;,&amp;#39;)
-
-        &amp;quot;(#{line_values})&amp;quot;
-      end
-      .join(&amp;quot;,\n&amp;quot;)
-    end
-
-    def enum_value(column_name, enumeration_value)
-      self.send(column_name.pluralize)[enumeration_value]
-    end
-
-    def is_enum_column?(column_name)
-      self.defined_enums.include?(column_name)
-    end
-
-    def is_timestamp_column?(column_name)
-      %w(created_at updated_at).include?(column_name)
-    end
-  end
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;To use this, all you have to do is include the module in your model like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="ruby"&gt;class MenuItem &amp;lt; ApplicationRecord
-  include HasBulkInsert
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now you can call the method:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="ruby"&gt;MenuItem.bulk_insert(items_to_create)  
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The SQL query used by ActiveRecord will be consolidated to look more like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="sql"&gt;INSERT INTO models (...) VALUES
-  (...),
-  (...),
-  (...),
-  (...),
-  ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;One limitation of my code module at this point is that it does not support serialized fields, but it is excellent for
-basic tables and speeds things up tremendously - by about 50% in my local bench tests!&lt;/p&gt;
-
-&lt;h3&gt;Related Links&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href="http://stackoverflow.com/questions/1793169/which-is-faster-multiple-single-inserts-or-one-multiple-row-insert"&gt;StackOverflow: Which is faster: single inserts or one multiple row insert?&lt;/a&gt; &lt;/p&gt;
 </content>
   </entry>
 </feed>
