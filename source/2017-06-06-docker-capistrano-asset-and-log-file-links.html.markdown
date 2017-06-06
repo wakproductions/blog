@@ -1,6 +1,6 @@
 ---
 title: Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"
-date: 2017-06-05
+date: 2017-06-06
 tags:
 ---
 
