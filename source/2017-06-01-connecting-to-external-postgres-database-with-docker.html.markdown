@@ -52,8 +52,53 @@ listen_addresses = 'localhost,192.168.1.143'
 
 ```
 
+The above setting worked on my local Mac, but for my Ubuntu server, I had to implement the change using the
+`ALTER SYSTEM` command from within Postgres:
+
+```
+postgres-# ALTER SYSTEM SET listen_addresses='localhost,172.0.30.143'
+ALTER SYSTEM
+postgres-# \q
+
+$ sudo service postgresql restart
+
+$ netstat -ntl
+  Active Internet connections (only servers)
+  Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+  tcp        0      0 172.0.30.143:5432        0.0.0.0:*               LISTEN   <- it's listening on the correct IP now   
+  tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN     
+  tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
+  tcp6       0      0 :::3030                 :::*                    LISTEN     
+  tcp6       0      0 :::22                   :::*                    LISTEN   
+```
+
+
 I also had to add the following line to `pg_hba.conf`
 
 ```
 host    all             all             192.168.1.143/32        trust
 ```
+
+In case you don't know the Postgres data directory, log into psql and:
+
+```
+# show data_directory;
+
+        data_directory        
+------------------------------
+ /var/lib/postgresql/9.5/main
+(1 row)
+```
+
+## Gotcha
+
+On my Ubuntu configuration, I had trobule getting the pg_hba.conf to work. That's because I created and edited the
+file in the data directory. I found out that the real location of the pg_hba.conf file was:
+
+```
+postgres-# SHOW hba_file;
+               
+               hba_file               
+--------------------------------------
+ /etc/postgresql/9.5/main/pg_hba.conf
+``` 
