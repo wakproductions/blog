@@ -5,10 +5,74 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-06-03T01:00:00-04:00</updated>
+  <updated>2017-06-08T01:00:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>US Treasury Yield Curve Chart</title>
+    <link rel="alternate" href="http://blog.url.com/2017/06/08/new-website-us-treasury-yield-curve.html"/>
+    <id>http://blog.url.com/2017/06/08/new-website-us-treasury-yield-curve.html</id>
+    <published>2017-06-08T01:00:00-04:00</published>
+    <updated>2017-06-08T16:21:06-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Here&amp;#39;s a little project I did for fun to demonstrate a little Javascript single page app running on an
+AWS/Docker/Ruby on Rails stack.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.ustreasuryyieldcurve.com"&gt;US Treasury Yield Curve&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The term structure of interest rates are an important barometer for the economy. When the yield curve flattens
+it&amp;#39;s often a good predictor of economic slowdown and subsequent decline in the stock market. Play around
+with it and see what the interest rates have looked like historically!&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</title>
+    <link rel="alternate" href="http://blog.url.com/2017/06/06/docker-capistrano-asset-and-log-file-links.html"/>
+    <id>http://blog.url.com/2017/06/06/docker-capistrano-asset-and-log-file-links.html</id>
+    <published>2017-06-06T01:00:00-04:00</published>
+    <updated>2017-06-06T15:00:43-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Upon getting my Docker application running in production, I ran into this error message:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;F, [2017-06-06T00:53:06.630911 #1] FATAL -- : [8957e40e-e8fa-4f2d-8072-4dab83c6269b] ActionView::Template::Error (The asset &amp;quot;application.css&amp;quot; is not present in the asset pipeline.):
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The problem occurred because the Rails asset pipeline was missing files. The application in production mode couldn&amp;#39;t find
+the files it was looking for from the &lt;code&gt;rake assets:precompile&lt;/code&gt; stage, which was performed by Capistrano &lt;em&gt;outside&lt;/em&gt; of the
+Docker container. To fix this error I had to symlink the &lt;code&gt;public/assets&lt;/code&gt; folder inside of the Docker container to
+the file system outside like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#docker-compose.yml
+
+version: &amp;#39;3&amp;#39;
+services:
+  web:
+    container_name: myapp
+    build: .
+    command: bundle exec rails s -p 3000
+    environment:
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - DATABASE_URL=${DATABASE_URL}
+      - RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+    extra_hosts:
+      - dbhost:${LOCAL_IP:-127.0.0.1}
+    ports:
+      - ${HTTP_PORT:-80}:3000
+    tty: true
+    volumes:
+      - ./log:/app/log
+      - ./public/assets:/app/public/assets
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that on the &lt;code&gt;volumes&lt;/code&gt; section I link both the &lt;code&gt;log&lt;/code&gt; and &lt;code&gt;public&lt;/code&gt; assets folder. &lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Why I Switched to Docker when Using AWS with Ruby on Rails</title>
     <link rel="alternate" href="http://blog.url.com/2017/06/03/why-I-use-docker-on-aws.html"/>
@@ -104,7 +168,7 @@ environments and swap dependencies. &lt;/p&gt;
     <link rel="alternate" href="http://blog.url.com/2017/06/01/connecting-to-external-postgres-database-with-docker.html"/>
     <id>http://blog.url.com/2017/06/01/connecting-to-external-postgres-database-with-docker.html</id>
     <published>2017-06-01T01:00:00-04:00</published>
-    <updated>2017-06-01T22:31:14-04:00</updated>
+    <updated>2017-06-05T15:40:43-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -152,9 +216,50 @@ listen_addresses = &amp;#39;localhost,192.168.1.143&amp;#39;
 
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;The above setting worked on my local Mac, but for my Ubuntu server, I had to implement the change using the
+&lt;code&gt;ALTER SYSTEM&lt;/code&gt; command from within Postgres:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;postgres-# ALTER SYSTEM SET listen_addresses=&amp;#39;localhost,172.0.30.143&amp;#39;
+ALTER SYSTEM
+postgres-# \q
+
+$ sudo service postgresql restart
+
+$ netstat -ntl
+  Active Internet connections (only servers)
+  Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+  tcp        0      0 172.0.30.143:5432        0.0.0.0:*               LISTEN   &amp;lt;- it&amp;#39;s listening on the correct IP now   
+  tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN     
+  tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
+  tcp6       0      0 :::3030                 :::*                    LISTEN     
+  tcp6       0      0 :::22                   :::*                    LISTEN   
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;I also had to add the following line to &lt;code&gt;pg_hba.conf&lt;/code&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;host    all             all             192.168.1.143/32        trust
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In case you don&amp;#39;t know the Postgres data directory, log into psql and:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# show data_directory;
+
+        data_directory        
+------------------------------
+ /var/lib/postgresql/9.5/main
+(1 row)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Gotcha&lt;/h2&gt;
+
+&lt;p&gt;On my Ubuntu configuration, I had trobule getting the pg&lt;em&gt;hba.conf to work. That&amp;#39;s because I created and edited the
+file in the data directory. I found out that the real location of the pg&lt;/em&gt;hba.conf file was:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;postgres-# SHOW hba_file;
+
+               hba_file               
+--------------------------------------
+ /etc/postgresql/9.5/main/pg_hba.conf
 &lt;/code&gt;&lt;/pre&gt;
 </content>
   </entry>
@@ -281,107 +386,6 @@ Records: 249757  Duplicates: 0  Warnings: 0
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Problem solved!&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>How to Resize a Volume in AWS</title>
-    <link rel="alternate" href="http://blog.url.com/2017/03/03/how-to-resize-a-volume-in-aws.html"/>
-    <id>http://blog.url.com/2017/03/03/how-to-resize-a-volume-in-aws.html</id>
-    <published>2017-03-03T01:30:00-05:00</published>
-    <updated>2017-03-03T19:08:04-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/1Brbqkzqvjw" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
-
-&lt;h1&gt;Useful Unix Commands&lt;/h1&gt;
-
-&lt;p&gt;&lt;code&gt;$ df -h&lt;/code&gt; - gives the disk usage&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ df -h
-Filesystem      Size  Used Avail Use% Mounted on
-udev            7.5G   12K  7.5G   1% /dev
-tmpfs           1.5G  392K  1.5G   1% /run
-/dev/xvda1      7.8G  5.9G  1.6G  80% /
-none            4.0K     0  4.0K   0% /sys/fs/cgroup
-none            5.0M     0  5.0M   0% /run/lock
-none            7.5G     0  7.5G   0% /run/shm
-none            100M     0  100M   0% /run/user
-/dev/xvdc       296G  136G  147G  49% /mnt/mysql
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;$ sudo file -s /dev/xvd*&lt;/code&gt; - gives information about the available volumes&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo file -s /dev/xvd*
-/dev/xvda:  x86 boot sector
-/dev/xvda1: Linux rev 1.0 ext4 filesystem data, UUID=240ad8b1-c46c-4ed6-b233-02b4d2a7ede3, volume name &amp;quot;cloudimg-rootfs&amp;quot; (needs journal recovery) (extents) (large files) (huge files)
-/dev/xvdb:  FoxPro FPT, blocks size 0, next free block index 1664118375
-/dev/xvdc:  Linux rev 1.0 ext4 filesystem data, UUID=72ebf16a-eedc-432a-9364-1e4a9f311aad (needs journal recovery) (extents) (large files) (huge files)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;$ sudo resize2fs /dev/xvda1&lt;/code&gt; - expands the given volume xvda1 to take up the newly allocated space (works only on ext4) file system&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo resize2fs /dev/xvdc
-resize2fs 1.42.9 (4-Feb-2014)
-Filesystem at /dev/xvdc is mounted on /mnt/mysql; on-line resizing required
-old_desc_blocks = 19, new_desc_blocks = 69
-The filesystem on /dev/xvdc is now 288358400 blocks long.
-&lt;/code&gt;&lt;/pre&gt;
-</content>
-  </entry>
-  <entry>
-    <title>How to Install Ruby on a Production System with Ansible</title>
-    <link rel="alternate" href="http://blog.url.com/2017/02/28/install-ruby-on-a-production-system.html"/>
-    <id>http://blog.url.com/2017/02/28/install-ruby-on-a-production-system.html</id>
-    <published>2017-02-28T01:30:00-05:00</published>
-    <updated>2017-02-28T09:58:22-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;I recently had to set up a production server to run Ruby. Surprisingly there are many opinions on how to do it. Some
-people use RVM or RBenv, but I&amp;#39;ve been told by other people who have tried that that in a production system the system
-hacks those package managers use to get the magic to work can have unintended side effects. For example, RVM&amp;#39;s override
-of the shell causes problems when trying to use Ruby with UNIX cron jobs.&lt;/p&gt;
-
-&lt;p&gt;Doing the build-from-scratch install of system Ruby seems to be the best option for setting up a production server.
-&lt;a href="http://robmclarty.com/blog/how-to-setup-a-production-server-for-rails-4"&gt;I found this useful blog article&lt;/a&gt;, which I&amp;#39;m reposting an excerpt here in case it ever disappears from the Internet. The setup
-process should be largely the same for any other versions of Ruby.&lt;/p&gt;
-
-&lt;h3&gt;Excerpt from robmclarty.com&lt;/h3&gt;
-
-&lt;p&gt;I wanted to setup the bleeding edge on this server, so I went with a source code install process for Ruby rather than a pre-existing package. I installed Ruby 2.0 and Rails 4.beta. What I usually do to keep track of my source-code-installed components is create a src directory in my user&amp;#39;s home folder inside which I store all my source code folders for compilation, installation, and later, any uninstallation I might need to do.&lt;/p&gt;
-
-&lt;p&gt;But before that, I needed to install a few more dependencies so my server environment was ready for it.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo apt-get install build-essential libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion
-Next, inside /home/bill/src and got the latest Ruby, decompressed it, configured, compiled, and installed.
-
-wget ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p0.tar.gz
-tar xzvf ruby-2.0.0-p0.tar.gz
-cd ruby-2.0.0-p0
-./configure
-make
-sudo make install
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Next, I made a symbolic link from /usr/local/bin/ruby to /usr/bin/ruby because some programs look for it there.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo ln -s /usr/local/bin/ruby /usr/bin/ruby
-The newer Rubies come with rubygems so you don&amp;#39;t need to worry about installing that separately anymore. But before installing any new gems (like Rails) it&amp;#39;s always a good idea to make sure it&amp;#39;s up to date.
-
-sudo gem update --system
-Finally, now that there was a convenient beta1 branch for the Rails gem, all I needed to do was install the latest Rails was the following.
-
-sudo gem install rails --version 4.0.0.beta1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;I encountered some weird issues with rdoc and ri where I had to answer &amp;quot;yes&amp;quot; to overwrite the existing versions. I just went with it since this is a dedicated server and I care more about the app working than some documentation that isn&amp;#39;t necessary for me in production. I&amp;#39;m sure this will be fixed in the final release.&lt;/p&gt;
-
-&lt;p&gt;Update: @kaspergrubbe gave me a great little tweak so you don&amp;#39;t need to specify --no-ri --no-rdoc every time you install a gem in production: just add gem: --no-rdoc --no-ri to ~/.gemrc (create that file if it doesn&amp;#39;t already exist) and don&amp;#39;t worry about ri or rdoc again in production.&lt;/p&gt;
-
-&lt;h1&gt;Throw in some Ansible&lt;/h1&gt;
-
-&lt;p&gt;I automated these steps using Ansible to install Ruby 2.3.3 on my system. &lt;a href="https://github.com/wakproductions/ansible-examples/blob/master/roles/web/tasks/install_ruby233.yml"&gt;Here&amp;#39;s the playbook.&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>

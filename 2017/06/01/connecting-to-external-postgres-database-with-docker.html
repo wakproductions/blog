@@ -70,9 +70,25 @@
             
             <pre><code>#------------------------------------------------------------------------------&#x000A;# CONNECTIONS AND AUTHENTICATION&#x000A;#------------------------------------------------------------------------------&#x000A;&#x000A;# - Connection Settings -&#x000A;&#x000A;# what IP address(es) to listen on;&#x000A;listen_addresses = &#39;localhost,192.168.1.143&#39;&#x000A;                                        # comma-separated list of addresses;&#x000A;                                        # defaults to &#39;localhost&#39;; use &#39;*&#39; for all&#x000A;                                        # (change requires restart)&#x000A;&#x000A;</code></pre>
             
+            <p>The above setting worked on my local Mac, but for my Ubuntu server, I had to implement the change using the
+            <code>ALTER SYSTEM</code> command from within Postgres:</p>
+            
+            <pre><code>postgres-# ALTER SYSTEM SET listen_addresses=&#39;localhost,172.0.30.143&#39;&#x000A;ALTER SYSTEM&#x000A;postgres-# \q&#x000A;&#x000A;$ sudo service postgresql restart&#x000A;&#x000A;$ netstat -ntl&#x000A;  Active Internet connections (only servers)&#x000A;  Proto Recv-Q Send-Q Local Address           Foreign Address         State      &#x000A;  tcp        0      0 172.0.30.143:5432        0.0.0.0:*               LISTEN   &lt;- it&#39;s listening on the correct IP now   &#x000A;  tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN     &#x000A;  tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     &#x000A;  tcp6       0      0 :::3030                 :::*                    LISTEN     &#x000A;  tcp6       0      0 :::22                   :::*                    LISTEN   &#x000A;</code></pre>
+            
             <p>I also had to add the following line to <code>pg_hba.conf</code></p>
             
             <pre><code>host    all             all             192.168.1.143/32        trust&#x000A;</code></pre>
+            
+            <p>In case you don&#39;t know the Postgres data directory, log into psql and:</p>
+            
+            <pre><code># show data_directory;&#x000A;&#x000A;        data_directory        &#x000A;------------------------------&#x000A; /var/lib/postgresql/9.5/main&#x000A;(1 row)&#x000A;</code></pre>
+            
+            <h2>Gotcha</h2>
+            
+            <p>On my Ubuntu configuration, I had trobule getting the pg<em>hba.conf to work. That&#39;s because I created and edited the
+            file in the data directory. I found out that the real location of the pg</em>hba.conf file was:</p>
+            
+            <pre><code>postgres-# SHOW hba_file;&#x000A;&#x000A;               hba_file               &#x000A;--------------------------------------&#x000A; /etc/postgresql/9.5/main/pg_hba.conf&#x000A;</code></pre>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -109,6 +125,8 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
+            <li><a href="../08/new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
+            <li><a href="../06/docker-capistrano-asset-and-log-file-links.html">Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</a> <span>Jun  6</span></li>
             <li><a href="../03/why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
             <li><a href="../03/installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
             <li><a href="connecting-to-external-postgres-database-with-docker.html">How to connect to an external Postgres database from a Docker container</a> <span>Jun  1</span></li>
@@ -117,12 +135,10 @@
             <li><a href="../../02/28/install-ruby-on-a-production-system.html">How to Install Ruby on a Production System with Ansible</a> <span>Feb 28</span></li>
             <li><a href="../../02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html">Pretty Print a Really Big Hash in Ruby</a> <span>Feb 16</span></li>
             <li><a href="../../01/14/bulk-insert-in-rails-and-mysql.html">Better Bulk Inserts in Rails</a> <span>Jan 14</span></li>
-            <li><a href="../../01/12/s3-code-examples.html">AWS S3 Code Examples in Ruby (aws-sdk 2.0)</a> <span>Jan 12</span></li>
-            <li><a href="../../01/07/ruby-string-freeze-memory.html">Ruby - Don't Freeze User-Defined Strings!</a> <span>Jan  7</span></li>
           </ol>
           <h2>By Year</h2>
           <ol>
-            <li><a href="../../../2017.html">2017 (10)</a></li>
+            <li><a href="../../../2017.html">2017 (12)</a></li>
             <li><a href="../../../2016.html">2016 (7)</a></li>
           </ol>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>

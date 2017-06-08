@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>First Post</title>
+    <title>Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2016 x2016_09 x2016_09_10 x2016_09_10_first-post'>
+  <body class='x2017 x2017_06 x2017_06_06 x2017_06_06_docker-capistrano-asset-and-log-file-links'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>First Post</h2>
+          <h2 class='article-title'>Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,12 +51,20 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>09/10/2016</div>
+          <div class='article-date'>06/06/2017</div>
           <div class='article-body'>
-            <p>Welcome to my blog, where I will be covering technical topics encountered in my work as a software engineer. This is
-            to act as a reference for myself, my team, and others who may be facing similar technical challenges. This won&#39;t be a
-            traditional blog with static articles as I plan to retroactively update many of these posts. Think of it more as a
-            Wiki on technical topics.  </p>
+            <p>Upon getting my Docker application running in production, I ran into this error message:</p>
+            
+            <pre><code>F, [2017-06-06T00:53:06.630911 #1] FATAL -- : [8957e40e-e8fa-4f2d-8072-4dab83c6269b] ActionView::Template::Error (The asset &quot;application.css&quot; is not present in the asset pipeline.):&#x000A;</code></pre>
+            
+            <p>The problem occurred because the Rails asset pipeline was missing files. The application in production mode couldn&#39;t find
+            the files it was looking for from the <code>rake assets:precompile</code> stage, which was performed by Capistrano <em>outside</em> of the
+            Docker container. To fix this error I had to symlink the <code>public/assets</code> folder inside of the Docker container to
+            the file system outside like this:</p>
+            
+            <pre><code>#docker-compose.yml&#x000A;&#x000A;version: &#39;3&#39;&#x000A;services:&#x000A;  web:&#x000A;    container_name: myapp&#x000A;    build: .&#x000A;    command: bundle exec rails s -p 3000&#x000A;    environment:&#x000A;      - RAILS_ENV=${RAILS_ENV:-development}&#x000A;      - DATABASE_URL=${DATABASE_URL}&#x000A;      - RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES}&#x000A;      - SECRET_KEY_BASE=${SECRET_KEY_BASE}&#x000A;    extra_hosts:&#x000A;      - dbhost:${LOCAL_IP:-127.0.0.1}&#x000A;    ports:&#x000A;      - ${HTTP_PORT:-80}:3000&#x000A;    tty: true&#x000A;    volumes:&#x000A;      - ./log:/app/log&#x000A;      - ./public/assets:/app/public/assets&#x000A;</code></pre>
+            
+            <p>Note that on the <code>volumes</code> section I link both the <code>log</code> and <code>public</code> assets folder. </p>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -93,16 +101,16 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../../../2017/06/08/new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
-            <li><a href="../../../2017/06/06/docker-capistrano-asset-and-log-file-links.html">Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</a> <span>Jun  6</span></li>
-            <li><a href="../../../2017/06/03/why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
-            <li><a href="../../../2017/06/03/installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
-            <li><a href="../../../2017/06/01/connecting-to-external-postgres-database-with-docker.html">How to connect to an external Postgres database from a Docker container</a> <span>Jun  1</span></li>
-            <li><a href="../../../2017/03/15/headers-matter-double-check-mysql-conf.html">Headers matter! Check that your MySQL configuration file is valid!</a> <span>Mar 15</span></li>
-            <li><a href="../../../2017/03/03/how-to-resize-a-volume-in-aws.html">How to Resize a Volume in AWS</a> <span>Mar  3</span></li>
-            <li><a href="../../../2017/02/28/install-ruby-on-a-production-system.html">How to Install Ruby on a Production System with Ansible</a> <span>Feb 28</span></li>
-            <li><a href="../../../2017/02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html">Pretty Print a Really Big Hash in Ruby</a> <span>Feb 16</span></li>
-            <li><a href="../../../2017/01/14/bulk-insert-in-rails-and-mysql.html">Better Bulk Inserts in Rails</a> <span>Jan 14</span></li>
+            <li><a href="../08/new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
+            <li><a href="docker-capistrano-asset-and-log-file-links.html">Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</a> <span>Jun  6</span></li>
+            <li><a href="../03/why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
+            <li><a href="../03/installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
+            <li><a href="../01/connecting-to-external-postgres-database-with-docker.html">How to connect to an external Postgres database from a Docker container</a> <span>Jun  1</span></li>
+            <li><a href="../../03/15/headers-matter-double-check-mysql-conf.html">Headers matter! Check that your MySQL configuration file is valid!</a> <span>Mar 15</span></li>
+            <li><a href="../../03/03/how-to-resize-a-volume-in-aws.html">How to Resize a Volume in AWS</a> <span>Mar  3</span></li>
+            <li><a href="../../02/28/install-ruby-on-a-production-system.html">How to Install Ruby on a Production System with Ansible</a> <span>Feb 28</span></li>
+            <li><a href="../../02/16/pretty-print-a-really-big-hash-to-string-in-ruby.html">Pretty Print a Really Big Hash in Ruby</a> <span>Feb 16</span></li>
+            <li><a href="../../01/14/bulk-insert-in-rails-and-mysql.html">Better Bulk Inserts in Rails</a> <span>Jan 14</span></li>
           </ol>
           <h2>By Year</h2>
           <ol>
