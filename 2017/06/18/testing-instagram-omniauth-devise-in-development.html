@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>US Treasury Yield Curve Chart</title>
+    <title>How to test Devise Omniauth in your local development environment with Instagram</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2017 x2017_06 x2017_06_08 x2017_06_08_new-website-us-treasury-yield-curve'>
+  <body class='x2017 x2017_06 x2017_06_18 x2017_06_18_testing-instagram-omniauth-devise-in-development'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>US Treasury Yield Curve Chart</h2>
+          <h2 class='article-title'>How to test Devise Omniauth in your local development environment with Instagram</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,16 +51,25 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>06/08/2017</div>
+          <div class='article-date'>06/18/2017</div>
           <div class='article-body'>
-            <p>Here&#39;s a little project I did for fun to demonstrate a little Javascript single page app running on an
-            AWS/Docker/Ruby on Rails stack.</p>
+            <p>For testing in your local environment, you can set the Omniauth redirect to a URL on your localhost. First, you have
+            to add localhost to your list of authorized hosts in your Omniauth settings:</p>
             
-            <p><a href="http://www.ustreasuryyieldcurve.com">US Treasury Yield Curve</a></p>
+            <p><img src="../../../images/2016/Pasted_Image_6_18_17__4_57_PM.png" style="width: 600px" relative="true" alt="Pasted image 6 18 17  4 57 pm" /></p>
             
-            <p>The term structure of interest rates are an important barometer for the economy. When the yield curve flattens
-            it&#39;s often a good predictor of economic slowdown and subsequent decline in the stock market. Play around
-            with it and see what the interest rates have looked like historically!</p>
+            <p>Then access the Oauth link to log into Instagram. You can do this by clicking a link in your browser set by
+            your Rails app running locally, or you can type the URL into your browser directly:</p>
+            
+            <pre><code>https://www.instagram.com/oauth/authorize?client_id=ce5d6048488346cc93010e9c170dd338&amp;redirect_uri=http://localhost:5050/users/auth/instagram/callback&amp;response_type=code&#x000A;</code></pre>
+            
+            <p>You can then log into your Instagram account and it will redirect you back to the application.</p>
+            
+            <p><img src="../../../images/2016/Pasted_Image_6_18_17__5_09_PM.png" style="width: 600px" relative="true" alt="Pasted image 6 18 17  5 09 pm" /></p>
+            
+            <p>Showing that the Devise callback URL is being hit by the browser with the access token from inside <code>rails s</code>:</p>
+            
+            <pre><code>     2: def instagram&#x000A;     3:   @user = User.from_omniauth(omniauth_data)&#x000A;     4:&#x000A;     5:   binding.pry&#x000A;     6:&#x000A; =&gt;  7:   if @user.access_token != omniauth_data.credentials.token&#x000A;     8:     # This will be saved by the `sign_in_and_redirect` method below&#x000A;     9:     @user.access_token = omniauth_data.credentials.token&#x000A;    10:   end&#x000A;&#x000A;[1] pry(#&lt;Users::OmniauthCallbacksController&gt;)&gt; @user&#x000A;=&gt; #&lt;User id: 1, uid: &quot;300202775&quot;, email: &quot;&quot;, created_at: &quot;2017-06-18 19:25:50&quot;, updated_at: &quot;2017-06-18 19:25:50&quot;, access_token: nil, first_name: &quot;Winston&quot;, last_name: &quot;Kotzan&quot;, middle_name: &quot;&quot;, time_zone: nil, provider: &quot;instagram&quot;&gt;&#x000A;[2] pry(#&lt;Users::OmniauthCallbacksController&gt;)&gt; User.count&#x000A;   (1.2ms)  SELECT COUNT(*) FROM &quot;users&quot;&#x000A;=&gt; 1&#x000A;[4] pry(#&lt;Users::OmniauthCallbacksController&gt;)&gt; omniauth_data&#x000A;=&gt; {&quot;provider&quot;=&gt;&quot;instagram&quot;,&#x000A; &quot;uid&quot;=&gt;&quot;300202775&quot;,&#x000A; &quot;info&quot;=&gt;&#x000A;  {&quot;nickname&quot;=&gt;&quot;wakproductions&quot;,&#x000A;   &quot;name&quot;=&gt;&quot;Winston Kotzan&quot;,&#x000A;   &quot;email&quot;=&gt;nil,&#x000A;   &quot;image&quot;=&gt;&quot;https://scontent.cdninstagram.com/t51.2885-19/11934657_1625722474367056_1293718021_a.jpg&quot;,&#x000A;   &quot;bio&quot;=&gt;&quot;&quot;,&#x000A;   &quot;website&quot;=&gt;&quot;&quot;},&#x000A; &quot;credentials&quot;=&gt;{&quot;token&quot;=&gt;&quot;300202775.ce5d604.417373f3e1e844478f2ddfae17dbe378&quot;, &quot;expires&quot;=&gt;false},&#x000A; &quot;extra&quot;=&gt;&#x000A;  {&quot;raw_info&quot;=&gt;&#x000A;    {&quot;id&quot;=&gt;&quot;300202775&quot;,&#x000A;     &quot;username&quot;=&gt;&quot;wakproductions&quot;,&#x000A;     &quot;profile_picture&quot;=&gt;&quot;https://scontent.cdninstagram.com/t51.2885-19/11934657_1625722474367056_1293718021_a.jpg&quot;,&#x000A;     &quot;full_name&quot;=&gt;&quot;Winston Kotzan&quot;,&#x000A;     &quot;bio&quot;=&gt;&quot;&quot;,&#x000A;     &quot;website&quot;=&gt;&quot;&quot;}}}&#x000A;[5] pry(#&lt;Users::OmniauthCallbacksController&gt;)&gt;&#x000A;&#x000A;</code></pre>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -97,8 +106,8 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../18/testing-instagram-omniauth-devise-in-development.html">How to test Devise Omniauth in your local development environment with Instagram</a> <span>Jun 18</span></li>
-            <li><a href="new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
+            <li><a href="testing-instagram-omniauth-devise-in-development.html">How to test Devise Omniauth in your local development environment with Instagram</a> <span>Jun 18</span></li>
+            <li><a href="../08/new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
             <li><a href="../06/docker-capistrano-asset-and-log-file-links.html">Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</a> <span>Jun  6</span></li>
             <li><a href="../03/why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
             <li><a href="../03/installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
