@@ -39,7 +39,7 @@ Showing that the Devise callback URL is being hit by the browser with the access
 [2] pry(#<Users::OmniauthCallbacksController>)> User.count
    (1.2ms)  SELECT COUNT(*) FROM "users"
 => 1
-[4] pry(#<Users::OmniauthCallbacksController>)> omniauth_data
+[4] pry(#<Users::OmniauthCallbacksController>)> request.env['omniauth.auth']
 => {"provider"=>"instagram",
  "uid"=>"300202775",
  "info"=>
