@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</title>
+    <title>Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2017 x2017_06 x2017_06_03 x2017_06_03_installing-docker-on-ubuntu-with-ansible'>
+  <body class='x2017 x2017_07 x2017_07_12 x2017_07_12_docker-could-not-find-available-ipv4-address'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</h2>
+          <h2 class='article-title'>Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,13 +51,21 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>06/03/2017</div>
+          <div class='article-date'>07/12/2017</div>
           <div class='article-body'>
-            <p>Here is the Ansible role based <a href="https://docs.docker.com/engine/installation/linux/ubuntu/#prerequisites">on the official Docker installation guide</a></p>
+            <p>So on my latest Capistrano deploy to <a href="http://www.momentumstockscans.com">MomentumStockScans.com</a>, I received the following
+            error:</p>
             
-            <pre><code class="yml">---&#x000A;# This is aimed towards Ubuntu Xenial 16&#x000A;&#x000A;- name: Uninstall Old Versions&#x000A;  apt:&#x000A;    pkg:          &quot;{{ item }}&quot;&#x000A;    state:        absent&#x000A;  with_items:&#x000A;    - docker&#x000A;    - docker-engine&#x000A;&#x000A;- name: Install dependencies&#x000A;  apt:&#x000A;    pkg:          &quot;{{ item }}&quot;&#x000A;    state:        present&#x000A;    update_cache: true&#x000A;  with_items:&#x000A;    - apt-transport-https&#x000A;    - ca-certificates&#x000A;    - curl&#x000A;    - software-properties-common&#x000A;&#x000A;- name: Install the GPG key&#x000A;  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -&#x000A;&#x000A;- name: Add Docker repository&#x000A;  apt_repository:&#x000A;    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable&#x000A;    state: present&#x000A;&#x000A;- name: Install Docker&#x000A;  apt:&#x000A;    pkg:          docker-ce=17.03.0~ce-0~ubuntu-xenial&#x000A;    state:        present&#x000A;    update_cache: yes&#x000A;&#x000A;- name: Install Docker compose&#x000A;  shell: &gt;&#x000A;    curl -L https://github.com/docker/compose/releases/download/1.13.0/docker-compose-`uname -s`-`uname -m` &gt; /usr/local/bin/docker-compose &amp;&amp;&#x000A;    sudo chmod +x /usr/local/bin/docker-compose&#x000A;  become: true&#x000A;</code></pre>
+            <pre><code>$ sudo docker-compose up -d&#x000A;sudo: unable to resolve host ip-172-30-0-194&#x000A;Creating network &quot;20170713014600_default&quot; with the default driver&#x000A;ERROR: could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network&#x000A;</code></pre>
             
-            <p><a href="https://github.com/wakproductions/ansible-examples">See my full ansible examples repository for more</a></p>
+            <p>Turns out every time I was running <code>docker-compose</code> it created a new bridge network, and <a href="https://github.com/moby/moby/issues/23971">there&#39;s a limit of 31 networks
+            on the system</a>!</p>
+            
+            <p>When I did <code>docker network ls</code>, it gave me a whole list of networks it created. One for each deploy. I cleared them using</p>
+            
+            <pre><code>$ sudo docker network prune&#x000A;</code></pre>
+            
+            <p>Everything was fine! Will add the above command to my Capistrano deploy script.</p>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -94,14 +102,14 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../../07/12/docker-could-not-find-available-ipv4-address.html">Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</a> <span>Jul 12</span></li>
-            <li><a href="../25/introducing-momentum-stock-scans.html">Introducing MomentumStockScans.com!</a> <span>Jun 25</span></li>
-            <li><a href="../18/testing-instagram-omniauth-devise-in-development.html">How to test Devise Omniauth in your local development environment with Instagram</a> <span>Jun 18</span></li>
-            <li><a href="../08/new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
-            <li><a href="../06/docker-capistrano-asset-and-log-file-links.html">Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</a> <span>Jun  6</span></li>
-            <li><a href="why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
-            <li><a href="installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
-            <li><a href="../01/connecting-to-external-postgres-database-with-docker.html">How to connect to an external Postgres database from a Docker container</a> <span>Jun  1</span></li>
+            <li><a href="docker-could-not-find-available-ipv4-address.html">Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</a> <span>Jul 12</span></li>
+            <li><a href="../../06/25/introducing-momentum-stock-scans.html">Introducing MomentumStockScans.com!</a> <span>Jun 25</span></li>
+            <li><a href="../../06/18/testing-instagram-omniauth-devise-in-development.html">How to test Devise Omniauth in your local development environment with Instagram</a> <span>Jun 18</span></li>
+            <li><a href="../../06/08/new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
+            <li><a href="../../06/06/docker-capistrano-asset-and-log-file-links.html">Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</a> <span>Jun  6</span></li>
+            <li><a href="../../06/03/why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
+            <li><a href="../../06/03/installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
+            <li><a href="../../06/01/connecting-to-external-postgres-database-with-docker.html">How to connect to an external Postgres database from a Docker container</a> <span>Jun  1</span></li>
             <li><a href="../../03/15/headers-matter-double-check-mysql-conf.html">Headers matter! Check that your MySQL configuration file is valid!</a> <span>Mar 15</span></li>
             <li><a href="../../03/03/how-to-resize-a-volume-in-aws.html">How to Resize a Volume in AWS</a> <span>Mar  3</span></li>
           </ol>

@@ -5,10 +5,39 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-06-25T01:00:00-04:00</updated>
+  <updated>2017-07-12T01:00:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</title>
+    <link rel="alternate" href="http://blog.url.com/2017/07/12/docker-could-not-find-available-ipv4-address.html"/>
+    <id>http://blog.url.com/2017/07/12/docker-could-not-find-available-ipv4-address.html</id>
+    <published>2017-07-12T01:00:00-04:00</published>
+    <updated>2017-07-12T22:03:52-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;So on my latest Capistrano deploy to &lt;a href="http://www.momentumstockscans.com"&gt;MomentumStockScans.com&lt;/a&gt;, I received the following
+error:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo docker-compose up -d
+sudo: unable to resolve host ip-172-30-0-194
+Creating network &amp;quot;20170713014600_default&amp;quot; with the default driver
+ERROR: could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Turns out every time I was running &lt;code&gt;docker-compose&lt;/code&gt; it created a new bridge network, and &lt;a href="https://github.com/moby/moby/issues/23971"&gt;there&amp;#39;s a limit of 31 networks
+on the system&lt;/a&gt;!&lt;/p&gt;
+
+&lt;p&gt;When I did &lt;code&gt;docker network ls&lt;/code&gt;, it gave me a whole list of networks it created. One for each deploy. I cleared them using&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo docker network prune
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Everything was fine! Will add the above command to my Capistrano deploy script.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Introducing MomentumStockScans.com!</title>
     <link rel="alternate" href="http://blog.url.com/2017/06/25/introducing-momentum-stock-scans.html"/>
@@ -185,63 +214,6 @@ ubuntu@ip-172-30-0-78:~$ gem install bundler
 dependencies for new features? The last thing I would want is for my production system to go down due to unforeseen
 differences between my development environment and production. Docker gives me a way to ensure consistency between
 environments and swap dependencies. &lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</title>
-    <link rel="alternate" href="http://blog.url.com/2017/06/03/installing-docker-on-ubuntu-with-ansible.html"/>
-    <id>http://blog.url.com/2017/06/03/installing-docker-on-ubuntu-with-ansible.html</id>
-    <published>2017-06-03T01:00:00-04:00</published>
-    <updated>2017-06-03T14:04:54-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;Here is the Ansible role based &lt;a href="https://docs.docker.com/engine/installation/linux/ubuntu/#prerequisites"&gt;on the official Docker installation guide&lt;/a&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="yml"&gt;---
-# This is aimed towards Ubuntu Xenial 16
-
-- name: Uninstall Old Versions
-  apt:
-    pkg:          &amp;quot;{{ item }}&amp;quot;
-    state:        absent
-  with_items:
-    - docker
-    - docker-engine
-
-- name: Install dependencies
-  apt:
-    pkg:          &amp;quot;{{ item }}&amp;quot;
-    state:        present
-    update_cache: true
-  with_items:
-    - apt-transport-https
-    - ca-certificates
-    - curl
-    - software-properties-common
-
-- name: Install the GPG key
-  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-
-- name: Add Docker repository
-  apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
-    state: present
-
-- name: Install Docker
-  apt:
-    pkg:          docker-ce=17.03.0~ce-0~ubuntu-xenial
-    state:        present
-    update_cache: yes
-
-- name: Install Docker compose
-  shell: &amp;gt;
-    curl -L https://github.com/docker/compose/releases/download/1.13.0/docker-compose-`uname -s`-`uname -m` &amp;gt; /usr/local/bin/docker-compose &amp;amp;&amp;amp;
-    sudo chmod +x /usr/local/bin/docker-compose
-  become: true
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a href="https://github.com/wakproductions/ansible-examples"&gt;See my full ansible examples repository for more&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>
