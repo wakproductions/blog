@@ -1,0 +1,26 @@
+---
+title: Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network
+date: 2017-07-12
+tags:
+---
+
+So on my latest Capistrano deploy to [MomentumStockScans.com](http://www.momentumstockscans.com), I received the following
+error:
+
+```
+$ sudo docker-compose up -d
+sudo: unable to resolve host ip-172-30-0-194
+Creating network "20170713014600_default" with the default driver
+ERROR: could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network
+```
+
+Turns out every time I was running `docker-compose` it created a new bridge network, and [there's a limit of 31 networks
+on the system](https://github.com/moby/moby/issues/23971)!
+
+When I did `docker network ls`, it gave me a whole list of networks it created. One for each deploy. I cleared them using
+
+```
+$ sudo docker network prune
+```
+
+Everything was fine! Will add the above command to my Capistrano deploy script.
