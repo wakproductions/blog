@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>How to Resize a Volume in AWS</title>
+    <title>Interviewing Tip - Peel the Onion</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2017 x2017_03 x2017_03_03 x2017_03_03_how-to-resize-a-volume-in-aws'>
+  <body class='x2017 x2017_07 x2017_07_13 x2017_07_13_interviewing-tip-peel-the-onion'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>How to Resize a Volume in AWS</h2>
+          <h2 class='article-title'>Interviewing Tip - Peel the Onion</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,23 +51,41 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>03/03/2017</div>
+          <div class='article-date'>07/13/2017</div>
           <div class='article-body'>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/1Brbqkzqvjw" frameborder="0" allowfullscreen></iframe>
+            <p>I&#39;m the author of the college student job search guide, <a href="https://www.amazon.com/gp/product/0985757116/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0985757116&amp;linkCode=as2&amp;tag=winstonkotzan-20&amp;linkId=49527ca8d490f74681ce640c10f22108">This is Not Your Father&#39;s Job Market</a>,
+            and right now I&#39;m actively using those job search skills again myself as I look for new technical projects. Something that I
+            retrospectively caught myself doing today during a phone interview is rambling a bit.</p>
             
-            <h1>Useful Unix Commands</h1>
+            <p>One of the tricky things about interviewing in general, but in particular with phone interviewing, is that it&#39;s easy to
+            spill too much information when answering an interview question. So in the call I was on today, I asked the interviewer
+            about the production stack they are using to run their website. He said that their front-end is very simple-just some
+            plain Javascript, but in this role I was in I may have an opportunity to help them decide how to build a more up-to-date
+            front end. I then started talking about my personal experience using React.js and other front end frameworks, and probably
+            spoke for a good 3 minutes espousing my opinions of the pros and cons of each.</p>
             
-            <p><code>$ df -h</code> - gives the disk usage</p>
+            <p>There&#39;s a few reasons talking too continuously is bad for interviews:</p>
             
-            <pre><code>$ df -h&#x000A;Filesystem      Size  Used Avail Use% Mounted on&#x000A;udev            7.5G   12K  7.5G   1% /dev&#x000A;tmpfs           1.5G  392K  1.5G   1% /run&#x000A;/dev/xvda1      7.8G  5.9G  1.6G  80% /&#x000A;none            4.0K     0  4.0K   0% /sys/fs/cgroup&#x000A;none            5.0M     0  5.0M   0% /run/lock&#x000A;none            7.5G     0  7.5G   0% /run/shm&#x000A;none            100M     0  100M   0% /run/user&#x000A;/dev/xvdc       296G  136G  147G  49% /mnt/mysql&#x000A;</code></pre>
+            <ol>
+            <li>You don&#39;t have visual cues as to how the interviewer is reacting. i.e.) the person on the other end of the
+            line might look bored or disinterested in what you are saying, but since you can&#39;t see it&#39;s difficult to know.</li>
+            <li>You might reveal something compromising or contrary to what the interviewer is looking for. For example, I may have
+            given the impression in this case that I was biased to React.js. What if this team wanted to use Ember.js?</li>
+            <li>You might inadvertently come across as a know-it-all. Talking too much on a topic makes it sound like you&#39;re
+            trying to dominate the conversation. This can easily happen over the phone when only one person can speak at a time.
+            At worst, your opinions may even conflict with the interviewer&#39;s opinions making you a dislikable candidate.</li>
+            </ol>
             
-            <p><code>$ sudo file -s /dev/xvd*</code> - gives information about the available volumes</p>
+            <p>The way to fix this is to only give enough information and talk long enough to give what&#39;s needed - it&#39;s like peeling an
+            onion only one layer at a time. Don&#39;t give away the whole thing at once. If the interviewer is interested in what you
+            have to say, he&#39;ll probe for more. You can also end each statement you make by affirming with: &quot;Does that adequately
+            answer the question?&quot;</p>
             
-            <pre><code>$ sudo file -s /dev/xvd*&#x000A;/dev/xvda:  x86 boot sector&#x000A;/dev/xvda1: Linux rev 1.0 ext4 filesystem data, UUID=240ad8b1-c46c-4ed6-b233-02b4d2a7ede3, volume name &quot;cloudimg-rootfs&quot; (needs journal recovery) (extents) (large files) (huge files)&#x000A;/dev/xvdb:  FoxPro FPT, blocks size 0, next free block index 1664118375&#x000A;/dev/xvdc:  Linux rev 1.0 ext4 filesystem data, UUID=72ebf16a-eedc-432a-9364-1e4a9f311aad (needs journal recovery) (extents) (large files) (huge files)&#x000A;</code></pre>
+            <p>If you want a job search guide full of awesome tips like this, I recommend getting a copy of my book! Link below.</p>
             
-            <p><code>$ sudo resize2fs /dev/xvda1</code> - expands the given volume xvda1 to take up the newly allocated space (works only on ext4) file system</p>
+            <p><a target="_blank" href="https://www.amazon.com/gp/product/0985757116/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0985757116&linkCode=as2&tag=winstonkotzan-20&linkId=49527ca8d490f74681ce640c10f22108">This is Not Your Father&#39;s Job Market: Job Seeking Strategies for Today&#39;s New College Graduates</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=winstonkotzan-20&l=am2&o=1&a=0985757116" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
             
-            <pre><code>$ sudo resize2fs /dev/xvdc&#x000A;resize2fs 1.42.9 (4-Feb-2014)&#x000A;Filesystem at /dev/xvdc is mounted on /mnt/mysql; on-line resizing required&#x000A;old_desc_blocks = 19, new_desc_blocks = 69&#x000A;The filesystem on /dev/xvdc is now 288358400 blocks long.&#x000A;</code></pre>
+            <iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&OneJS=1&Operation=GetAdHtml&MarketPlace=US&source=ac&ref=qf_sp_asin_til&ad_type=product_link&tracking_id=winstonkotzan-20&marketplace=amazon&region=US&placement=0985757116&asins=0985757116&linkId=f280bde1ac5d26e167436aca1ba048ee&show_border=false&link_opens_in_new_window=true&price_color=333333&title_color=0066c0&bg_color=ffffff"></iframe>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -104,8 +122,8 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../../07/13/interviewing-tip-peel-the-onion.html">Interviewing Tip - Peel the Onion</a> <span>Jul 13</span></li>
-            <li><a href="../../07/12/docker-could-not-find-available-ipv4-address.html">Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</a> <span>Jul 12</span></li>
+            <li><a href="interviewing-tip-peel-the-onion.html">Interviewing Tip - Peel the Onion</a> <span>Jul 13</span></li>
+            <li><a href="../12/docker-could-not-find-available-ipv4-address.html">Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</a> <span>Jul 12</span></li>
             <li><a href="../../06/25/introducing-momentum-stock-scans.html">Introducing MomentumStockScans.com!</a> <span>Jun 25</span></li>
             <li><a href="../../06/18/testing-instagram-omniauth-devise-in-development.html">How to test Devise Omniauth in your local development environment with Instagram</a> <span>Jun 18</span></li>
             <li><a href="../../06/08/new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
@@ -113,7 +131,7 @@
             <li><a href="../../06/03/why-I-use-docker-on-aws.html">Why I Switched to Docker when Using AWS with Ruby on Rails</a> <span>Jun  3</span></li>
             <li><a href="../../06/03/installing-docker-on-ubuntu-with-ansible.html">Docker installation on AWS/Ubuntu Xenial made Easy with Ansible</a> <span>Jun  3</span></li>
             <li><a href="../../06/01/connecting-to-external-postgres-database-with-docker.html">How to connect to an external Postgres database from a Docker container</a> <span>Jun  1</span></li>
-            <li><a href="../15/headers-matter-double-check-mysql-conf.html">Headers matter! Check that your MySQL configuration file is valid!</a> <span>Mar 15</span></li>
+            <li><a href="../../03/15/headers-matter-double-check-mysql-conf.html">Headers matter! Check that your MySQL configuration file is valid!</a> <span>Mar 15</span></li>
           </ol>
           <h2>By Year</h2>
           <ol>
