@@ -5,10 +5,76 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-07-13T19:55:00-04:00</updated>
+  <updated>2017-07-17T19:55:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Interviewing Tip - 3 Step Process fo Writing a Good Cover Letter</title>
+    <link rel="alternate" href="http://blog.url.com/2017/07/17/interviewing-tip-3-step-process-to-a-good-cover-letter.html"/>
+    <id>http://blog.url.com/2017/07/17/interviewing-tip-3-step-process-to-a-good-cover-letter.html</id>
+    <published>2017-07-17T19:55:00-04:00</published>
+    <updated>2017-07-18T15:18:22-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Cover letters are important! After going through a pile of resumes, they can all start to look the same. Most job
+applicants for a particular position will have work histories in some business-y job doing similar job titles, give or
+take a few years difference in experience. The one chance you have to stand out and make &lt;em&gt;your&lt;/em&gt; application stand out
+is through a well written cover letter.&lt;/p&gt;
+
+&lt;p&gt;I&amp;#39;ve come up with a simple 3-step formula for making your cover letter concise and make your background stand out.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Introduce yourself - tell them who you are and what you&amp;#39;re looking for. You can even say what exactly it was
+about this particular posting that caught your attention.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Pull out something about the job position and write about how you have relevant experience doing that.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Call to action. This is something I learned to consciously do from Youtube.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Let&amp;#39;s look at an example hypothetical job posting.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are looking for a Senior Ruby Developer to join our existing team. The position is full time and can be remote.
+Strong knowledge of Ruby is required. Real world experience building and maintaining Ruby on Rails apps is a must - from UI to APIs. This project will involve being part of a team working on an application used by tens of thousands of customers every day.
+Our typical project stack is Ruby, Rails, JavaScript and PostgreSQL. We prefer developers who  embrace new approaches and the craft of software design to solve problems.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Now let&amp;#39;s read the same posting again, this time I&amp;#39;m going to highlight key phrases to pull out for crafting a cover
+letter:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are &lt;span style="color: green; font-weight: bold"&gt;looking for a Senior Ruby Developer&lt;/span&gt; to join our existing team. The position is full time and &lt;span style="color: green; font-weight: bold"&gt;can be remote&lt;/span&gt;.
+Strong knowledge of Ruby is required. &lt;span style="color: blue; font-weight: bold"&gt;Real world experience building and maintaining Ruby on Rails apps is a must - from UI to APIs&lt;/span&gt;. This project will involve being part of a team working on an application &lt;span style="color: blue; font-weight: bold"&gt;used by tens of thousands of customers&lt;/span&gt; every day.
+Our typical project stack is &lt;span style="color: blue; font-weight: bold"&gt;Ruby, Rails, JavaScript and PostgreSQL&lt;/span&gt;. We prefer developers who embrace new approaches and the craft of software design to solve problems.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I color coded accordingly to match steps 1, 2, and 3 of the process I am suggesting. Here&amp;#39;s the cover letter body:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;I am &lt;span style="color: green; font-weight: bold"&gt;an experienced Ruby on Rails developer&lt;/span&gt; looking for &lt;span style="color: green; font-weight: bold"&gt;remote work&lt;/span&gt;.
+I enjoy working on a variety of projects, and have been &lt;span style="color: green; font-weight: bold"&gt;taking on remote contracts of late&lt;/span&gt;. At FinCorp, a Chicago-based finance tech company, I worked with an agile team to maintain and build new logic into a Ruby-based accounting system for a &lt;span style="color: blue; font-weight: bold"&gt;$3 billion loan portfolio&lt;/span&gt;.
+In other projects, I&amp;#39;ve also written Ruby programs to &lt;span style="color: blue; font-weight: bold"&gt;scrape large amounts of data from financial APIs&lt;/span&gt;. My expertise falls largely into back-end and data management with systems like &lt;span style="color: blue; font-weight: bold"&gt;PostgreSQL&lt;/span&gt;, but I am also familiar with &lt;span style="color: blue; font-weight: bold"&gt;front end including Javascript, JQuery, and React&lt;/span&gt;.
+I hope you find my qualifications appealing. I am eager to get to together with a bright team and start some new interesting projects! &lt;span style="color: red; font-weight: bold"&gt;Please reply to this email if you think I’m a good fit for the team!&lt;/span&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I start off by saying I&amp;#39;m an experienced Ruby developer looking to work remotely to show that the kind of job I&amp;#39;m looking for
+is aligned with the kind of employee they are looking to higher. The job posting stresses they want someone with real world
+experience making applications and interfacing APIs. Their website is a busy one with lost of customers. To highlight how I
+worked on sizable systems like that, I state that I worked on a large accounting system for $3 billion worth of loans and
+also mention my API experience.&lt;/p&gt;
+
+&lt;p&gt;Now my weak area for this job search is my lack of resume experience building the front end experience of websites. However,
+I try to make up for it by stating the major frameworks I&amp;#39;m familiar with. When applying for a job, it&amp;#39;s okay to fall short
+on a bullet point or two if you strongly meet the other requirements they are seeking.&lt;/p&gt;
+
+&lt;p&gt;Lastly, I have the call to action by suggesting the reader reply to this email.&lt;/p&gt;
+
+&lt;p&gt;&lt;a target="_blank" href="https://www.amazon.com/gp/product/0985757116/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0985757116&amp;linkCode=as2&amp;tag=winstonkotzan-20&amp;linkId=49527ca8d490f74681ce640c10f22108"&gt;This is Not Your Father&amp;#39;s Job Market: Job Seeking Strategies for Today&amp;#39;s New College Graduates&lt;/a&gt;&lt;img src="//ir-na.amazon-adsystem.com/e/ir?t=winstonkotzan-20&amp;l=am2&amp;o=1&amp;a=0985757116" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /&gt;&lt;/p&gt;
+
+&lt;iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;OneJS=1&amp;Operation=GetAdHtml&amp;MarketPlace=US&amp;source=ac&amp;ref=qf_sp_asin_til&amp;ad_type=product_link&amp;tracking_id=winstonkotzan-20&amp;marketplace=amazon&amp;region=US&amp;placement=0985757116&amp;asins=0985757116&amp;linkId=f280bde1ac5d26e167436aca1ba048ee&amp;show_border=false&amp;link_opens_in_new_window=true&amp;price_color=333333&amp;title_color=0066c0&amp;bg_color=ffffff"&gt;&lt;/iframe&gt;
+</content>
+  </entry>
   <entry>
     <title>Interviewing Tip - Peel the Onion</title>
     <link rel="alternate" href="http://blog.url.com/2017/07/13/interviewing-tip-peel-the-onion.html"/>
@@ -180,51 +246,6 @@ AWS/Docker/Ruby on Rails stack.&lt;/p&gt;
 &lt;p&gt;The term structure of interest rates are an important barometer for the economy. When the yield curve flattens
 it&amp;#39;s often a good predictor of economic slowdown and subsequent decline in the stock market. Play around
 with it and see what the interest rates have looked like historically!&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Docker + Capistrano + Rails Errors! "The asset "application.css" is not present in the asset pipeline"</title>
-    <link rel="alternate" href="http://blog.url.com/2017/06/06/docker-capistrano-asset-and-log-file-links.html"/>
-    <id>http://blog.url.com/2017/06/06/docker-capistrano-asset-and-log-file-links.html</id>
-    <published>2017-06-06T01:00:00-04:00</published>
-    <updated>2017-06-06T15:00:43-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;Upon getting my Docker application running in production, I ran into this error message:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;F, [2017-06-06T00:53:06.630911 #1] FATAL -- : [8957e40e-e8fa-4f2d-8072-4dab83c6269b] ActionView::Template::Error (The asset &amp;quot;application.css&amp;quot; is not present in the asset pipeline.):
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The problem occurred because the Rails asset pipeline was missing files. The application in production mode couldn&amp;#39;t find
-the files it was looking for from the &lt;code&gt;rake assets:precompile&lt;/code&gt; stage, which was performed by Capistrano &lt;em&gt;outside&lt;/em&gt; of the
-Docker container. To fix this error I had to symlink the &lt;code&gt;public/assets&lt;/code&gt; folder inside of the Docker container to
-the file system outside like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;#docker-compose.yml
-
-version: &amp;#39;3&amp;#39;
-services:
-  web:
-    container_name: myapp
-    build: .
-    command: bundle exec rails s -p 3000
-    environment:
-      - RAILS_ENV=${RAILS_ENV:-development}
-      - DATABASE_URL=${DATABASE_URL}
-      - RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES}
-      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
-    extra_hosts:
-      - dbhost:${LOCAL_IP:-127.0.0.1}
-    ports:
-      - ${HTTP_PORT:-80}:3000
-    tty: true
-    volumes:
-      - ./log:/app/log
-      - ./public/assets:/app/public/assets
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Note that on the &lt;code&gt;volumes&lt;/code&gt; section I link both the &lt;code&gt;log&lt;/code&gt; and &lt;code&gt;public&lt;/code&gt; assets folder. &lt;/p&gt;
 </content>
   </entry>
 </feed>
