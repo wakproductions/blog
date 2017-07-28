@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>How to Install Ruby on a Production System with Ansible</title>
+    <title>How to Download Videos from Youtube and Save Them on Your Hard Drive</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2017 x2017_02 x2017_02_28 x2017_02_28_install-ruby-on-a-production-system'>
+  <body class='x2017 x2017_07 x2017_07_27 x2017_07_27_how-to-download-youtube-videos-to-your-hard-drive'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>How to Install Ruby on a Production System with Ansible</h2>
+          <h2 class='article-title'>How to Download Videos from Youtube and Save Them on Your Hard Drive</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,36 +51,11 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>02/28/2017</div>
+          <div class='article-date'>07/27/2017</div>
           <div class='article-body'>
-            <p>I recently had to set up a production server to run Ruby. Surprisingly there are many opinions on how to do it. Some
-            people use RVM or RBenv, but I&#39;ve been told by other people who have tried that that in a production system the system
-            hacks those package managers use to get the magic to work can have unintended side effects. For example, RVM&#39;s override
-            of the shell causes problems when trying to use Ruby with UNIX cron jobs.</p>
+            <p>Lately Youtube has been more aggressive in taking down political videos as part of their campaign against &quot;fake news&quot; and alleged &quot;hate speech&quot;. However, many users are angered by Youtube&#39;s unclear and seemingly arbitrary policy for removing videos, accusing Youtube&#39;s management of censoring videos based on the political opinions they present. As someone who is against the censorship of free speech, I created this video to help viewers of Youtube save the content of their favorite creators. By downloading videos and saving them, you will still have access to them after Youtube removes them and help maintain their circulation in the public sphere.</p>
             
-            <p>Doing the build-from-scratch install of system Ruby seems to be the best option for setting up a production server.
-            <a href="http://robmclarty.com/blog/how-to-setup-a-production-server-for-rails-4">I found this useful blog article</a>, which I&#39;m reposting an excerpt here in case it ever disappears from the Internet. The setup
-            process should be largely the same for any other versions of Ruby.</p>
-            
-            <h3>Excerpt from robmclarty.com</h3>
-            
-            <p>I wanted to setup the bleeding edge on this server, so I went with a source code install process for Ruby rather than a pre-existing package. I installed Ruby 2.0 and Rails 4.beta. What I usually do to keep track of my source-code-installed components is create a src directory in my user&#39;s home folder inside which I store all my source code folders for compilation, installation, and later, any uninstallation I might need to do.</p>
-            
-            <p>But before that, I needed to install a few more dependencies so my server environment was ready for it.</p>
-            
-            <pre><code>sudo apt-get install build-essential libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion&#x000A;Next, inside /home/bill/src and got the latest Ruby, decompressed it, configured, compiled, and installed.&#x000A;&#x000A;wget ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p0.tar.gz&#x000A;tar xzvf ruby-2.0.0-p0.tar.gz&#x000A;cd ruby-2.0.0-p0&#x000A;./configure&#x000A;make&#x000A;sudo make install&#x000A;</code></pre>
-            
-            <p>Next, I made a symbolic link from /usr/local/bin/ruby to /usr/bin/ruby because some programs look for it there.</p>
-            
-            <pre><code>sudo ln -s /usr/local/bin/ruby /usr/bin/ruby&#x000A;The newer Rubies come with rubygems so you don&#39;t need to worry about installing that separately anymore. But before installing any new gems (like Rails) it&#39;s always a good idea to make sure it&#39;s up to date.&#x000A;&#x000A;sudo gem update --system&#x000A;Finally, now that there was a convenient beta1 branch for the Rails gem, all I needed to do was install the latest Rails was the following.&#x000A;&#x000A;sudo gem install rails --version 4.0.0.beta1&#x000A;</code></pre>
-            
-            <p>I encountered some weird issues with rdoc and ri where I had to answer &quot;yes&quot; to overwrite the existing versions. I just went with it since this is a dedicated server and I care more about the app working than some documentation that isn&#39;t necessary for me in production. I&#39;m sure this will be fixed in the final release.</p>
-            
-            <p>Update: @kaspergrubbe gave me a great little tweak so you don&#39;t need to specify --no-ri --no-rdoc every time you install a gem in production: just add gem: --no-rdoc --no-ri to ~/.gemrc (create that file if it doesn&#39;t already exist) and don&#39;t worry about ri or rdoc again in production.</p>
-            
-            <h1>Throw in some Ansible</h1>
-            
-            <p>I automated these steps using Ansible to install Ruby 2.3.3 on my system. <a href="https://github.com/wakproductions/ansible-examples/blob/master/roles/web/tasks/install_ruby233.yml">Here&#39;s the playbook.</a></p>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/J73aV3BWMj4" frameborder="0" allowfullscreen></iframe>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -117,10 +92,10 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../../07/27/how-to-download-youtube-videos-to-your-hard-drive.html">How to Download Videos from Youtube and Save Them on Your Hard Drive</a> <span>Jul 27</span></li>
-            <li><a href="../../07/17/interviewing-tip-3-step-process-to-a-good-cover-letter.html">Interviewing Tip - 3 Step Process fo Writing a Good Cover Letter</a> <span>Jul 17</span></li>
-            <li><a href="../../07/13/interviewing-tip-peel-the-onion.html">Interviewing Tip - Peel the Onion</a> <span>Jul 13</span></li>
-            <li><a href="../../07/12/docker-could-not-find-available-ipv4-address.html">Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</a> <span>Jul 12</span></li>
+            <li><a href="how-to-download-youtube-videos-to-your-hard-drive.html">How to Download Videos from Youtube and Save Them on Your Hard Drive</a> <span>Jul 27</span></li>
+            <li><a href="../17/interviewing-tip-3-step-process-to-a-good-cover-letter.html">Interviewing Tip - 3 Step Process fo Writing a Good Cover Letter</a> <span>Jul 17</span></li>
+            <li><a href="../13/interviewing-tip-peel-the-onion.html">Interviewing Tip - Peel the Onion</a> <span>Jul 13</span></li>
+            <li><a href="../12/docker-could-not-find-available-ipv4-address.html">Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</a> <span>Jul 12</span></li>
             <li><a href="../../06/25/introducing-momentum-stock-scans.html">Introducing MomentumStockScans.com!</a> <span>Jun 25</span></li>
             <li><a href="../../06/18/testing-instagram-omniauth-devise-in-development.html">How to test Devise Omniauth in your local development environment with Instagram</a> <span>Jun 18</span></li>
             <li><a href="../../06/08/new-website-us-treasury-yield-curve.html">US Treasury Yield Curve Chart</a> <span>Jun  8</span></li>
