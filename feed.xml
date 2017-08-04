@@ -5,10 +5,98 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-07-27T19:55:00-04:00</updated>
+  <updated>2017-07-31T19:55:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Why Bitcoin Will Fail for SHTF</title>
+    <link rel="alternate" href="http://blog.url.com/2017/07/31/bitcoin-will-fail-for-shtf.html"/>
+    <id>http://blog.url.com/2017/07/31/bitcoin-will-fail-for-shtf.html</id>
+    <published>2017-07-31T19:55:00-04:00</published>
+    <updated>2017-08-03T23:46:16-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/jjAC446ZAaE" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;A single Bitcoin today sells more than an ounce of gold — but is it a good currency for SHTF? A lot of people are
+hoarding Bitcoin these days because they think it is a way to guard themselves against the demise of the US dollar.&lt;/p&gt;
+
+&lt;p&gt;To many people, Bitcoin represents a way to fight back against the banking cartel. They don’t think the government
+can regulate it. It sounds like a currency by and for the people. However, as someone who works in the technology
+field I see some some technological reasons to think that holding Bitcoin as a long term defensive asset is a bad idea.
+Some of the perceived advantages are not as strong as the layperson may believe.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Bitcoin is not anonymous&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The very basis of how Bitcoin works is the blockchain, meaning that every Bitcoin transaction ever made is recorded
+in a public ledger. While the blockchain may be hard to read, theoretically anyone with a sophisticated enough computing
+power and some detective work can trace a particular transaction to its origin by looking at all of the addresses on the
+ledger. It’s unlike cash in which no record is kept once it’s been moved.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;The government can find indirect ways of regulating Bitcoin&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The government can find ways to regulate the use of Bitcoin by implement rules making it difficult to use. Already, the
+IRS classifies Bitcoin as an asset and not a currency, meaning that you have to pay capital gains taxes if your Bitcoin
+appreciates in value and you sell it for a profit. This means that in the lens of the financial world, Bitcoin has more
+in common with a stock certificate than a US dollar. The Bitcoin nodes and exchanges are also a vulnerable to
+regulation. To convert dollars into Bitcoin and back you need to use an exchange. If they got serious about controlling
+Bitcoin, the regulators could impose taxes or fees on the use of exchanges, or go after the people running the nodes
+that process the Bitcoin ledger. Recently the engineers running the Bitcoin project implemented an update to the
+blockchain called SegWit, which was implemented through the exchanges. This is a testament to the fact that there are
+bottlenecks in the Bitcoin ecosystem that can be controlled by a regulatory authority.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;The mining nodes in the infrastructure is a vulnerability&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;a href="https://www.wired.com/2017/03/plan-save-blockchain-democracy-bitcoins-civil-war/"&gt;Miners are needed to process the transactions.&lt;/a&gt; This
+can come under attack, or without enough infrastructure could run very slow. Right now it could take up to hours for a
+Bitcoin transaction to make its way through the ledger. This is a huge impediment when using Bitcoin for commerce.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Technological breakthrough&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Moore’s Law is currently broke for the moment, meaning that over the past several years chip manufacturers have been
+having a harder time making processors more powerful at the tepid pace that they have been for the last 20 years. But
+let’s say Moore’s Law catches up - if we have a hardware technology breakthrough - what could that mean for
+cryptocurrencies like bitcoin? Would a quantum computer be able to break the encryption and crack the digital
+signatures by brute force? If that occurs then anyone’s Bitcoin account could be at risk of getting hacked.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Old fashioned manipulation&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The limited supply of Bitcoins may solve the inflationary problems of money printing, but it’s vulnerable to manipulation through supply and demand - just like a stock price.
+        - Market cap is only $42B, but some publicly traded companies have a market cap much higher. Apple has a market cap of $800B. Someone with enough money can control the price of Bitcoin much like a high frequency trader can control the short term price of a stock.&lt;/p&gt;
+
+&lt;h1&gt;Final Word&lt;/h1&gt;
+
+&lt;p&gt;Bitcoin is a virtual asset, but it’s a commodity just like any other kind of financial asset. You can make money from
+speculation in it, but it’s worth as a store of value in an economic or societal disaster is questionable. Peppers who
+are buying Bitcoin may be misguided. I know stocks better, so I’d rather use my speculative money in the stock market.
+For ecological disasters, I think it’s better to hold physical assets such as gold, silver, or even commodity goods
+that can be traded because those will have a use if the Internet goes down.&lt;/p&gt;
+
+&lt;p&gt;Superinflation might be the best reason to hold Bitcoin. However, I believe the market has already priced this in
+because of the rapidly rising price action it&amp;#39;s seen over the last several years. It looks like a parabolic stock
+chart, and many of Bitcoin&amp;#39;s proponents speak of it like an investment that can never fail. Sounds like bubble talk to
+me.&lt;/p&gt;
+
+&lt;p&gt;While I think cryptocurrencies are unreliable long term holdings as an economic, political, or natural disaster
+hedges, there could be other uses for them. I like some of the ideas driving Ethereum, because is has it has a purpose
+in running distributed applications and contracts. But that’s for another video.&lt;/p&gt;
+
+&lt;p&gt;If you want a daily list of great stock trading ideas, check out MomentumStockScans.com, follow me on Twitter -
+and don’t forget to like the video and subscribe to my channel. See you next time.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>How to Download Videos from Youtube and Save Them on Your Hard Drive</title>
     <link rel="alternate" href="http://blog.url.com/2017/07/27/how-to-download-youtube-videos-to-your-hard-drive.html"/>
@@ -176,71 +264,6 @@ scanning tool to help equities traders find the best daily opportunities. Here i
 more content to follow!&lt;/p&gt;
 
 &lt;iframe width="560" height="315" src="https://www.youtube.com/embed/pgX9ws8k6uY" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
-</content>
-  </entry>
-  <entry>
-    <title>How to test Devise Omniauth in your local development environment with Instagram</title>
-    <link rel="alternate" href="http://blog.url.com/2017/06/18/testing-instagram-omniauth-devise-in-development.html"/>
-    <id>http://blog.url.com/2017/06/18/testing-instagram-omniauth-devise-in-development.html</id>
-    <published>2017-06-18T01:00:00-04:00</published>
-    <updated>2017-06-20T16:37:11-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;For testing in your local environment, you can set the Omniauth redirect to a URL on your localhost. First, you have
-to add localhost to your list of authorized hosts in your Omniauth settings:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="../../../images/2016/Pasted_Image_6_18_17__4_57_PM.png" style="width: 600px" relative="true" alt="Pasted image 6 18 17  4 57 pm" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Then access the Oauth link to log into Instagram. You can do this by clicking a link in your browser set by
-your Rails app running locally, or you can type the URL into your browser directly:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;https://www.instagram.com/oauth/authorize?client_id=&amp;lt;-- your client id --&amp;gt;&amp;amp;redirect_uri=http://localhost:5050/users/auth/instagram/callback&amp;amp;response_type=code
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;You can then log into your Instagram account and it will redirect you back to the application.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="../../../images/2016/Pasted_Image_6_18_17__5_09_PM.png" style="width: 600px" relative="true" alt="Pasted image 6 18 17  5 09 pm" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Showing that the Devise callback URL is being hit by the browser with the access token from inside &lt;code&gt;rails s&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;     2: def instagram
-     3:   @user = User.from_omniauth(omniauth_data)
-     4:
-     5:   binding.pry
-     6:
- =&amp;gt;  7:   if @user.access_token != omniauth_data.credentials.token
-     8:     # This will be saved by the `sign_in_and_redirect` method below
-     9:     @user.access_token = omniauth_data.credentials.token
-    10:   end
-
-[1] pry(#&amp;lt;Users::OmniauthCallbacksController&amp;gt;)&amp;gt; @user
-=&amp;gt; #&amp;lt;User id: 1, uid: &amp;quot;300202775&amp;quot;, email: &amp;quot;&amp;quot;, created_at: &amp;quot;2017-06-18 19:25:50&amp;quot;, updated_at: &amp;quot;2017-06-18 19:25:50&amp;quot;, access_token: nil, first_name: &amp;quot;Winston&amp;quot;, last_name: &amp;quot;Kotzan&amp;quot;, middle_name: &amp;quot;&amp;quot;, time_zone: nil, provider: &amp;quot;instagram&amp;quot;&amp;gt;
-[2] pry(#&amp;lt;Users::OmniauthCallbacksController&amp;gt;)&amp;gt; User.count
-   (1.2ms)  SELECT COUNT(*) FROM &amp;quot;users&amp;quot;
-=&amp;gt; 1
-[4] pry(#&amp;lt;Users::OmniauthCallbacksController&amp;gt;)&amp;gt; request.env[&amp;#39;omniauth.auth&amp;#39;]
-=&amp;gt; {&amp;quot;provider&amp;quot;=&amp;gt;&amp;quot;instagram&amp;quot;,
- &amp;quot;uid&amp;quot;=&amp;gt;&amp;quot;300202775&amp;quot;,
- &amp;quot;info&amp;quot;=&amp;gt;
-  {&amp;quot;nickname&amp;quot;=&amp;gt;&amp;quot;wakproductions&amp;quot;,
-   &amp;quot;name&amp;quot;=&amp;gt;&amp;quot;Winston Kotzan&amp;quot;,
-   &amp;quot;email&amp;quot;=&amp;gt;nil,
-   &amp;quot;image&amp;quot;=&amp;gt;&amp;quot;https://scontent.cdninstagram.com/t51.2885-19/11934657_1625722474367056_1293718021_a.jpg&amp;quot;,
-   &amp;quot;bio&amp;quot;=&amp;gt;&amp;quot;&amp;quot;,
-   &amp;quot;website&amp;quot;=&amp;gt;&amp;quot;&amp;quot;},
- &amp;quot;credentials&amp;quot;=&amp;gt;{&amp;quot;token&amp;quot;=&amp;gt;&amp;quot;300202775.ce5d604.417373f3e1e844478f2ddfae17dbe378&amp;quot;, &amp;quot;expires&amp;quot;=&amp;gt;false},
- &amp;quot;extra&amp;quot;=&amp;gt;
-  {&amp;quot;raw_info&amp;quot;=&amp;gt;
-    {&amp;quot;id&amp;quot;=&amp;gt;&amp;quot;300202775&amp;quot;,
-     &amp;quot;username&amp;quot;=&amp;gt;&amp;quot;wakproductions&amp;quot;,
-     &amp;quot;profile_picture&amp;quot;=&amp;gt;&amp;quot;https://scontent.cdninstagram.com/t51.2885-19/11934657_1625722474367056_1293718021_a.jpg&amp;quot;,
-     &amp;quot;full_name&amp;quot;=&amp;gt;&amp;quot;Winston Kotzan&amp;quot;,
-     &amp;quot;bio&amp;quot;=&amp;gt;&amp;quot;&amp;quot;,
-     &amp;quot;website&amp;quot;=&amp;gt;&amp;quot;&amp;quot;}}}
-[5] pry(#&amp;lt;Users::OmniauthCallbacksController&amp;gt;)&amp;gt;
-
-&lt;/code&gt;&lt;/pre&gt;
 </content>
   </entry>
 </feed>
