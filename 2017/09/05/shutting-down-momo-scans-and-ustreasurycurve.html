@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>Ruby - Don't Freeze User-Defined Strings!</title>
+    <title>Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2017 x2017_01 x2017_01_07 x2017_01_07_ruby-string-freeze-memory'>
+  <body class='x2017 x2017_09 x2017_09_05 x2017_09_05_shutting-down-momo-scans-and-ustreasurycurve'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>Ruby - Don't Freeze User-Defined Strings!</h2>
+          <h2 class='article-title'>Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,48 +51,12 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>01/07/2017</div>
+          <div class='article-date'>09/05/2017</div>
           <div class='article-body'>
-            <p>This week I was working on a Rails project that involved keeping a large hash of dynamic data in memory. On first 
-            thought, I was going to build the hash keys based on several data points which will be combined into a hash key. It
-            would have looked something like this:</p>
-            
-            <pre><code class="ruby">element_name = &#39;NETINC&#39;&#x000A;period = &#39;20160930&#39;&#x000A;span = &#39;span_trailing_twelve_months&#39;&#x000A;&#x000A;&quot;#{element_name}_#{period}_#{span}&quot;&#x000A;#=&gt; &quot;NETINC_20160930_span_trailing_twelve_months&quot;&#x000A;&#x000A;&#x000A;# ---------------------------------&#x000A;# Then I would be able to reference&#x000A;# the hash like this:&#x000A;&#x000A;hash[&#39;NETINC_20160930_span_trailing_twelve_months&#39;]&#x000A;</code></pre>
-            
-            <p>However, if once I build the hash keys I freeze them using <code>String.freeze</code>, do they get garbage collected when I&#39;m no 
-            longer processing that key? So let&#39;s say I&#39;m making thousands of these hash keys, process the hash and then move on
-            to a new data set. Would Ruby keep the defunct hash key strings in memory for the remainder of the program?</p>
-            
-            <p><strong>The answer is YES!</strong> Freezing the keys could possibly cause a memory leak because the program will be maintaining
-            each string object in an in-memory table even after I&#39;m done using it. The memory pile of string objects could
-            grow indefinitely. This is why freezing strings of user-defined input could be very dangerous - a malicious user
-            could crash your server by causing it to run out of memory this way.</p>
-            
-            <p>I verified this in a discussion with the Chicago Ruby Slack group:</p>
-            
-            <blockquote>
-            <p><code>&quot;foo&quot;.freeze.object_id == &quot;foo&quot;.freeze.object_id&quot; # =&gt; true</code>, but without the freeze it&#39;s <code>false</code>. And if 
-            <code>def a; &quot;foo&quot;.freeze.object_id; end; a; a</code> gives the same id twice.</p>
-            
-            <p>Oh yeah, good point... it does allow some memory optimizations if you freeze it, like two strings being the same 
-            string in memory if they&#39;re frozen and identical</p>
-            
-            <p>Wrapped up work and dug a minute: in <code>string.c</code>, the retaining is happening in <code>str_new_frozen</code>. The vm calls 
-            <code>str_replace_shared_without_enc</code> to eval the string literal, that calls <code>rb_fstring</code>, that calls 
-            <code>str_replace_shared_without_enc</code>, that calls <code>str_new_frozen</code>.</p>
-            
-            <p>They&#39;re marked as SHARED. Then <code>gc.c</code>, <code>gc_mark_children</code> does <code>gc_mark(objspace, any-&gt;as.string.as.heap.aux.shared);</code>
-            on all the shared strings so unless there&#39;s something I&#39;m not spotting that sneaks around to unset SHARED those 
-            strings are retained for the life of the process.</p>
-            </blockquote>
-            
-            <p>The approach I took to get around this problem was to build my hash to be dimensions deep. So to access the value,
-            I would instead use a chain of keys:</p>
-            
-            <pre><code class="ruby">hash[&#39;NETINC&#39;][&#39;20160930&#39;][&#39;span_trailing_twelve_months&#39;]&#x000A;</code></pre>
-            
-            <p>All it took was a small modification of the fetch methods wrapping my Hash to implement this. <code>element_name</code> and <code>span</code> 
-            are fine to freeze because there is a finite number of them in my program.</p>
+            <p>I am temporarily shutting down my websites momentumstockscans.com and ustreasuryyieldcurve.com. I initially thought
+            these websites would generate sufficient traffic to be self-sustainable from ad revenue, but at the moment they
+            are unprofitable. Both websites require their own databases and run via Docker containers hosted on AWS, which gets
+            costly. I will put the websites back up as they were once I find a more cost effective hosting solution.</p>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -129,7 +93,7 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../../09/05/shutting-down-momo-scans-and-ustreasurycurve.html">Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</a> <span>Sep  5</span></li>
+            <li><a href="shutting-down-momo-scans-and-ustreasurycurve.html">Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</a> <span>Sep  5</span></li>
             <li><a href="../../07/31/bitcoin-will-fail-for-shtf.html">Why Bitcoin Will Fail for SHTF</a> <span>Jul 31</span></li>
             <li><a href="../../07/27/how-to-download-youtube-videos-to-your-hard-drive.html">How to Download Videos from Youtube and Save Them on Your Hard Drive</a> <span>Jul 27</span></li>
             <li><a href="../../07/17/interviewing-tip-3-step-process-to-a-good-cover-letter.html">Interviewing Tip - 3 Step Process fo Writing a Good Cover Letter</a> <span>Jul 17</span></li>
