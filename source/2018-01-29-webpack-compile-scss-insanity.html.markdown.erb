@@ -1,0 +1,93 @@
+---
+title: Compiling SCSS to CSS in Webpack - INSANITY!
+date: 2018-01-29 20:55 EST
+tags:
+---
+
+I'm busy learning Webpack and it's got some weird conventions that quite differ from normal web programming. So
+I want to work in SCSS and compile that to a CSS file for use in my project. Here's what my files look like:
+
+```html
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Momentum Stock Scans</title>
+  <link rel="stylesheet" href="/dist/style.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="/dist/bundle.js"></script>
+</body>
+
+</html>
+```
+
+```scss
+// style.scss
+body {
+  font-family: Verdana;
+}
+```
+
+```javascript
+// webpack.config.js
+const path = require('path')
+
+module.exports = {
+  context: __dirname,
+  entry: "./js/App.jsx",
+  watch: true,
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js'
+  },
+  stats: {
+    colors: true,
+    reasons: true
+  },
+  module: {
+    rules: [
+      {
+        test: /\.scss?$/,
+        use: [
+          { loader: "style-loader" },
+          { loader: "css-loader" },
+          {
+            loader: "sass-loader"
+            // options: {
+            //   includePaths: ["/stylesheets"]
+            // }
+          }
+        ]
+      },
+      { test: /\.jsx?$/, use: 'babel-loader' }
+    ]
+  }
+}
+```
+
+Now I was expecting this would compile my `style.scss` file into a `style.css` file in the `dist` directory. But that's
+not how Webpack works. Apparently the output file is a one-shot deal - meaning EVERYTHING goes into `bundle.js`, including
+other types of information.
+
+So this also means that you have to **REQUIRE THE STYLESHEET** in the Javascript entry point file. So `./js/App.jsx`
+should have this line at the top:
+
+```javascript
+require('../style.scss')
+```
+
+Then this compiles the following into the middle of **`dist/bundle.js`**
+
+```javascript
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("exports = module.exports = __webpack_require__(4)(false);\n// imports\n\n\n// module\nexports.push([module.i, \"body {\\n  font-family: Verdana; }\\n\", \"\"]);\n\n// exports\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy8uL3N0eWxlLnNjc3M/MTk1MSJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnRzID0gbW9kdWxlLmV4cG9ydHMgPSByZXF1aXJlKFwiLi9ub2RlX21vZHVsZXMvY3NzLWxvYWRlci9saWIvY3NzLWJhc2UuanNcIikoZmFsc2UpO1xuLy8gaW1wb3J0c1xuXG5cbi8vIG1vZHVsZVxuZXhwb3J0cy5wdXNoKFttb2R1bGUuaWQsIFwiYm9keSB7XFxuICBmb250LWZhbWlseTogVmVyZGFuYTsgfVxcblwiLCBcIlwiXSk7XG5cbi8vIGV4cG9ydHNcblxuXG5cbi8vLy8vLy8vLy8vLy8vLy8vL1xuLy8gV0VCUEFDSyBGT09URVJcbi8vIC4vbm9kZV9tb2R1bGVzL2Nzcy1sb2FkZXIhLi9ub2RlX21vZHVsZXMvc2Fzcy1sb2FkZXIvbGliL2xvYWRlci5qcyEuL3N0eWxlLnNjc3Ncbi8vIG1vZHVsZSBpZCA9IDNcbi8vIG1vZHVsZSBjaHVua3MgPSAwIl0sIm1hcHBpbmdzIjoiQUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOyIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///3\n");
+
+/***/ }),
+
+```
+
+**WTF!!!** That's some strange unconventional shit going on right there. But I guess that's the Webpack way.
