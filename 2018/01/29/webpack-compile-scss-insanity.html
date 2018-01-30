@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>First Post</title>
+    <title>Compiling SCSS to CSS in Webpack - INSANITY!</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2016 x2016_09 x2016_09_10 x2016_09_10_first-post'>
+  <body class='x2018 x2018_01 x2018_01_29 x2018_01_29_webpack-compile-scss-insanity'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>First Post</h2>
+          <h2 class='article-title'>Compiling SCSS to CSS in Webpack - INSANITY!</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,12 +51,31 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>09/10/2016</div>
+          <div class='article-date'>01/29/2018</div>
           <div class='article-body'>
-            <p>Welcome to my blog, where I will be covering technical topics encountered in my work as a software engineer. This is
-            to act as a reference for myself, my team, and others who may be facing similar technical challenges. This won&#39;t be a
-            traditional blog with static articles as I plan to retroactively update many of these posts. Think of it more as a
-            Wiki on technical topics.  </p>
+            <p>I&#39;m busy learning Webpack and it&#39;s got some weird conventions that quite differ from normal web programming. So
+            I want to work in SCSS and compile that to a CSS file for use in my project. Here&#39;s what my files look like:</p>
+            
+            <pre><code class="html">&lt;!-- index.html --&gt;&#x000A;&#x000A;&lt;!DOCTYPE html&gt;&#x000A;&lt;html&gt;&#x000A;&lt;head&gt;&#x000A;  &lt;title&gt;Momentum Stock Scans&lt;/title&gt;&#x000A;  &lt;link rel=&quot;stylesheet&quot; href=&quot;/dist/style.css&quot;&gt;&#x000A;&lt;/head&gt;&#x000A;&lt;body&gt;&#x000A;&lt;div id=&quot;app&quot;&gt;&lt;/div&gt;&#x000A;&lt;script src=&quot;/dist/bundle.js&quot;&gt;&lt;/script&gt;&#x000A;&lt;/body&gt;&#x000A;&#x000A;&lt;/html&gt;&#x000A;</code></pre>
+            
+            <pre><code class="scss">// style.scss&#x000A;body {&#x000A;  font-family: Verdana;&#x000A;}&#x000A;</code></pre>
+            
+            <pre><code class="javascript">// webpack.config.js&#x000A;const path = require(&#39;path&#39;)&#x000A;&#x000A;module.exports = {&#x000A;  context: __dirname,&#x000A;  entry: &quot;./js/App.jsx&quot;,&#x000A;  watch: true,&#x000A;  output: {&#x000A;    path: path.resolve(__dirname, &#39;dist&#39;),&#x000A;    filename: &#39;bundle.js&#39;&#x000A;  },&#x000A;  stats: {&#x000A;    colors: true,&#x000A;    reasons: true&#x000A;  },&#x000A;  module: {&#x000A;    rules: [&#x000A;      {&#x000A;        test: /\.scss?$/,&#x000A;        use: [&#x000A;          { loader: &quot;style-loader&quot; },&#x000A;          { loader: &quot;css-loader&quot; },&#x000A;          {&#x000A;            loader: &quot;sass-loader&quot;&#x000A;            // options: {&#x000A;            //   includePaths: [&quot;/stylesheets&quot;]&#x000A;            // }&#x000A;          }&#x000A;        ]&#x000A;      },&#x000A;      { test: /\.jsx?$/, use: &#39;babel-loader&#39; }&#x000A;    ]&#x000A;  }&#x000A;}&#x000A;</code></pre>
+            
+            <p>Now I was expecting this would compile my <code>style.scss</code> file into a <code>style.css</code> file in the <code>dist</code> directory. But that&#39;s
+            not how Webpack works. Apparently the output file is a one-shot deal - meaning EVERYTHING goes into <code>bundle.js</code>, including
+            other types of information.</p>
+            
+            <p>So this also means that you have to <strong>REQUIRE THE STYLESHEET</strong> in the Javascript entry point file. So <code>./js/App.jsx</code>
+            should have this line at the top:</p>
+            
+            <pre><code class="javascript">require(&#39;../style.scss&#39;)&#x000A;</code></pre>
+            
+            <p>Then this compiles the following into the middle of <strong><code>dist/bundle.js</code></strong></p>
+            
+            <pre><code class="javascript">/***/ (function(module, exports, __webpack_require__) {&#x000A;&#x000A;eval(&quot;exports = module.exports = __webpack_require__(4)(false);\n// imports\n\n\n// module\nexports.push([module.i, \&quot;body {\\n  font-family: Verdana; }\\n\&quot;, \&quot;\&quot;]);\n\n// exports\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy8uL3N0eWxlLnNjc3M/MTk1MSJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnRzID0gbW9kdWxlLmV4cG9ydHMgPSByZXF1aXJlKFwiLi9ub2RlX21vZHVsZXMvY3NzLWxvYWRlci9saWIvY3NzLWJhc2UuanNcIikoZmFsc2UpO1xuLy8gaW1wb3J0c1xuXG5cbi8vIG1vZHVsZVxuZXhwb3J0cy5wdXNoKFttb2R1bGUuaWQsIFwiYm9keSB7XFxuICBmb250LWZhbWlseTogVmVyZGFuYTsgfVxcblwiLCBcIlwiXSk7XG5cbi8vIGV4cG9ydHNcblxuXG5cbi8vLy8vLy8vLy8vLy8vLy8vL1xuLy8gV0VCUEFDSyBGT09URVJcbi8vIC4vbm9kZV9tb2R1bGVzL2Nzcy1sb2FkZXIhLi9ub2RlX21vZHVsZXMvc2Fzcy1sb2FkZXIvbGliL2xvYWRlci5qcyEuL3N0eWxlLnNjc3Ncbi8vIG1vZHVsZSBpZCA9IDNcbi8vIG1vZHVsZSBjaHVua3MgPSAwIl0sIm1hcHBpbmdzIjoiQUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOyIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///3\n&quot;);&#x000A;&#x000A;/***/ }),&#x000A;&#x000A;</code></pre>
+            
+            <p><strong>WTF!!!</strong> That&#39;s some strange unconventional shit going on right there. But I guess that&#39;s the Webpack way.</p>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -93,8 +112,8 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../../../2018/01/29/webpack-compile-scss-insanity.html">Compiling SCSS to CSS in Webpack - INSANITY!</a> <span>Jan 29</span></li>
-            <li><a href="../../../2018/01/29/frontendmasters-review.html">Review of FrontendMasters React.js/Redux Tutorial v3</a> <span>Jan 29</span></li>
+            <li><a href="webpack-compile-scss-insanity.html">Compiling SCSS to CSS in Webpack - INSANITY!</a> <span>Jan 29</span></li>
+            <li><a href="frontendmasters-review.html">Review of FrontendMasters React.js/Redux Tutorial v3</a> <span>Jan 29</span></li>
             <li><a href="../../../2017/09/05/shutting-down-momo-scans-and-ustreasurycurve.html">Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</a> <span>Sep  5</span></li>
             <li><a href="../../../2017/07/31/bitcoin-will-fail-for-shtf.html">Why Bitcoin Will Fail for SHTF</a> <span>Jul 31</span></li>
             <li><a href="../../../2017/07/27/how-to-download-youtube-videos-to-your-hard-drive.html">How to Download Videos from Youtube and Save Them on Your Hard Drive</a> <span>Jul 27</span></li>

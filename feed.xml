@@ -5,10 +5,103 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2018-01-29T18:55:00-05:00</updated>
+  <updated>2018-01-29T20:55:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Compiling SCSS to CSS in Webpack - INSANITY!</title>
+    <link rel="alternate" href="http://blog.url.com/2018/01/29/webpack-compile-scss-insanity.html"/>
+    <id>http://blog.url.com/2018/01/29/webpack-compile-scss-insanity.html</id>
+    <published>2018-01-29T20:55:00-05:00</published>
+    <updated>2018-01-29T21:42:41-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;I&amp;#39;m busy learning Webpack and it&amp;#39;s got some weird conventions that quite differ from normal web programming. So
+I want to work in SCSS and compile that to a CSS file for use in my project. Here&amp;#39;s what my files look like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="html"&gt;&amp;lt;!-- index.html --&amp;gt;
+
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+  &amp;lt;title&amp;gt;Momentum Stock Scans&amp;lt;/title&amp;gt;
+  &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;/dist/style.css&amp;quot;&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+&amp;lt;div id=&amp;quot;app&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+&amp;lt;script src=&amp;quot;/dist/bundle.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;/body&amp;gt;
+
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class="scss"&gt;// style.scss
+body {
+  font-family: Verdana;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class="javascript"&gt;// webpack.config.js
+const path = require(&amp;#39;path&amp;#39;)
+
+module.exports = {
+  context: __dirname,
+  entry: &amp;quot;./js/App.jsx&amp;quot;,
+  watch: true,
+  output: {
+    path: path.resolve(__dirname, &amp;#39;dist&amp;#39;),
+    filename: &amp;#39;bundle.js&amp;#39;
+  },
+  stats: {
+    colors: true,
+    reasons: true
+  },
+  module: {
+    rules: [
+      {
+        test: /\.scss?$/,
+        use: [
+          { loader: &amp;quot;style-loader&amp;quot; },
+          { loader: &amp;quot;css-loader&amp;quot; },
+          {
+            loader: &amp;quot;sass-loader&amp;quot;
+            // options: {
+            //   includePaths: [&amp;quot;/stylesheets&amp;quot;]
+            // }
+          }
+        ]
+      },
+      { test: /\.jsx?$/, use: &amp;#39;babel-loader&amp;#39; }
+    ]
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now I was expecting this would compile my &lt;code&gt;style.scss&lt;/code&gt; file into a &lt;code&gt;style.css&lt;/code&gt; file in the &lt;code&gt;dist&lt;/code&gt; directory. But that&amp;#39;s
+not how Webpack works. Apparently the output file is a one-shot deal - meaning EVERYTHING goes into &lt;code&gt;bundle.js&lt;/code&gt;, including
+other types of information.&lt;/p&gt;
+
+&lt;p&gt;So this also means that you have to &lt;strong&gt;REQUIRE THE STYLESHEET&lt;/strong&gt; in the Javascript entry point file. So &lt;code&gt;./js/App.jsx&lt;/code&gt;
+should have this line at the top:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="javascript"&gt;require(&amp;#39;../style.scss&amp;#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then this compiles the following into the middle of &lt;strong&gt;&lt;code&gt;dist/bundle.js&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="javascript"&gt;/***/ (function(module, exports, __webpack_require__) {
+
+eval(&amp;quot;exports = module.exports = __webpack_require__(4)(false);\n// imports\n\n\n// module\nexports.push([module.i, \&amp;quot;body {\\n  font-family: Verdana; }\\n\&amp;quot;, \&amp;quot;\&amp;quot;]);\n\n// exports\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy8uL3N0eWxlLnNjc3M/MTk1MSJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnRzID0gbW9kdWxlLmV4cG9ydHMgPSByZXF1aXJlKFwiLi9ub2RlX21vZHVsZXMvY3NzLWxvYWRlci9saWIvY3NzLWJhc2UuanNcIikoZmFsc2UpO1xuLy8gaW1wb3J0c1xuXG5cbi8vIG1vZHVsZVxuZXhwb3J0cy5wdXNoKFttb2R1bGUuaWQsIFwiYm9keSB7XFxuICBmb250LWZhbWlseTogVmVyZGFuYTsgfVxcblwiLCBcIlwiXSk7XG5cbi8vIGV4cG9ydHNcblxuXG5cbi8vLy8vLy8vLy8vLy8vLy8vL1xuLy8gV0VCUEFDSyBGT09URVJcbi8vIC4vbm9kZV9tb2R1bGVzL2Nzcy1sb2FkZXIhLi9ub2RlX21vZHVsZXMvc2Fzcy1sb2FkZXIvbGliL2xvYWRlci5qcyEuL3N0eWxlLnNjc3Ncbi8vIG1vZHVsZSBpZCA9IDNcbi8vIG1vZHVsZSBjaHVua3MgPSAwIl0sIm1hcHBpbmdzIjoiQUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOyIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///3\n&amp;quot;);
+
+/***/ }),
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;WTF!!!&lt;/strong&gt; That&amp;#39;s some strange unconventional shit going on right there. But I guess that&amp;#39;s the Webpack way.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Review of FrontendMasters React.js/Redux Tutorial v3</title>
     <link rel="alternate" href="http://blog.url.com/2018/01/29/frontendmasters-review.html"/>
@@ -249,50 +342,6 @@ I try to make up for it by stating the major frameworks I&amp;#39;m familiar wit
 on a bullet point or two if you strongly meet the other requirements they are seeking.&lt;/p&gt;
 
 &lt;p&gt;Lastly, I have the call to action by suggesting the reader reply to this email.&lt;/p&gt;
-
-&lt;p&gt;&lt;a target="_blank" href="https://www.amazon.com/gp/product/0985757116/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0985757116&amp;linkCode=as2&amp;tag=winstonkotzan-20&amp;linkId=49527ca8d490f74681ce640c10f22108"&gt;This is Not Your Father&amp;#39;s Job Market: Job Seeking Strategies for Today&amp;#39;s New College Graduates&lt;/a&gt;&lt;img src="//ir-na.amazon-adsystem.com/e/ir?t=winstonkotzan-20&amp;l=am2&amp;o=1&amp;a=0985757116" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /&gt;&lt;/p&gt;
-
-&lt;iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;OneJS=1&amp;Operation=GetAdHtml&amp;MarketPlace=US&amp;source=ac&amp;ref=qf_sp_asin_til&amp;ad_type=product_link&amp;tracking_id=winstonkotzan-20&amp;marketplace=amazon&amp;region=US&amp;placement=0985757116&amp;asins=0985757116&amp;linkId=f280bde1ac5d26e167436aca1ba048ee&amp;show_border=false&amp;link_opens_in_new_window=true&amp;price_color=333333&amp;title_color=0066c0&amp;bg_color=ffffff"&gt;&lt;/iframe&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Interviewing Tip - Peel the Onion</title>
-    <link rel="alternate" href="http://blog.url.com/2017/07/13/interviewing-tip-peel-the-onion.html"/>
-    <id>http://blog.url.com/2017/07/13/interviewing-tip-peel-the-onion.html</id>
-    <published>2017-07-13T19:55:00-04:00</published>
-    <updated>2017-07-20T20:47:00-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;I&amp;#39;m the author of the college student job search guide, &lt;a href="https://www.amazon.com/gp/product/0985757116/ref=as_li_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0985757116&amp;amp;linkCode=as2&amp;amp;tag=winstonkotzan-20&amp;amp;linkId=49527ca8d490f74681ce640c10f22108"&gt;This is Not Your Father&amp;#39;s Job Market&lt;/a&gt;,
-and right now I&amp;#39;m actively using those job search skills again myself as I look for new technical projects. Something that I
-retrospectively caught myself doing today during a phone interview is rambling a bit.&lt;/p&gt;
-
-&lt;p&gt;One of the tricky things about interviewing in general, but in particular with phone interviewing, is that it&amp;#39;s easy to
-spill too much information when answering an interview question. So in the call I was on today, I asked the interviewer
-about the production stack they are using to run their website. He said that their front-end is very simple-just some
-plain Javascript, but in this role I was in I may have an opportunity to help them decide how to build a more up-to-date
-front end. I then started talking about my personal experience using React.js and other front end frameworks, and probably
-spoke for a good 3 minutes espousing my opinions of the pros and cons of each.&lt;/p&gt;
-
-&lt;p&gt;There&amp;#39;s a few reasons talking too continuously is bad for interviews:&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;You don&amp;#39;t have visual cues as to how the interviewer is reacting. i.e.) the person on the other end of the
-line might look bored or disinterested in what you are saying, but since you can&amp;#39;t see it&amp;#39;s difficult to know.&lt;/li&gt;
-&lt;li&gt;You might reveal something compromising or contrary to what the interviewer is looking for. For example, I may have
-given the impression in this case that I was biased to React.js. What if this team wanted to use Ember.js?&lt;/li&gt;
-&lt;li&gt;You might inadvertently come across as a know-it-all. Talking too much on a topic makes it sound like you&amp;#39;re
-trying to dominate the conversation. This can easily happen over the phone when only one person can speak at a time.
-At worst, your opinions may even conflict with the interviewer&amp;#39;s opinions making you a dislikable candidate.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;The way to fix this is to only give enough information and talk long enough to give what&amp;#39;s needed - it&amp;#39;s like peeling an
-onion only one layer at a time. Don&amp;#39;t give away the whole thing at once. If the interviewer is interested in what you
-have to say, he&amp;#39;ll probe for more. You can also end each statement you make by affirming with: &amp;quot;Does that adequately
-answer the question?&amp;quot; or &amp;quot;Is there any topic you&amp;#39;d like me to talk about some more?&amp;quot;&lt;/p&gt;
-
-&lt;p&gt;If you want a job search guide full of awesome tips like this, I recommend getting a copy of my book! Link below.&lt;/p&gt;
 
 &lt;p&gt;&lt;a target="_blank" href="https://www.amazon.com/gp/product/0985757116/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0985757116&amp;linkCode=as2&amp;tag=winstonkotzan-20&amp;linkId=49527ca8d490f74681ce640c10f22108"&gt;This is Not Your Father&amp;#39;s Job Market: Job Seeking Strategies for Today&amp;#39;s New College Graduates&lt;/a&gt;&lt;img src="//ir-na.amazon-adsystem.com/e/ir?t=winstonkotzan-20&amp;l=am2&amp;o=1&amp;a=0985757116" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /&gt;&lt;/p&gt;
 
