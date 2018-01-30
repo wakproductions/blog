@@ -5,10 +5,73 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2017-09-05T19:55:00-04:00</updated>
+  <updated>2018-01-29T18:55:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Review of FrontendMasters React.js/Redux Tutorial v3</title>
+    <link rel="alternate" href="http://blog.url.com/2018/01/29/frontendmasters-review.html"/>
+    <id>http://blog.url.com/2018/01/29/frontendmasters-review.html</id>
+    <published>2018-01-29T18:55:00-05:00</published>
+    <updated>2018-01-29T19:44:44-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;I&amp;#39;m trying to learn &lt;a href="https://reactjs.org"&gt;React.js&lt;/a&gt; along with &lt;a href="https://redux.js.org"&gt;Redux&lt;/a&gt;. These frameworks are
+really complicated to set up and get familiar with on the basics level, so I was hoping that taking an online
+course would get me up to speed with the contextual background knowledge needed to get a single page React app up
+and running.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="../../../images/2018/ScreenShot2018-01-29at7.20.54PM.png" style="width: 600px" relative="true" alt="Screen shot 2018 01 29 at 7.20.54 pm" /&gt;&lt;/p&gt;
+
+&lt;h2&gt;Positive&lt;/h2&gt;
+
+&lt;p&gt;So first I&amp;#39;ll start with the good. This course gave me much of the general background I was hoping for. In addition
+to basic React, it covered some of the basic set up of a React single page application beyond the cop out of telling
+you to use &lt;em&gt;create-react-app&lt;/em&gt;. By showing you how to integrate into Webpack, it shows you how to use React in a more
+practical sense as you would in a company environment. I got a much better bird&amp;#39;s eye view than I would have from
+reading the official &lt;a href="https://reactjs.org/docs/hello-world.html"&gt;React guides&lt;/a&gt; alone.&lt;/p&gt;
+
+&lt;p&gt;It also incorporates a lot of useful tools like &lt;em&gt;Prettier&lt;/em&gt;, &lt;em&gt;eslint&lt;/em&gt;, and testing using &lt;em&gt;Jest&lt;/em&gt;. I think I accomplished
+the big goal of getting to understand how &lt;em&gt;Redux&lt;/em&gt; incorporates with React. For example, I when I tried approaching
+learning React/Redux independently from the online reference guides, I did not understand that Redux &lt;em&gt;replaces&lt;/em&gt; the
+entire state machine that the React tutorials tell you to use. Seeing this in action side by side clicked with me.&lt;/p&gt;
+
+&lt;h2&gt;Negative&lt;/h2&gt;
+
+&lt;p&gt;Despite getting a good general overview of React through this course, I feel like part of its downfall was that it
+tried to incorporate too much. This course is over 14 hours long, and I&amp;#39;m in a crunch to learn this as fast as I can.
+I think he went into a lot of topics that were unnecessary like &lt;em&gt;Flow&lt;/em&gt;. My employer uses &lt;em&gt;Typescript&lt;/em&gt; so this is
+something that I think is better served in another tutorial. Of course, you can always skip over those sections, but
+you will get a little lost if you are coding along and following the examples in your own locally hosted project.
+Another minor annoyance is that the instructor would occasionally get stumped by a lint error and spend time debugging
+it. That sort of junk is boring to watch and throws off my learning flow. I paid for this stuff so I expect him to come
+prepared with a Powerpoint and more structured overview.&lt;/p&gt;
+
+&lt;p&gt;The biggest problem I have with this course is the same weakness I see with a lot of other coding instruction, including
+&lt;a href="https://www.codeschool.com/"&gt;CodeSchool&lt;/a&gt;. There&amp;#39;s too much &amp;quot;Type this into this file and... wow!&amp;quot; I really hate it when
+an instructor has too much magic going on behind the scenes that he doesn&amp;#39;t explain. This is especially relevant in the
+areas related to configuration like Webpack setup.&lt;/p&gt;
+
+&lt;p&gt;Speaking of which, I also tried out the FrontendMasters Webpack tutorial and was disappointed. I just want to know the
+basic structure of Webpack explained in context - but the guy running the 5 hour course rambled off on too many tangents
+such as about Node modules he personally worked on but have no relevance to Webpack. All I wanted to know was X, Y, Z
+steps to set up and configure Webpack to get my SCSS compiled to CSS. Show me how to use the Webpack references by
+providing a good contextual overview and I can take it from here.&lt;/p&gt;
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;I believe the most intimidating thing about learning React is not the React concepts itself, but the whole associated
+array of tools to create a single page application. The &lt;a href="https://reactjs.org/docs/"&gt;React Guides&lt;/a&gt; got me so far,
+but don&amp;#39;t tell you about the essential associated technologies to run the whole big picture like Webpack and Redux.
+FrontendMasters was an okay course, but was really inefficient for my learning style. I wish they just did away with
+the whole video tutorial and wrote out the entire course as a series of blog entries so that I can skim to the
+important parts.&lt;/p&gt;
+
+&lt;p&gt;If you want to really learn Redux, &lt;a href="http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html"&gt;try this tutorial right here&lt;/a&gt;.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</title>
     <link rel="alternate" href="http://blog.url.com/2017/09/05/shutting-down-momo-scans-and-ustreasurycurve.html"/>
@@ -234,35 +297,6 @@ answer the question?&amp;quot; or &amp;quot;Is there any topic you&amp;#39;d lik
 &lt;p&gt;&lt;a target="_blank" href="https://www.amazon.com/gp/product/0985757116/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0985757116&amp;linkCode=as2&amp;tag=winstonkotzan-20&amp;linkId=49527ca8d490f74681ce640c10f22108"&gt;This is Not Your Father&amp;#39;s Job Market: Job Seeking Strategies for Today&amp;#39;s New College Graduates&lt;/a&gt;&lt;img src="//ir-na.amazon-adsystem.com/e/ir?t=winstonkotzan-20&amp;l=am2&amp;o=1&amp;a=0985757116" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /&gt;&lt;/p&gt;
 
 &lt;iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;OneJS=1&amp;Operation=GetAdHtml&amp;MarketPlace=US&amp;source=ac&amp;ref=qf_sp_asin_til&amp;ad_type=product_link&amp;tracking_id=winstonkotzan-20&amp;marketplace=amazon&amp;region=US&amp;placement=0985757116&amp;asins=0985757116&amp;linkId=f280bde1ac5d26e167436aca1ba048ee&amp;show_border=false&amp;link_opens_in_new_window=true&amp;price_color=333333&amp;title_color=0066c0&amp;bg_color=ffffff"&gt;&lt;/iframe&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Capistrano + Docker could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network</title>
-    <link rel="alternate" href="http://blog.url.com/2017/07/12/docker-could-not-find-available-ipv4-address.html"/>
-    <id>http://blog.url.com/2017/07/12/docker-could-not-find-available-ipv4-address.html</id>
-    <published>2017-07-12T01:00:00-04:00</published>
-    <updated>2017-07-12T22:03:52-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;So on my latest Capistrano deploy to &lt;a href="http://www.momentumstockscans.com"&gt;MomentumStockScans.com&lt;/a&gt;, I received the following
-error:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo docker-compose up -d
-sudo: unable to resolve host ip-172-30-0-194
-Creating network &amp;quot;20170713014600_default&amp;quot; with the default driver
-ERROR: could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Turns out every time I was running &lt;code&gt;docker-compose&lt;/code&gt; it created a new bridge network, and &lt;a href="https://github.com/moby/moby/issues/23971"&gt;there&amp;#39;s a limit of 31 networks
-on the system&lt;/a&gt;!&lt;/p&gt;
-
-&lt;p&gt;When I did &lt;code&gt;docker network ls&lt;/code&gt;, it gave me a whole list of networks it created. One for each deploy. I cleared them using&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo docker network prune
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Everything was fine! Will add the above command to my Capistrano deploy script.&lt;/p&gt;
 </content>
   </entry>
 </feed>
