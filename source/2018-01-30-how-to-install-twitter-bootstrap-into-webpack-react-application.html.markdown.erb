@@ -1,0 +1,155 @@
+---
+title: How to Install Twitter Bootstrap into a Webpack/React.js Application
+date: 2018-01-30 18:55 EST
+tags:
+---
+
+Installing Twitter Bootstrap into my React.js application took more effort that I would have liked. There were several
+problems I ran into.
+
+## Bootstrap v3.3.7 fails
+
+Bootstrap 4 is only beta, but it looks like I'm going to have to use it. I had all sorts of problems getting the
+includes and dependencies to work with v3.3.7, such as this inability to resolve fonts:
+
+```
+ERROR in ./node_modules/css-loader!./node_modules/postcss-loader/lib?{}!./node_modules/sass-loader/lib/loader.js!./stylesheets/style.scss
+Module not found: Error: Can't resolve '../fonts/bootstrap/glyphicons-halflings-regular.eot' in '/Users/wkotzan/Development/momo-scans-frontend/stylesheets'
+ @ ./node_modules/css-loader!./node_modules/postcss-loader/lib?{}!./node_modules/sass-loader/lib/loader.js!./stylesheets/style.scss 7:4360-4422 7:4453-4515
+ @ ./stylesheets/style.scss
+ @ ./js/App.jsx
+ @ multi (webpack)-dev-server/client?http://localhost:8080 ./js/App.jsx
+```
+
+I could probably troubleshoot some more, but not worth the effort given that Bootstrap 3.3.7 will probably be
+obsolete very soon. So onto v4.0.0....
+
+## jQuery problems
+
+First, you need to get the Javascript dependencies within Bootstrap working. I have the following at the top of my
+`App.jsx` application file:
+
+```javascript
+import 'bootstrap';
+```
+
+But then I started getting a browser error that the jQuery dependency could not be found and my application page
+wouldn't render. I had to fix this by doing a `yarn add jquery` and then adding the following to my Webpack config
+file:
+
+```javascript
+const webpack = require('webpack');
+
+...
+
+  plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    })
+```
+
+This makes the JQuery references in Bootstrap universally available.
+
+## Getting the styles to work
+
+For the styles to wor, I had to add this line to my master `style.scss` file:
+
+```scss
+@import "~bootstrap/scss/bootstrap";
+```
+
+And then I had to add the following processing plugins to my Webpack config file:
+
+```javascript
+  module: {
+    rules: [
+      {
+        test: /\.scss?$/,
+        use: [
+          { loader: "style-loader" },
+          { loader: "css-loader" },
+          {
+            loader: "postcss-loader",
+            options: {
+              plugins: function() {
+                return [
+                  require('precss'),
+                  require('autoprefixer')
+                ]
+              }
+            }
+          },
+          { loader: "sass-loader" }
+        ]
+      },
+    ]
+  },
+
+```
+
+
+## Final webpack.config.js
+
+Here's my complete Webpack config file:
+
+```javascript
+const path = require('path');
+const webpack = require('webpack');
+
+module.exports = {
+  context: __dirname,
+  entry: "./js/App.jsx",
+  watch: true,
+  devtool: "cheap-eval-source-map",
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js'
+  },
+  devServer: {
+    publicPath: '/dist/',
+    historyApiFallback: true
+  },
+  resolve: {
+    extensions: ['.js', '.jsx', '.json']
+  },
+  stats: {
+    colors: true,
+    reasons: true
+  },
+  module: {
+    rules: [
+      {
+        test: /\.scss?$/,
+        use: [
+          { loader: "style-loader" },
+          { loader: "css-loader" },
+          {
+            loader: "postcss-loader",
+            options: {
+              plugins: function() {
+                return [
+                  require('precss'),
+                  require('autoprefixer')
+                ]
+              }
+            }
+          },
+          { loader: "sass-loader" }
+        ]
+      },
+      { test: /\.jsx?$/, use: 'babel-loader' }
+    ]
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    })
+  ]
+}
+```
+
+
+
+Information source: [TWBS documentation](https://getbootstrap.com/docs/4.0/getting-started/webpack/), Stack Overflow
