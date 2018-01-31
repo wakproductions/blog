@@ -5,10 +5,161 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2018-01-29T20:55:00-05:00</updated>
+  <updated>2018-01-30T18:55:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>How to Install Twitter Bootstrap into a Webpack/React.js Application</title>
+    <link rel="alternate" href="http://blog.url.com/2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html"/>
+    <id>http://blog.url.com/2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html</id>
+    <published>2018-01-30T18:55:00-05:00</published>
+    <updated>2018-01-31T00:25:59-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Installing Twitter Bootstrap into my React.js application took more effort that I would have liked. There were several
+problems I ran into.&lt;/p&gt;
+
+&lt;h2&gt;Bootstrap v3.3.7 fails&lt;/h2&gt;
+
+&lt;p&gt;Bootstrap 4 is only beta, but it looks like I&amp;#39;m going to have to use it. I had all sorts of problems getting the
+includes and dependencies to work with v3.3.7, such as this inability to resolve fonts:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ERROR in ./node_modules/css-loader!./node_modules/postcss-loader/lib?{}!./node_modules/sass-loader/lib/loader.js!./stylesheets/style.scss
+Module not found: Error: Can&amp;#39;t resolve &amp;#39;../fonts/bootstrap/glyphicons-halflings-regular.eot&amp;#39; in &amp;#39;/Users/wkotzan/Development/momo-scans-frontend/stylesheets&amp;#39;
+ @ ./node_modules/css-loader!./node_modules/postcss-loader/lib?{}!./node_modules/sass-loader/lib/loader.js!./stylesheets/style.scss 7:4360-4422 7:4453-4515
+ @ ./stylesheets/style.scss
+ @ ./js/App.jsx
+ @ multi (webpack)-dev-server/client?http://localhost:8080 ./js/App.jsx
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I could probably troubleshoot some more, but not worth the effort given that Bootstrap 3.3.7 will probably be
+obsolete very soon. So onto v4.0.0....&lt;/p&gt;
+
+&lt;h2&gt;jQuery problems&lt;/h2&gt;
+
+&lt;p&gt;First, you need to get the Javascript dependencies within Bootstrap working. I have the following at the top of my
+&lt;code&gt;App.jsx&lt;/code&gt; application file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="javascript"&gt;import &amp;#39;bootstrap&amp;#39;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But then I started getting a browser error that the jQuery dependency could not be found and my application page
+wouldn&amp;#39;t render. I had to fix this by doing a &lt;code&gt;yarn add jquery&lt;/code&gt; and then adding the following to my Webpack config
+file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="javascript"&gt;const webpack = require(&amp;#39;webpack&amp;#39;);
+
+...
+
+  plugins: [
+    new webpack.ProvidePlugin({
+      $: &amp;#39;jquery&amp;#39;,
+      jQuery: &amp;#39;jquery&amp;#39;
+    })
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This makes the JQuery references in Bootstrap universally available.&lt;/p&gt;
+
+&lt;h2&gt;Getting the styles to work&lt;/h2&gt;
+
+&lt;p&gt;For the styles to wor, I had to add this line to my master &lt;code&gt;style.scss&lt;/code&gt; file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="scss"&gt;@import &amp;quot;~bootstrap/scss/bootstrap&amp;quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then I had to add the following processing plugins to my Webpack config file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="javascript"&gt;  module: {
+    rules: [
+      {
+        test: /\.scss?$/,
+        use: [
+          { loader: &amp;quot;style-loader&amp;quot; },
+          { loader: &amp;quot;css-loader&amp;quot; },
+          {
+            loader: &amp;quot;postcss-loader&amp;quot;,
+            options: {
+              plugins: function() {
+                return [
+                  require(&amp;#39;precss&amp;#39;),
+                  require(&amp;#39;autoprefixer&amp;#39;)
+                ]
+              }
+            }
+          },
+          { loader: &amp;quot;sass-loader&amp;quot; }
+        ]
+      },
+    ]
+  },
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Final webpack.config.js&lt;/h2&gt;
+
+&lt;p&gt;Here&amp;#39;s my complete Webpack config file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="javascript"&gt;const path = require(&amp;#39;path&amp;#39;);
+const webpack = require(&amp;#39;webpack&amp;#39;);
+
+module.exports = {
+  context: __dirname,
+  entry: &amp;quot;./js/App.jsx&amp;quot;,
+  watch: true,
+  devtool: &amp;quot;cheap-eval-source-map&amp;quot;,
+  output: {
+    path: path.resolve(__dirname, &amp;#39;dist&amp;#39;),
+    filename: &amp;#39;bundle.js&amp;#39;
+  },
+  devServer: {
+    publicPath: &amp;#39;/dist/&amp;#39;,
+    historyApiFallback: true
+  },
+  resolve: {
+    extensions: [&amp;#39;.js&amp;#39;, &amp;#39;.jsx&amp;#39;, &amp;#39;.json&amp;#39;]
+  },
+  stats: {
+    colors: true,
+    reasons: true
+  },
+  module: {
+    rules: [
+      {
+        test: /\.scss?$/,
+        use: [
+          { loader: &amp;quot;style-loader&amp;quot; },
+          { loader: &amp;quot;css-loader&amp;quot; },
+          {
+            loader: &amp;quot;postcss-loader&amp;quot;,
+            options: {
+              plugins: function() {
+                return [
+                  require(&amp;#39;precss&amp;#39;),
+                  require(&amp;#39;autoprefixer&amp;#39;)
+                ]
+              }
+            }
+          },
+          { loader: &amp;quot;sass-loader&amp;quot; }
+        ]
+      },
+      { test: /\.jsx?$/, use: &amp;#39;babel-loader&amp;#39; }
+    ]
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      $: &amp;#39;jquery&amp;#39;,
+      jQuery: &amp;#39;jquery&amp;#39;
+    })
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Information source: &lt;a href="https://getbootstrap.com/docs/4.0/getting-started/webpack/"&gt;TWBS documentation&lt;/a&gt;, Stack Overflow&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Compiling SCSS to CSS in Webpack - INSANITY!</title>
     <link rel="alternate" href="http://blog.url.com/2018/01/29/webpack-compile-scss-insanity.html"/>
@@ -280,72 +431,6 @@ and don’t forget to like the video and subscribe to my channel. See you next t
     <content type="html">&lt;p&gt;Lately Youtube has been more aggressive in taking down political videos as part of their campaign against &amp;quot;fake news&amp;quot; and alleged &amp;quot;hate speech&amp;quot;. However, many users are angered by Youtube&amp;#39;s unclear and seemingly arbitrary policy for removing videos, accusing Youtube&amp;#39;s management of censoring videos based on the political opinions they present. As someone who is against the censorship of free speech, I created this video to help viewers of Youtube save the content of their favorite creators. By downloading videos and saving them, you will still have access to them after Youtube removes them and help maintain their circulation in the public sphere.&lt;/p&gt;
 
 &lt;iframe width="560" height="315" src="https://www.youtube.com/embed/J73aV3BWMj4" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Interviewing Tip - 3 Step Process fo Writing a Good Cover Letter</title>
-    <link rel="alternate" href="http://blog.url.com/2017/07/17/interviewing-tip-3-step-process-to-a-good-cover-letter.html"/>
-    <id>http://blog.url.com/2017/07/17/interviewing-tip-3-step-process-to-a-good-cover-letter.html</id>
-    <published>2017-07-17T19:55:00-04:00</published>
-    <updated>2017-07-18T15:18:22-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;Cover letters are important! After going through a pile of resumes, they can all start to look the same. Most job
-applicants for a particular position will have work histories in some business-y job doing similar job titles, give or
-take a few years difference in experience. The one chance you have to stand out and make &lt;em&gt;your&lt;/em&gt; application stand out
-is through a well written cover letter.&lt;/p&gt;
-
-&lt;p&gt;I&amp;#39;ve come up with a simple 3-step formula for making your cover letter concise and make your background stand out.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;Introduce yourself - tell them who you are and what you&amp;#39;re looking for. You can even say what exactly it was
-about this particular posting that caught your attention.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Pull out something about the job position and write about how you have relevant experience doing that.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Call to action. This is something I learned to consciously do from Youtube.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Let&amp;#39;s look at an example hypothetical job posting.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;We are looking for a Senior Ruby Developer to join our existing team. The position is full time and can be remote.
-Strong knowledge of Ruby is required. Real world experience building and maintaining Ruby on Rails apps is a must - from UI to APIs. This project will involve being part of a team working on an application used by tens of thousands of customers every day.
-Our typical project stack is Ruby, Rails, JavaScript and PostgreSQL. We prefer developers who  embrace new approaches and the craft of software design to solve problems.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Now let&amp;#39;s read the same posting again, this time I&amp;#39;m going to highlight key phrases to pull out for crafting a cover
-letter:&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;We are &lt;span style="color: green; font-weight: bold"&gt;looking for a Senior Ruby Developer&lt;/span&gt; to join our existing team. The position is full time and &lt;span style="color: green; font-weight: bold"&gt;can be remote&lt;/span&gt;.
-Strong knowledge of Ruby is required. &lt;span style="color: blue; font-weight: bold"&gt;Real world experience building and maintaining Ruby on Rails apps is a must - from UI to APIs&lt;/span&gt;. This project will involve being part of a team working on an application &lt;span style="color: blue; font-weight: bold"&gt;used by tens of thousands of customers&lt;/span&gt; every day.
-Our typical project stack is &lt;span style="color: blue; font-weight: bold"&gt;Ruby, Rails, JavaScript and PostgreSQL&lt;/span&gt;. We prefer developers who embrace new approaches and the craft of software design to solve problems.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;I color coded accordingly to match steps 1, 2, and 3 of the process I am suggesting. Here&amp;#39;s the cover letter body:&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;I am &lt;span style="color: green; font-weight: bold"&gt;an experienced Ruby on Rails developer&lt;/span&gt; looking for &lt;span style="color: green; font-weight: bold"&gt;remote work&lt;/span&gt;.
-I enjoy working on a variety of projects, and have been &lt;span style="color: green; font-weight: bold"&gt;taking on remote contracts of late&lt;/span&gt;. At FinCorp, a Chicago-based finance tech company, I worked with an agile team to maintain and build new logic into a Ruby-based accounting system for a &lt;span style="color: blue; font-weight: bold"&gt;$3 billion loan portfolio&lt;/span&gt;.
-In other projects, I&amp;#39;ve also written Ruby programs to &lt;span style="color: blue; font-weight: bold"&gt;scrape large amounts of data from financial APIs&lt;/span&gt;. My expertise falls largely into back-end and data management with systems like &lt;span style="color: blue; font-weight: bold"&gt;PostgreSQL&lt;/span&gt;, but I am also familiar with &lt;span style="color: blue; font-weight: bold"&gt;front end including Javascript, JQuery, and React&lt;/span&gt;.
-I hope you find my qualifications appealing. I am eager to get to together with a bright team and start some new interesting projects! &lt;span style="color: red; font-weight: bold"&gt;Please reply to this email if you think I’m a good fit for the team!&lt;/span&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;I start off by saying I&amp;#39;m an experienced Ruby developer looking to work remotely to show that the kind of job I&amp;#39;m looking for
-is aligned with the kind of employee they are looking to higher. The job posting stresses they want someone with real world
-experience making applications and interfacing APIs. Their website is a busy one with lost of customers. To highlight how I
-worked on sizable systems like that, I state that I worked on a large accounting system for $3 billion worth of loans and
-also mention my API experience.&lt;/p&gt;
-
-&lt;p&gt;Now my weak area for this job search is my lack of resume experience building the front end experience of websites. However,
-I try to make up for it by stating the major frameworks I&amp;#39;m familiar with. When applying for a job, it&amp;#39;s okay to fall short
-on a bullet point or two if you strongly meet the other requirements they are seeking.&lt;/p&gt;
-
-&lt;p&gt;Lastly, I have the call to action by suggesting the reader reply to this email.&lt;/p&gt;
-
-&lt;p&gt;&lt;a target="_blank" href="https://www.amazon.com/gp/product/0985757116/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0985757116&amp;linkCode=as2&amp;tag=winstonkotzan-20&amp;linkId=49527ca8d490f74681ce640c10f22108"&gt;This is Not Your Father&amp;#39;s Job Market: Job Seeking Strategies for Today&amp;#39;s New College Graduates&lt;/a&gt;&lt;img src="//ir-na.amazon-adsystem.com/e/ir?t=winstonkotzan-20&amp;l=am2&amp;o=1&amp;a=0985757116" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /&gt;&lt;/p&gt;
-
-&lt;iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;OneJS=1&amp;Operation=GetAdHtml&amp;MarketPlace=US&amp;source=ac&amp;ref=qf_sp_asin_til&amp;ad_type=product_link&amp;tracking_id=winstonkotzan-20&amp;marketplace=amazon&amp;region=US&amp;placement=0985757116&amp;asins=0985757116&amp;linkId=f280bde1ac5d26e167436aca1ba048ee&amp;show_border=false&amp;link_opens_in_new_window=true&amp;price_color=333333&amp;title_color=0066c0&amp;bg_color=ffffff"&gt;&lt;/iframe&gt;
 </content>
   </entry>
 </feed>
