@@ -1,0 +1,27 @@
+---
+title: How to Node on Ruby 2.5.0 (Debian Stretch) Docker Container
+date: 2018-03-05 18:55 EST
+tags:
+---
+
+Another Ruby version, another curveball. Node is no longer in the default package repository for Debian, so you have
+to manually add it. Here's how I got my Dockerfile to run:
+
+```
+# Dockerfile
+FROM ruby:2.5.0
+RUN apt-get update
+RUN curl -sL https://deb.nodesource.com/setup_9.x | bash -
+RUN apt-get install -y nodejs
+RUN apt-get install -y npm
+RUN npm install yarn -g
+
+CMD mkdir /app
+WORKDIR /app
+COPY Gemfile /app
+COPY Gemfile.lock /app
+
+RUN gem install bundler -v 1.16.1
+RUN bundle install
+
+```
