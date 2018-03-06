@@ -5,10 +5,41 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2018-01-30T18:55:00-05:00</updated>
+  <updated>2018-03-05T18:55:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>How to Node on Ruby 2.5.0 (Debian Stretch) Docker Container</title>
+    <link rel="alternate" href="http://blog.url.com/2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html"/>
+    <id>http://blog.url.com/2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html</id>
+    <published>2018-03-05T18:55:00-05:00</published>
+    <updated>2018-03-05T22:35:41-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Another Ruby version, another curveball. Node is no longer in the default package repository for Debian, so you have
+to manually add it. Here&amp;#39;s how I got my Dockerfile to run:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Dockerfile
+FROM ruby:2.5.0
+RUN apt-get update
+RUN curl -sL https://deb.nodesource.com/setup_9.x | bash -
+RUN apt-get install -y nodejs
+RUN apt-get install -y npm
+RUN npm install yarn -g
+
+CMD mkdir /app
+WORKDIR /app
+COPY Gemfile /app
+COPY Gemfile.lock /app
+
+RUN gem install bundler -v 1.16.1
+RUN bundle install
+
+&lt;/code&gt;&lt;/pre&gt;
+</content>
+  </entry>
   <entry>
     <title>How to Install Twitter Bootstrap into a Webpack/React.js Application</title>
     <link rel="alternate" href="http://blog.url.com/2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html"/>
@@ -417,20 +448,6 @@ in running distributed applications and contracts. But that’s for another vide
 
 &lt;p&gt;If you want a daily list of great stock trading ideas, check out MomentumStockScans.com, follow me on Twitter -
 and don’t forget to like the video and subscribe to my channel. See you next time.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>How to Download Videos from Youtube and Save Them on Your Hard Drive</title>
-    <link rel="alternate" href="http://blog.url.com/2017/07/27/how-to-download-youtube-videos-to-your-hard-drive.html"/>
-    <id>http://blog.url.com/2017/07/27/how-to-download-youtube-videos-to-your-hard-drive.html</id>
-    <published>2017-07-27T19:55:00-04:00</published>
-    <updated>2017-07-27T22:22:35-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;Lately Youtube has been more aggressive in taking down political videos as part of their campaign against &amp;quot;fake news&amp;quot; and alleged &amp;quot;hate speech&amp;quot;. However, many users are angered by Youtube&amp;#39;s unclear and seemingly arbitrary policy for removing videos, accusing Youtube&amp;#39;s management of censoring videos based on the political opinions they present. As someone who is against the censorship of free speech, I created this video to help viewers of Youtube save the content of their favorite creators. By downloading videos and saving them, you will still have access to them after Youtube removes them and help maintain their circulation in the public sphere.&lt;/p&gt;
-
-&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/J73aV3BWMj4" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
 </content>
   </entry>
 </feed>
