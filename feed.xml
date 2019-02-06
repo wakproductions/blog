@@ -14,7 +14,7 @@
     <link rel="alternate" href="http://blog.url.com/2019/02/03/three-allergic-triggers-that-can-cause-eczema.html"/>
     <id>http://blog.url.com/2019/02/03/three-allergic-triggers-that-can-cause-eczema.html</id>
     <published>2019-02-03T18:00:00-05:00</published>
-    <updated>2019-02-03T23:25:49-05:00</updated>
+    <updated>2019-02-05T20:29:22-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -122,7 +122,7 @@ it forces me to notice the link in an obvious way.&lt;/p&gt;
     <link rel="alternate" href="http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"/>
     <id>http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html</id>
     <published>2019-02-03T18:00:00-05:00</published>
-    <updated>2019-02-03T18:43:23-05:00</updated>
+    <updated>2019-02-05T20:29:22-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -224,7 +224,7 @@ this blog series and want to add to the discussion, please leave your feedback o
     <link rel="alternate" href="http://blog.url.com/2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html"/>
     <id>http://blog.url.com/2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html</id>
     <published>2018-03-05T18:55:00-05:00</published>
-    <updated>2018-03-05T22:35:41-05:00</updated>
+    <updated>2019-02-05T20:29:22-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -255,7 +255,7 @@ RUN bundle install
     <link rel="alternate" href="http://blog.url.com/2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html"/>
     <id>http://blog.url.com/2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html</id>
     <published>2018-01-30T18:55:00-05:00</published>
-    <updated>2018-01-31T00:25:59-05:00</updated>
+    <updated>2019-02-05T20:29:22-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -406,7 +406,7 @@ module.exports = {
     <link rel="alternate" href="http://blog.url.com/2018/01/29/webpack-compile-scss-insanity.html"/>
     <id>http://blog.url.com/2018/01/29/webpack-compile-scss-insanity.html</id>
     <published>2018-01-29T20:55:00-05:00</published>
-    <updated>2018-01-29T21:42:41-05:00</updated>
+    <updated>2019-02-05T20:29:22-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -499,7 +499,7 @@ eval(&amp;quot;exports = module.exports = __webpack_require__(4)(false);\n// imp
     <link rel="alternate" href="http://blog.url.com/2018/01/29/frontendmasters-review.html"/>
     <id>http://blog.url.com/2018/01/29/frontendmasters-review.html</id>
     <published>2018-01-29T18:55:00-05:00</published>
-    <updated>2018-12-08T12:42:05-05:00</updated>
+    <updated>2019-02-05T20:29:22-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
