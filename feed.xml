@@ -5,10 +5,165 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2019-02-03T18:00:00-05:00</updated>
+  <updated>2019-02-05T01:00:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>How to connect Docker to a Postgres database on host machine localhost</title>
+    <link rel="alternate" href="http://blog.url.com/2019/02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html"/>
+    <id>http://blog.url.com/2019/02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html</id>
+    <published>2019-02-05T01:00:00-05:00</published>
+    <updated>2019-02-05T22:47:56-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Connecting a Docker application to non-Dockerized Postgres database from is a more complicated task
+than you would think. While a Docker container can easily communicate with other containers running on the same machine,
+it can&amp;#39;t easily find how to connect to the host machine running it. This is because of the way Docker handles 
+networking, by isolating the containers on its own virtual network which doesn&amp;#39;t include the computer hosting Docker.&lt;/p&gt;
+
+&lt;p&gt;A while back I published &lt;a href="2017-06-01-connecting-to-external-postgres-database-with-docker.html.markdown"&gt;How to connect to an external Postgres database from a Docker container&lt;/a&gt;,
+which showed you how to tinker with the settings on your local machine or any other computer in your local network
+so that your Dockerized app can connect to Postgres. I&amp;#39;ve recently discovered an alternative method which is even faster.
+Here&amp;#39;s how I do it now: &lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="yaml"&gt;version: &amp;#39;3&amp;#39;
+
+services:
+  myapp:
+    build: .
+    command: &amp;quot;bundle exec rails s&amp;quot;
+    environment:
+      - DATABASE_URL=${DATABASE_URL} # Connection string to the database goes here
+      - PGPASSWORD=${PGPASSWORD}
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - RAILS_LOG_TO_STDOUT=true
+    network_mode: host
+    tty: true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Notice how in my &lt;code&gt;docker-compose&lt;/code&gt; the &lt;code&gt;network_mode&lt;/code&gt; is &amp;quot;host&amp;quot;. This value will cause the container to run from the
+host&amp;#39;s network directly - no isolation of the container onto its own network. That means &lt;code&gt;localhost&lt;/code&gt; in the container
+will point to the &lt;code&gt;localhost&lt;/code&gt; of your machine. You can then connect to Postgres in the command line from within
+the container like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker-compose run myapp /bin/sh
+
+/app # psql -U postgres -h localhost
+psql (10.5, server 9.6.11)
+Type &amp;quot;help&amp;quot; for help.
+
+postgres=# 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that it&amp;#39;s necessary to specify the &lt;code&gt;-h localhost&lt;/code&gt; parameter. Also, if you make use of the &lt;code&gt;PGPASSWORD&lt;/code&gt; environment
+variable you can have that set to the database password so that it won&amp;#39;t prompt you to type it in.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>I Conquered Eczema after 30 Years of Itchy Skin, And You Can Too</title>
+    <link rel="alternate" href="http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"/>
+    <id>http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html</id>
+    <published>2019-02-03T18:00:00-05:00</published>
+    <updated>2019-02-05T20:29:22-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h2&gt;Part 1: Genetics and (Mis)Diagnosis&lt;/h2&gt;
+
+&lt;p&gt;According to the National Eczema Foundation, 30 million Americans are afflicted with the itchy, red, blistery skin
+condition medically referred to as atopic dermatitis, but better known as eczema. Eczema affects people of all races,
+ages, and gender. While it&amp;#39;s not typically a life threatening condition, it can impair quality of life for its sufferers
+with a great deal of discomfort and social anxiety. As a life-long sufferer of eczema, I&amp;#39;ve dealt with days where
+flare-ups on my hands that were so painful that I&amp;#39;ve had to use sick days from my office job on the computer. I can&amp;#39;t
+even imagine what an impairment this condition could become in trades requiring more intense physical labor.&lt;/p&gt;
+
+&lt;p&gt;If you&amp;#39;ve landed on this page, chances are you want to learn more about this condition. What I&amp;#39;m going to share in this
+series of blog posts is my findings on how to manage eczema, which I hope you will find useful too.&lt;/p&gt;
+
+&lt;h3&gt;Is it eczema or a single episode of dermatitis?&lt;/h3&gt;
+
+&lt;p&gt;I&amp;#39;ve had eczema since I was 5 years old, beginning as two itchy, dry patches of skin on the inner bend of my arms.
+The first few times my mom took me to the family doctor, I was given a cream to apply to it and told not to
+scratch. Scratching avoidance never seemed to make a difference for me - I would get the rash no matter how hard
+I resisted the itching. As a patient, being told not to scratch is upsetting because it can feel like you&amp;#39;re being
+blamed for making it worse even though you know that has little to do with the cause.&lt;/p&gt;
+
+&lt;p&gt;As a kid most of the time I would just put up with the discomfort and accepted it as part of life. I thought
+maybe it was just something everybody deals with, especially during the winter in Chicago. I remember in high school
+one day a classmate sitting next to me saw me roll up my sleeve and start scratching the inflamed, dry flakes on my arm.
+&amp;quot;You really need to put moisturizer on that!&amp;quot; she said.&lt;/p&gt;
+
+&lt;p&gt;Steroid medication always made the skin heal up for a while, but it wouldn&amp;#39;t be long before the problem would
+return. I would go back to the doctor on occasion during times when the itching would become unbearable. When I was
+a teen we started seeing a new family doctor and every time he would see my rashes on my arm or hands he would say
+&amp;quot;That&amp;#39;s contact dermatitis!&amp;quot;, prescribe the same steroid cream, and the cycle continued. It wasn&amp;#39;t until we got the
+Internet in my home that I Alta Vista&amp;#39;ed (because Google wasn&amp;#39;t a thing yet) my symptoms and found websites full of
+information about this skin problem. For the first time I had an answer as to why I kept getting itchy, flaky, red
+rashes in the same spots on my skin - it was eczema and the Internet was full of stories similar to mine.&lt;/p&gt;
+
+&lt;p&gt;I think that the episodic nature of our healthcare delivery system causes people with non-life threatening chronic
+problems like this to fall through the cracks until the situation gets severe. After a little over 10 years of doctor
+visits, not once was I ever diagnosed with &amp;quot;eczema&amp;quot;. It seems typical for the run of the mill family doctor to treat
+each flare-up of eczema as an isolated case of skin irritation, and miss the bigger picture. Your doctor probably
+doesn&amp;#39;t live with this condition, and isn&amp;#39;t there with you all day to take note of the lifestyle related things you do
+which could be making your eczema better or worse. He just knows that the prescribing drugs will work well enough to
+mask the symptoms and send you on your way for a while.&lt;/p&gt;
+
+&lt;p&gt;Medications may be useful for suppressing an eczema flare-up, but repeatedly taking this approach has diminishing
+returns. Steroid medications like triamcinolone are often the first line of treatment, but they can be hard on your
+body. Long term use can lead to the thinning of your skin. Injections of that medication can lead to harmful
+side effects like cataracts. Over time they may even become less effective and your condition will worsen. Given that,
+why not try to eliminate the cause rather than the symptoms?&lt;/p&gt;
+
+&lt;p&gt;From my experience I&amp;#39;ve learned that lifestyle factors are influential in managing eczema. Doctors aren&amp;#39;t so well
+coordinated in educating you on this lifestyle angle because they can only base their decisions based on the information
+they&amp;#39;ve read in established medical journals, which is limited. It takes a lot of experimentation and observation to
+figure out the triggers for your particular case. Only you are in the best position to figure out what works for you,
+which may vary from person to person. If you are successful, you will save yourself a great deal of discomfort,
+expenses, and the harmful long term side effects of prescription medication.&lt;/p&gt;
+
+&lt;h3&gt;Eczema and genetics&lt;/h3&gt;
+
+&lt;p&gt;There is definitely a genetic component to eczema. Some of the medical sites I&amp;#39;ve visited cite one of the root
+causes as the &lt;a href="https://ghr.nlm.nih.gov/condition/atopic-dermatitis#genes"&gt;FLG gene&lt;/a&gt;, which helps your body create
+certain proteins that waterproof the skin, thereby retaining moisture and keeping out substances that can cause
+irritation. People with a corrupted FLG gene do not produce this protein correctly.&lt;/p&gt;
+
+&lt;p&gt;As I learned more about this condition, I began to see links to my mother&amp;#39;s health. My mom worked in the hospital
+as a lab tech and often had trouble with dermatitis on her hands. She would constantly use moisturizers and blamed
+the irritation on latex gloves. However, she would sometimes get more extensive rashes and go to the doctor
+for creams and sometimes shots to subdue the discomfort.&lt;/p&gt;
+
+&lt;p&gt;Later on I would have conversations with my mom about my grandmother, who passed away in the Philippines long before
+I was born. I learned that my grandmother also dealt with the discomforts of eczema, but on the back of her ankles.
+Given this information, it became apparent that my case eczema was a token of the genetic lottery from my mother&amp;#39;s side
+of the family. My dad and his parents did not have any such skin problems.&lt;/p&gt;
+
+&lt;h3&gt;The immune system&amp;#39;s role in eczema&lt;/h3&gt;
+
+&lt;p&gt;Although science offers some clues, I don&amp;#39;t think medical research fully understands the mechanics of what causes full
+blown eczema. It&amp;#39;s not just that some eczema suffers lack certain proteins in the skin. There is also an immune system
+component. A lot of medical research into eczema revolves around overactive immune system response, which causes the
+inflammation in the skin that leads to rashes.&lt;/p&gt;
+
+&lt;p&gt;I subscribe to the idea that because an eczema suffer&amp;#39;s skin may be more porous, environmental irritants are more likely
+to get through the outer barriers and trigger the immune system to cause inflammation. This may be why so many doctors
+treat chronic eczema like they would a standard case of contact dermatitis (skin irritation/allergy) - because the
+body&amp;#39;s mechanisms in causing both kinds of rashes is the same. It&amp;#39;s just that a person with the chronic illness is much
+more sensitive to allergens and gets triggered more often.&lt;/p&gt;
+
+&lt;p&gt;Stubborn cases of chronic eczema could have multiple triggers, including a combination of allergens and pathogens. The
+porus skin of someone with the eczema gene is more susceptible to stealthy bacterial or fungal infections that produce
+eczema-like rashes. In such cases, taking a medication like fluconazole in combination with other medication can
+provide a great deal of relief and stomp out a persistent flare-up.&lt;/p&gt;
+
+&lt;p&gt;In the &lt;a href="three-allergic-triggers-that-can-cause-eczema.html"&gt;Part 2&lt;/a&gt; of this series, I go into more detail about the allergy and pathogenic factors causing eczema. If you like
+this blog series and want to add to the discussion, please leave your feedback on the Disqus board below.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Three Allergic Triggers That Can Cause Eczema</title>
     <link rel="alternate" href="http://blog.url.com/2019/02/03/three-allergic-triggers-that-can-cause-eczema.html"/>
@@ -115,108 +270,6 @@ out by eliminating all coconut from my diet, and this seems to have worked. If I
 milk or coconut water I start to have some eczema problems in the following days. This was a tricky one to figure out
 because like the cat and dog allegy, there is a delayed reaction and the symptoms aren&amp;#39;t so severe right away that
 it forces me to notice the link in an obvious way.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>I Conquered Eczema after 30 Years of Itchy Skin, And You Can Too</title>
-    <link rel="alternate" href="http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"/>
-    <id>http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html</id>
-    <published>2019-02-03T18:00:00-05:00</published>
-    <updated>2019-02-05T20:29:22-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h2&gt;Part 1: Genetics and (Mis)Diagnosis&lt;/h2&gt;
-
-&lt;p&gt;According to the National Eczema Foundation, 30 million Americans are afflicted with the itchy, red, blistery skin
-condition medically referred to as atopic dermatitis, but better known as eczema. Eczema affects people of all races,
-ages, and gender. While it&amp;#39;s not typically a life threatening condition, it can impair quality of life for its sufferers
-with a great deal of discomfort and social anxiety. As a life-long sufferer of eczema, I&amp;#39;ve dealt with days where
-flare-ups on my hands that were so painful that I&amp;#39;ve had to use sick days from my office job on the computer. I can&amp;#39;t
-even imagine what an impairment this condition could become in trades requiring more intense physical labor.&lt;/p&gt;
-
-&lt;p&gt;If you&amp;#39;ve landed on this page, chances are you want to learn more about this condition. What I&amp;#39;m going to share in this
-series of blog posts is my findings on how to manage eczema, which I hope you will find useful too.&lt;/p&gt;
-
-&lt;h3&gt;Is it eczema or a single episode of dermatitis?&lt;/h3&gt;
-
-&lt;p&gt;I&amp;#39;ve had eczema since I was 5 years old, beginning as two itchy, dry patches of skin on the inner bend of my arms.
-The first few times my mom took me to the family doctor, I was given a cream to apply to it and told not to
-scratch. Scratching avoidance never seemed to make a difference for me - I would get the rash no matter how hard
-I resisted the itching. As a patient, being told not to scratch is upsetting because it can feel like you&amp;#39;re being
-blamed for making it worse even though you know that has little to do with the cause.&lt;/p&gt;
-
-&lt;p&gt;As a kid most of the time I would just put up with the discomfort and accepted it as part of life. I thought
-maybe it was just something everybody deals with, especially during the winter in Chicago. I remember in high school
-one day a classmate sitting next to me saw me roll up my sleeve and start scratching the inflamed, dry flakes on my arm.
-&amp;quot;You really need to put moisturizer on that!&amp;quot; she said.&lt;/p&gt;
-
-&lt;p&gt;Steroid medication always made the skin heal up for a while, but it wouldn&amp;#39;t be long before the problem would
-return. I would go back to the doctor on occasion during times when the itching would become unbearable. When I was
-a teen we started seeing a new family doctor and every time he would see my rashes on my arm or hands he would say
-&amp;quot;That&amp;#39;s contact dermatitis!&amp;quot;, prescribe the same steroid cream, and the cycle continued. It wasn&amp;#39;t until we got the
-Internet in my home that I Alta Vista&amp;#39;ed (because Google wasn&amp;#39;t a thing yet) my symptoms and found websites full of
-information about this skin problem. For the first time I had an answer as to why I kept getting itchy, flaky, red
-rashes in the same spots on my skin - it was eczema and the Internet was full of stories similar to mine.&lt;/p&gt;
-
-&lt;p&gt;I think that the episodic nature of our healthcare delivery system causes people with non-life threatening chronic
-problems like this to fall through the cracks until the situation gets severe. After a little over 10 years of doctor
-visits, not once was I ever diagnosed with &amp;quot;eczema&amp;quot;. It seems typical for the run of the mill family doctor to treat
-each flare-up of eczema as an isolated case of skin irritation, and miss the bigger picture. Your doctor probably
-doesn&amp;#39;t live with this condition, and isn&amp;#39;t there with you all day to take note of the lifestyle related things you do
-which could be making your eczema better or worse. He just knows that the prescribing drugs will work well enough to
-mask the symptoms and send you on your way for a while.&lt;/p&gt;
-
-&lt;p&gt;Medications may be useful for suppressing an eczema flare-up, but repeatedly taking this approach has diminishing
-returns. Steroid medications like triamcinolone are often the first line of treatment, but they can be hard on your
-body. Long term use can lead to the thinning of your skin. Injections of that medication can lead to harmful
-side effects like cataracts. Over time they may even become less effective and your condition will worsen. Given that,
-why not try to eliminate the cause rather than the symptoms?&lt;/p&gt;
-
-&lt;p&gt;From my experience I&amp;#39;ve learned that lifestyle factors are influential in managing eczema. Doctors aren&amp;#39;t so well
-coordinated in educating you on this lifestyle angle because they can only base their decisions based on the information
-they&amp;#39;ve read in established medical journals, which is limited. It takes a lot of experimentation and observation to
-figure out the triggers for your particular case. Only you are in the best position to figure out what works for you,
-which may vary from person to person. If you are successful, you will save yourself a great deal of discomfort,
-expenses, and the harmful long term side effects of prescription medication.&lt;/p&gt;
-
-&lt;h3&gt;Eczema and genetics&lt;/h3&gt;
-
-&lt;p&gt;There is definitely a genetic component to eczema. Some of the medical sites I&amp;#39;ve visited cite one of the root
-causes as the &lt;a href="https://ghr.nlm.nih.gov/condition/atopic-dermatitis#genes"&gt;FLG gene&lt;/a&gt;, which helps your body create
-certain proteins that waterproof the skin, thereby retaining moisture and keeping out substances that can cause
-irritation. People with a corrupted FLG gene do not produce this protein correctly.&lt;/p&gt;
-
-&lt;p&gt;As I learned more about this condition, I began to see links to my mother&amp;#39;s health. My mom worked in the hospital
-as a lab tech and often had trouble with dermatitis on her hands. She would constantly use moisturizers and blamed
-the irritation on latex gloves. However, she would sometimes get more extensive rashes and go to the doctor
-for creams and sometimes shots to subdue the discomfort.&lt;/p&gt;
-
-&lt;p&gt;Later on I would have conversations with my mom about my grandmother, who passed away in the Philippines long before
-I was born. I learned that my grandmother also dealt with the discomforts of eczema, but on the back of her ankles.
-Given this information, it became apparent that my case eczema was a token of the genetic lottery from my mother&amp;#39;s side
-of the family. My dad and his parents did not have any such skin problems.&lt;/p&gt;
-
-&lt;h3&gt;The immune system&amp;#39;s role in eczema&lt;/h3&gt;
-
-&lt;p&gt;Although science offers some clues, I don&amp;#39;t think medical research fully understands the mechanics of what causes full
-blown eczema. It&amp;#39;s not just that some eczema suffers lack certain proteins in the skin. There is also an immune system
-component. A lot of medical research into eczema revolves around overactive immune system response, which causes the
-inflammation in the skin that leads to rashes.&lt;/p&gt;
-
-&lt;p&gt;I subscribe to the idea that because an eczema suffer&amp;#39;s skin may be more porous, environmental irritants are more likely
-to get through the outer barriers and trigger the immune system to cause inflammation. This may be why so many doctors
-treat chronic eczema like they would a standard case of contact dermatitis (skin irritation/allergy) - because the
-body&amp;#39;s mechanisms in causing both kinds of rashes is the same. It&amp;#39;s just that a person with the chronic illness is much
-more sensitive to allergens and gets triggered more often.&lt;/p&gt;
-
-&lt;p&gt;Stubborn cases of chronic eczema could have multiple triggers, including a combination of allergens and pathogens. The
-porus skin of someone with the eczema gene is more susceptible to stealthy bacterial or fungal infections that produce
-eczema-like rashes. In such cases, taking a medication like fluconazole in combination with other medication can
-provide a great deal of relief and stomp out a persistent flare-up.&lt;/p&gt;
-
-&lt;p&gt;In the &lt;a href="three-allergic-triggers-that-can-cause-eczema.html"&gt;Part 2&lt;/a&gt; of this series, I go into more detail about the allergy and pathogenic factors causing eczema. If you like
-this blog series and want to add to the discussion, please leave your feedback on the Disqus board below.&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -492,70 +545,6 @@ eval(&amp;quot;exports = module.exports = __webpack_require__(4)(false);\n// imp
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;strong&gt;WTF!!!&lt;/strong&gt; That&amp;#39;s some strange unconventional shit going on right there. But I guess that&amp;#39;s the Webpack way.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Review of FrontendMasters React.js/Redux Tutorial v3</title>
-    <link rel="alternate" href="http://blog.url.com/2018/01/29/frontendmasters-review.html"/>
-    <id>http://blog.url.com/2018/01/29/frontendmasters-review.html</id>
-    <published>2018-01-29T18:55:00-05:00</published>
-    <updated>2019-02-05T20:29:22-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;w
-I&amp;#39;m trying to learn &lt;a href="https://reactjs.org"&gt;React.js&lt;/a&gt; along with &lt;a href="https://redux.js.org"&gt;Redux&lt;/a&gt;. These frameworks are
-really complicated to set up and get familiar with on the basics level, so I was hoping that taking an online
-course would get me up to speed with the contextual background knowledge needed to get a single page React app up
-and running.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="../../../images/2018/Screen-Shot-2018-01-29-fem.png" style="width: 600px" relative="true" alt="Screen shot 2018 01 29 fem" /&gt;&lt;/p&gt;
-
-&lt;h2&gt;Positive&lt;/h2&gt;
-
-&lt;p&gt;So first I&amp;#39;ll start with the good. This course gave me much of the general background I was hoping for. In addition
-to basic React, it covered some of the basic set up of a React single page application beyond the cop out of telling
-you to use &lt;em&gt;create-react-app&lt;/em&gt;. By showing you how to integrate into Webpack, it shows you how to use React in a more
-practical sense as you would in a company environment. I got a much better bird&amp;#39;s eye view than I would have from
-reading the official &lt;a href="https://reactjs.org/docs/hello-world.html"&gt;React guides&lt;/a&gt; alone.&lt;/p&gt;
-
-&lt;p&gt;It also incorporates a lot of useful tools like &lt;em&gt;Prettier&lt;/em&gt;, &lt;em&gt;eslint&lt;/em&gt;, and testing using &lt;em&gt;Jest&lt;/em&gt;. I think I accomplished
-the big goal of getting to understand how &lt;em&gt;Redux&lt;/em&gt; incorporates with React. For example, I when I tried approaching
-learning React/Redux independently from the online reference guides, I did not understand that Redux &lt;em&gt;replaces&lt;/em&gt; the
-entire state machine that the React tutorials tell you to use. Seeing this in action side by side clicked with me.&lt;/p&gt;
-
-&lt;h2&gt;Negative&lt;/h2&gt;
-
-&lt;p&gt;Despite getting a good general overview of React through this course, I feel like part of its downfall was that it
-tried to incorporate too much. This course is over 14 hours long, and I&amp;#39;m in a crunch to learn this as fast as I can.
-I think he went into a lot of topics that were unnecessary like &lt;em&gt;Flow&lt;/em&gt;. My employer uses &lt;em&gt;Typescript&lt;/em&gt; so this is
-something that I think is better served in another tutorial. Of course, you can always skip over those sections, but
-you will get a little lost if you are coding along and following the examples in your own locally hosted project.
-Another minor annoyance is that the instructor would occasionally get stumped by a lint error and spend time debugging
-it. That sort of junk is boring to watch and throws off my learning flow. I paid for this stuff so I expect him to come
-prepared with a Powerpoint and more structured overview.&lt;/p&gt;
-
-&lt;p&gt;The biggest problem I have with this course is the same weakness I see with a lot of other coding instruction, including
-&lt;a href="https://www.codeschool.com/"&gt;CodeSchool&lt;/a&gt;. There&amp;#39;s too much &amp;quot;Type this into this file and... wow!&amp;quot; I really hate it when
-an instructor has too much magic going on behind the scenes that he doesn&amp;#39;t explain. This is especially relevant in the
-areas related to configuration like Webpack setup.&lt;/p&gt;
-
-&lt;p&gt;Speaking of which, I also tried out the FrontendMasters Webpack tutorial and was disappointed. I just want to know the
-basic structure of Webpack explained in context - but the guy running the 5 hour course rambled off on too many tangents
-such as about Node modules he personally worked on but have no relevance to Webpack. All I wanted to know was X, Y, Z
-steps to set up and configure Webpack to get my SCSS compiled to CSS. Show me how to use the Webpack references by
-providing a good contextual overview and I can take it from here.&lt;/p&gt;
-
-&lt;h2&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;I believe the most intimidating thing about learning React is not the React concepts itself, but the whole associated
-array of tools to create a single page application. The &lt;a href="https://reactjs.org/docs/"&gt;React Guides&lt;/a&gt; got me so far,
-but don&amp;#39;t tell you about the essential associated technologies to run the whole big picture like Webpack and Redux.
-FrontendMasters was an okay course, but was really inefficient for my learning style. I wish they just did away with
-the whole video tutorial and wrote out the entire course as a series of blog entries so that I can skim to the
-important parts.&lt;/p&gt;
-
-&lt;p&gt;If you want to really learn Redux, &lt;a href="http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html"&gt;try this tutorial right here&lt;/a&gt;.&lt;/p&gt;
 </content>
   </entry>
 </feed>

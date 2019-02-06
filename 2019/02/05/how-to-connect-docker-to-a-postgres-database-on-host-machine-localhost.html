@@ -12,7 +12,7 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta charset='utf-8'>
     <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
-    <title>Why I Switched to Docker when Using AWS with Ruby on Rails</title>
+    <title>How to connect Docker to a Postgres database on host machine localhost</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
     <link href="../../../stylesheets/site.css" rel="stylesheet" />
     <script src="../../../javascripts/all.js"></script>
@@ -28,7 +28,7 @@
         ga('send', 'pageview');
     </script>
   </head>
-  <body class='x2017 x2017_06 x2017_06_03 x2017_06_03_why-I-use-docker-on-aws'>
+  <body class='x2019 x2019_02 x2019_02_05 x2019_02_05_how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost'>
     <div class='jumbotron'>
       <div class='container'>
         <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
@@ -41,7 +41,7 @@
     <div class='container content'>
       <div class='col-md-8'>
         <div class='main article-content' role='main'>
-          <h2 class='article-title'>Why I Switched to Docker when Using AWS with Ruby on Rails</h2>
+          <h2 class='article-title'>How to connect Docker to a Postgres database on host machine localhost</h2>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-top -->
           <ins class="adsbygoogle"
@@ -51,24 +51,29 @@
           <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
-          <div class='article-date'>06/03/2017</div>
+          <div class='article-date'>02/05/2019</div>
           <div class='article-body'>
-            <h2>Why Do I Use Docker?</h2>
+            <p>Connecting a Docker application to non-Dockerized Postgres database from is a more complicated task
+            than you would think. While a Docker container can easily communicate with other containers running on the same machine,
+            it can&#39;t easily find how to connect to the host machine running it. This is because of the way Docker handles 
+            networking, by isolating the containers on its own virtual network which doesn&#39;t include the computer hosting Docker.</p>
             
-            <p>I am working on a Ruby on Rails app which will soon be up and running on AWS EC2. To my displeasure (as I&#39;m more of an app
-            developer than DevOps guy), I ran into numerous configuration problems setting up my production server. When building
-            Ruby I ran into permissions problems with the gems such as:</p>
+            <p>A while back I published <a href="2017-06-01-connecting-to-external-postgres-database-with-docker.html.markdown">How to connect to an external Postgres database from a Docker container</a>,
+            which showed you how to tinker with the settings on your local machine or any other computer in your local network
+            so that your Dockerized app can connect to Postgres. I&#39;ve recently discovered an alternative method which is even faster.
+            Here&#39;s how I do it now: </p>
             
-            <p><code>&#x000A;ubuntu@ip-172-30-0-78:~$ gem install bundler&#x000A;   Fetching: bundler-1.15.0.gem (100%)&#x000A;   ERROR:  While executing gem ... (Gem::FilePermissionError)&#x000A;       You don&#39;t have write permissions for the /usr/local/lib/ruby/gems/2.4.0 directory.</code></p>
+            <pre><code class="yaml">version: &#39;3&#39;&#x000A;&#x000A;services:&#x000A;  myapp:&#x000A;    build: .&#x000A;    command: &quot;bundle exec rails s&quot;&#x000A;    environment:&#x000A;      - DATABASE_URL=${DATABASE_URL} # Connection string to the database goes here&#x000A;      - PGPASSWORD=${PGPASSWORD}&#x000A;      - RAILS_ENV=${RAILS_ENV:-development}&#x000A;      - RAILS_LOG_TO_STDOUT=true&#x000A;    network_mode: host&#x000A;    tty: true&#x000A;</code></pre>
             
-            <p>Not to mention unforseen missing dependency problems such as this one when building the gemset:</p>
+            <p>Notice how in my <code>docker-compose</code> the <code>network_mode</code> is &quot;host&quot;. This value will cause the container to run from the
+            host&#39;s network directly - no isolation of the container onto its own network. That means <code>localhost</code> in the container
+            will point to the <code>localhost</code> of your machine. You can then connect to Postgres in the command line from within
+            the container like this:</p>
             
-            <pre><code>Gem Load Error is: Could not find a JavaScript runtime. See https://github.com/rails/execjs for a list of available runtimes.&#x000A;</code></pre>
+            <pre><code>$ docker-compose run myapp /bin/sh&#x000A;&#x000A;/app # psql -U postgres -h localhost&#x000A;psql (10.5, server 9.6.11)&#x000A;Type &quot;help&quot; for help.&#x000A;&#x000A;postgres=# &#x000A;&#x000A;</code></pre>
             
-            <p>I could fiddle around for hours fixing these issues, but then what if I had to upgrade Ruby later on or add new
-            dependencies for new features? The last thing I would want is for my production system to go down due to unforeseen
-            differences between my development environment and production. Docker gives me a way to ensure consistency between
-            environments and swap dependencies. </p>
+            <p>Note that it&#39;s necessary to specify the <code>-h localhost</code> parameter. Also, if you make use of the <code>PGPASSWORD</code> environment
+            variable you can have that set to the database password so that it won&#39;t prompt you to type it in.</p>
           </div>
           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
           <!-- article-bottom -->
@@ -105,16 +110,16 @@
         <aside>
           <h2>Recent Articles</h2>
           <ol>
-            <li><a href="../../../2019/02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html">How to connect Docker to a Postgres database on host machine localhost</a> <span>Feb  5</span></li>
-            <li><a href="../../../2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html">I Conquered Eczema after 30 Years of Itchy Skin, And You Can Too</a> <span>Feb  3</span></li>
-            <li><a href="../../../2019/02/03/three-allergic-triggers-that-can-cause-eczema.html">Three Allergic Triggers That Can Cause Eczema</a> <span>Feb  3</span></li>
+            <li><a href="how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html">How to connect Docker to a Postgres database on host machine localhost</a> <span>Feb  5</span></li>
+            <li><a href="../03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html">I Conquered Eczema after 30 Years of Itchy Skin, And You Can Too</a> <span>Feb  3</span></li>
+            <li><a href="../03/three-allergic-triggers-that-can-cause-eczema.html">Three Allergic Triggers That Can Cause Eczema</a> <span>Feb  3</span></li>
             <li><a href="../../../2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html">How to Node on Ruby 2.5.0 (Debian Stretch) Docker Container</a> <span>Mar  5</span></li>
             <li><a href="../../../2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html">How to Install Twitter Bootstrap into a Webpack/React.js Application</a> <span>Jan 30</span></li>
             <li><a href="../../../2018/01/29/webpack-compile-scss-insanity.html">Compiling SCSS to CSS in Webpack - INSANITY!</a> <span>Jan 29</span></li>
             <li><a href="../../../2018/01/29/frontendmasters-review.html">Review of FrontendMasters React.js/Redux Tutorial v3</a> <span>Jan 29</span></li>
-            <li><a href="../../09/05/shutting-down-momo-scans-and-ustreasurycurve.html">Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</a> <span>Sep  5</span></li>
-            <li><a href="../../07/31/bitcoin-will-fail-for-shtf.html">Why Bitcoin Will Fail for SHTF</a> <span>Jul 31</span></li>
-            <li><a href="../../07/27/how-to-download-youtube-videos-to-your-hard-drive.html">How to Download Videos from Youtube and Save Them on Your Hard Drive</a> <span>Jul 27</span></li>
+            <li><a href="../../../2017/09/05/shutting-down-momo-scans-and-ustreasurycurve.html">Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</a> <span>Sep  5</span></li>
+            <li><a href="../../../2017/07/31/bitcoin-will-fail-for-shtf.html">Why Bitcoin Will Fail for SHTF</a> <span>Jul 31</span></li>
+            <li><a href="../../../2017/07/27/how-to-download-youtube-videos-to-your-hard-drive.html">How to Download Videos from Youtube and Save Them on Your Hard Drive</a> <span>Jul 27</span></li>
           </ol>
           <h2>By Year</h2>
           <ol>
