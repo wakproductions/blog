@@ -14,7 +14,7 @@
     <link rel="alternate" href="http://blog.url.com/2019/03/09/production-https-setup-for-ruby-on-rails-app-with-docker.html"/>
     <id>http://blog.url.com/2019/03/09/production-https-setup-for-ruby-on-rails-app-with-docker.html</id>
     <published>2019-03-09T18:00:00-05:00</published>
-    <updated>2019-03-09T21:47:43-05:00</updated>
+    <updated>2019-03-09T22:12:01-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -32,7 +32,7 @@ be a required feature for website delivery.&lt;/p&gt;
 
 &lt;div class="image-box"&gt;
   &lt;div class="image-box-content"&gt;
-    &lt;a href="images/2019/Screen-Shot-2019-02-23-at-10.45.25-PM.png"&gt;&lt;img src="../../../images/2019/Screen-Shot-2019-02-23-at-10.45.25-PM.png" alt="Screen shot 2019 02 23 at 10.45.25 pm" /&gt;&lt;/a&gt;
+    &lt;a href="../../../images/2019/03/Screen-Shot-2019-02-23-at-10.45.25-PM.png"&gt;&lt;img src="../../../images/2019/03/Screen-Shot-2019-02-23-at-10.45.25-PM.png" alt="Screen shot 2019 02 23 at 10.45.25 pm" /&gt;&lt;/a&gt;
   &lt;/div&gt;
     &lt;div class="image-box-caption"&gt;
       Example of how an HTTPS enabled site displays
@@ -41,7 +41,7 @@ be a required feature for website delivery.&lt;/p&gt;
 
 &lt;div class="image-box"&gt;
   &lt;div class="image-box-content"&gt;
-    &lt;a href="images/2019/Screen-Shot-2019-02-23-at-10.48.14-PM.png"&gt;&lt;img src="../../../images/2019/Screen-Shot-2019-02-23-at-10.48.14-PM.png" alt="Screen shot 2019 02 23 at 10.48.14 pm" /&gt;&lt;/a&gt;
+    &lt;a href="../../../images/2019/03/Screen-Shot-2019-02-23-at-10.48.14-PM.png"&gt;&lt;img src="../../../images/2019/03/Screen-Shot-2019-02-23-at-10.48.14-PM.png" alt="Screen shot 2019 02 23 at 10.48.14 pm" /&gt;&lt;/a&gt;
   &lt;/div&gt;
     &lt;div class="image-box-caption"&gt;
       Example of how a not-HTTPS enabled site is displayed (as insecure)
@@ -80,7 +80,7 @@ has similar performance benchmarks to Apache HTTP Server.&lt;/p&gt;
 
 &lt;div class="image-box"&gt;
   &lt;div class="image-box-content"&gt;
-    &lt;a href="images/2019/Screen-Shot-2019-02-24-at-2.12.21-PM.png"&gt;&lt;img src="../../../images/2019/Screen-Shot-2019-02-24-at-2.12.21-PM.png" alt="Screen shot 2019 02 24 at 2.12.21 pm" /&gt;&lt;/a&gt;
+    &lt;a href="../../../images/2019/03/Screen-Shot-2019-02-24-at-2.12.21-PM.png"&gt;&lt;img src="../../../images/2019/03/Screen-Shot-2019-02-24-at-2.12.21-PM.png" alt="Screen shot 2019 02 24 at 2.12.21 pm" /&gt;&lt;/a&gt;
   &lt;/div&gt;
     &lt;div class="image-box-caption"&gt;
       How the NGINX reverse proxy routes traffic to the appropriate application port based on the domain
