@@ -102,3 +102,8 @@ postgres-# SHOW hba_file;
 --------------------------------------
  /etc/postgresql/9.5/main/pg_hba.conf
 ``` 
+
+## UPDATE 2/24/19
+
+I recently found a simpler method for doing this by changing the networking settings on the Docker network. Please
+[see my new article from February of 2019](blog/2019/02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html). 

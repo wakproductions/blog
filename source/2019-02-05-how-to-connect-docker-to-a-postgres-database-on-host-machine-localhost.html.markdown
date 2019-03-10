@@ -1,5 +1,5 @@
 ---
-title: How to connect Docker to a Postgres database on host machine localhost
+title: How to connect a Docker application to a Postgres database on the host machine
 date: 2019-02-05 01:00 EST
 tags:
 ---
