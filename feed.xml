@@ -5,16 +5,218 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2019-02-05T01:00:00-05:00</updated>
+  <updated>2019-03-09T18:00:00-05:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
-    <title>How to connect Docker to a Postgres database on host machine localhost</title>
+    <title>How to Set Up HTTPS for Free on a Dockerized Ruby on Rails Production Server</title>
+    <link rel="alternate" href="http://blog.url.com/2019/03/09/production-https-setup-for-ruby-on-rails-app-with-docker.html"/>
+    <id>http://blog.url.com/2019/03/09/production-https-setup-for-ruby-on-rails-app-with-docker.html</id>
+    <published>2019-03-09T18:00:00-05:00</published>
+    <updated>2019-03-09T20:13:14-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;I recently launched a Ruby on Rails based application and wanted to add HTTPS to my domain. In this
+post, I&amp;#39;m going to show you how to add HTTPS to your domain using a tool called Certbot.&lt;/p&gt;
+
+&lt;h3&gt;Why do you need HTTPS?&lt;/h3&gt;
+
+&lt;p&gt;HTTPS is an essential service for modern web applications. An HTTPS-enabled website will encrypt all of the data
+sent between you and the website server. This protects your passwords and other sensitive information from
+third parties on the Internet such as other users on your local Wifi network. HTTPS can also be used as a means
+to help users identify that they are on a correct website and not a scam website doctored to look like an authentic
+website. With the major web browsers like Chrome now labeling non-HTTPS enabled websites as insecure, HTTPS may soon
+be a required feature for website delivery.&lt;/p&gt;
+
+&lt;div class="image-box"&gt;
+  &lt;div class="image-box-content"&gt;
+    &lt;a href="images/2019/Screen%20Shot%202019-02-23%20at%2010.45.25%20PM.png"&gt;&lt;img src="../../../images/2019/ScreenShot2019-02-23at10.45.25PM.png" alt="Screen shot 2019 02 23 at 10.45.25 pm" /&gt;&lt;/a&gt;
+  &lt;/div&gt;
+    &lt;div class="image-box-caption"&gt;
+      Example of how an HTTPS enabled site displays
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="image-box"&gt;
+  &lt;div class="image-box-content"&gt;
+    &lt;a href="images/2019/Screen%20Shot%202019-02-23%20at%2010.48.14%20PM.png"&gt;&lt;img src="../../../images/2019/ScreenShot2019-02-23at10.48.14PM.png" alt="Screen shot 2019 02 23 at 10.48.14 pm" /&gt;&lt;/a&gt;
+  &lt;/div&gt;
+    &lt;div class="image-box-caption"&gt;
+      Example of how a not-HTTPS enabled site is displayed (as insecure)
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Prerequisites&lt;/h3&gt;
+
+&lt;p&gt;This particular HTTPS setup is making several assumptions on your general website setup. In this case I had the
+following pieces of software already running and configured:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Ubuntu Linux 18.04 (Bionic Beaver) - this won&amp;#39;t work for Heroku or Windows.&lt;/li&gt;
+&lt;li&gt;Application running on Docker
+
+&lt;ul&gt;
+&lt;li&gt;Rails app already installed on the server via Capistrano and running via Docker&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;NGINX installed on the server (but you can also run it via a Docker container)&lt;/li&gt;
+&lt;li&gt;Certbot installed&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3&gt;What is NGINX?&lt;/h3&gt;
+
+&lt;p&gt;NGINX is a Node.js based web server. In the Javascript world it can be used similarly to WEBRICK, Puma, or Thin
+of the Ruby world. You could whole Javacsript applications served by NGINX. It&amp;#39;s also known for it&amp;#39;s speed, which
+has similar performance benchmarks to Apache HTTP Server.&lt;/p&gt;
+
+&lt;p&gt;In this example NGINX serves three functions:
+1) Integrate our HTTPS certificate into transport layer.
+2) Redirect traffic seeking the HTTP port 80 to the HTTPS port 443 to force clients into using the more secure protocol.
+3) Route web traffic to the appropriate container for the domain name of the request. This will allow us to serve
+   multiple websites using the same Linux server.&lt;/p&gt;
+
+&lt;p&gt;This kind of setup for routing web traffic is called a reverse-proxy.&lt;/p&gt;
+
+&lt;div class="image-box"&gt;
+  &lt;div class="image-box-content"&gt;
+    &lt;a href="images/2019/Screen%20Shot%202019-02-24%20at%202.12.21%20PM.png"&gt;&lt;img src="../../../images/2019/ScreenShot2019-02-24at2.12.21PM.png" alt="Screen shot 2019 02 24 at 2.12.21 pm" /&gt;&lt;/a&gt;
+  &lt;/div&gt;
+    &lt;div class="image-box-caption"&gt;
+      How the NGINX reverse proxy routes traffic to the appropriate application port based on the domain
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h4&gt;How do you install NGINX?&lt;/h4&gt;
+
+&lt;p&gt;Installation instructions are found on &lt;a href="https://www.nginx.com/resources/wiki/start/topics/tutorials/install/"&gt;the official NGINX website&lt;/a&gt;.
+For this example instance, I installed NGINX using the &lt;code&gt;apt-get&lt;/code&gt; repository:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ sudo apt-get install nginx
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once it&amp;#39;s installed, a useful command to run is the configuration test, which verifies the OK status of its configuration
+settings.
+&lt;code&gt;
+$ sudo nginx -T
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3&gt;What is Let&amp;#39;s Encrypt and Certbot?&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;#39;s Encrypt is a nonprofit organization that promises to be the Internet&amp;#39;s free, automated, and open Certficate
+Authority (CA). Several companies such as Symantec, DigiCert, GoDaddy are also CA&amp;#39;s and offer certificates for a fee.
+For HTTPS to work, your server needs to install a certificate from one of these companies, which is nothing more
+than a private encryption key associated with your domain. When a client connects to your website, your server will send
+a message encrypted with that private key, which can be decoded by a public key on the client&amp;#39;s end. HTTPS enabled web
+browsers like Firefox or Chrome come with these public keys preinstalled, per an arrangement with the CA companies.
+If you want a more general overview of how HTTPS certificates work, here is a great &lt;a href="https://www.youtube.com/watch?v=iQsKdtjwtYI"&gt;YouTube video&lt;/a&gt;
+explaining the process.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;#39;s Encrypt has made the installation and renewal of SSL Certificates easy with a tool called &lt;a href="https://github.com/certbot/certbot"&gt;Certbot&lt;/a&gt;.
+Certbot validates your server to the Let&amp;#39;s Encrypt by having it perform what it calls an ACME &lt;a href="https://certbot.eff.org/docs/challenges.html?highlight=http"&gt;challenge&lt;/a&gt;.
+An example would be when you run Certbot, it will make a temporary file available via HTTP which the Let&amp;#39;s Encrypt
+organization can access. Let&amp;#39;s Encrypt will then check the DNS records to verify that the domain name you want to
+certify points to the server you are running Certbot from. If the DNS matches, then Let&amp;#39;s Encrypt will send
+a newly issued certificate to your Certbot.&lt;/p&gt;
+
+&lt;h4&gt;Certbot Tnstallation&lt;/h4&gt;
+
+&lt;p&gt;Installation instructions are available on the &lt;a href="https://certbot.eff.org/docs/install.html"&gt;Certbot user guides&lt;/a&gt;, but
+here is a summary of the commands I used to install Certbot:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ sudo apt-get update
+$ sudo apt-get install software-properties-common
+$ sudo add-apt-repository universe
+$ sudo add-apt-repository ppa:certbot/certbot
+$ sudo apt-get update
+$ sudo apt-get install certbot python-certbot-nginx
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Notice that I also installed the &lt;code&gt;python-certbot-nginx&lt;/code&gt; module, which invokes our instance of NGINX in performing
+the challenge.&lt;/p&gt;
+
+&lt;h3&gt;Configure the DNS to Point to the Server&amp;#39;s IP Address&lt;/h3&gt;
+
+&lt;p&gt;All you need is an A or CNAME record pointing your domain to the IP address of your Linux server.&lt;/p&gt;
+
+&lt;h3&gt;Run the Certbot ACME Challenge to Verify the Domain&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo certbot --nginx -d my-example-domain.com -d www.my-example-domain.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Passing the &lt;code&gt;nginx&lt;/code&gt; flag tells Certbot to use NGINX to perform the ACME challenge. Certbot temporarily modifies the
+NGINX settings so that the remote Let&amp;#39;s Encrypt system can find a file on your system to complete the challenge.
+Once complete, it will automatically install the received SSL certificate, which will act as a private key during the HTTPS initiation.&lt;/p&gt;
+
+&lt;h3&gt;Update the NGINX settings to forward HTTP to HTTPS&lt;/h3&gt;
+
+&lt;p&gt;Certbot should update your NGINX settings automatically, but here&amp;#39;s now it will look after.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# /etc/nginx/sites-available/my-example-domain.com
+
+server {
+    root /var/www/my-example-domain.com/current/public; # Directly serves anything in the Rails public folder
+    index index.html index.htm index.nginx-debian.html;
+    server_name my-example-domain.com www.my-example-domain.com; # managed by Certbot
+
+    location / {
+        proxy_pass http://localhost:8030; # 8030 is the port the Docker container is running on
+          proxy_set_header Host $host;
+          #try_files $uri $uri/ =404;
+    }
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/my-example-domain.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/my-example-domain.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = www.my-example-domain.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    if ($host = my-example-domain.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80 ;
+    listen [::]:80 ;
+    server_name my-example-domain.com www.my-example-domain.com;
+    return 404; # managed by Certbot
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NGINX has two important folders for domain settings:
+&lt;code&gt;/etc/nginx/sites-available&lt;/code&gt;
+&lt;code&gt;/etc/nginx/sites-enabled&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;sites-available&lt;/code&gt; folder has the NGINX proxy settings for each individual website. The &lt;code&gt;sites-enabled&lt;/code&gt; should
+contain symlinks to the files in the &lt;code&gt;sites-available&lt;/code&gt; folder. Create a symlink at the command line like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ln -s /etc/nginx/sites-enabled/my-example-domain.com /etc/nginx/sites-available/my-example-domain.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Additional Resources:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;https://blog.heckel.xyz/2013/07/01/how-to-use-mitmproxy-to-read-and-modify-https-traffic-of-your-phone/&lt;/li&gt;
+&lt;li&gt;https://www.youtube.com/watch?v=iQsKdtjwtYI&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+  </entry>
+  <entry>
+    <title>How to connect a Docker application to a Postgres database on the host machine</title>
     <link rel="alternate" href="http://blog.url.com/2019/02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html"/>
     <id>http://blog.url.com/2019/02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html</id>
     <published>2019-02-05T01:00:00-05:00</published>
-    <updated>2019-02-05T22:47:56-05:00</updated>
+    <updated>2019-03-09T19:14:19-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -63,119 +265,17 @@ variable you can have that set to the database password so that it won&amp;#39;t
 </content>
   </entry>
   <entry>
-    <title>I Conquered Eczema after 30 Years of Itchy Skin, And You Can Too</title>
-    <link rel="alternate" href="http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"/>
-    <id>http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html</id>
-    <published>2019-02-03T18:00:00-05:00</published>
-    <updated>2019-02-05T20:29:22-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h2&gt;Part 1: Genetics and (Mis)Diagnosis&lt;/h2&gt;
-
-&lt;p&gt;According to the National Eczema Foundation, 30 million Americans are afflicted with the itchy, red, blistery skin
-condition medically referred to as atopic dermatitis, but better known as eczema. Eczema affects people of all races,
-ages, and gender. While it&amp;#39;s not typically a life threatening condition, it can impair quality of life for its sufferers
-with a great deal of discomfort and social anxiety. As a life-long sufferer of eczema, I&amp;#39;ve dealt with days where
-flare-ups on my hands that were so painful that I&amp;#39;ve had to use sick days from my office job on the computer. I can&amp;#39;t
-even imagine what an impairment this condition could become in trades requiring more intense physical labor.&lt;/p&gt;
-
-&lt;p&gt;If you&amp;#39;ve landed on this page, chances are you want to learn more about this condition. What I&amp;#39;m going to share in this
-series of blog posts is my findings on how to manage eczema, which I hope you will find useful too.&lt;/p&gt;
-
-&lt;h3&gt;Is it eczema or a single episode of dermatitis?&lt;/h3&gt;
-
-&lt;p&gt;I&amp;#39;ve had eczema since I was 5 years old, beginning as two itchy, dry patches of skin on the inner bend of my arms.
-The first few times my mom took me to the family doctor, I was given a cream to apply to it and told not to
-scratch. Scratching avoidance never seemed to make a difference for me - I would get the rash no matter how hard
-I resisted the itching. As a patient, being told not to scratch is upsetting because it can feel like you&amp;#39;re being
-blamed for making it worse even though you know that has little to do with the cause.&lt;/p&gt;
-
-&lt;p&gt;As a kid most of the time I would just put up with the discomfort and accepted it as part of life. I thought
-maybe it was just something everybody deals with, especially during the winter in Chicago. I remember in high school
-one day a classmate sitting next to me saw me roll up my sleeve and start scratching the inflamed, dry flakes on my arm.
-&amp;quot;You really need to put moisturizer on that!&amp;quot; she said.&lt;/p&gt;
-
-&lt;p&gt;Steroid medication always made the skin heal up for a while, but it wouldn&amp;#39;t be long before the problem would
-return. I would go back to the doctor on occasion during times when the itching would become unbearable. When I was
-a teen we started seeing a new family doctor and every time he would see my rashes on my arm or hands he would say
-&amp;quot;That&amp;#39;s contact dermatitis!&amp;quot;, prescribe the same steroid cream, and the cycle continued. It wasn&amp;#39;t until we got the
-Internet in my home that I Alta Vista&amp;#39;ed (because Google wasn&amp;#39;t a thing yet) my symptoms and found websites full of
-information about this skin problem. For the first time I had an answer as to why I kept getting itchy, flaky, red
-rashes in the same spots on my skin - it was eczema and the Internet was full of stories similar to mine.&lt;/p&gt;
-
-&lt;p&gt;I think that the episodic nature of our healthcare delivery system causes people with non-life threatening chronic
-problems like this to fall through the cracks until the situation gets severe. After a little over 10 years of doctor
-visits, not once was I ever diagnosed with &amp;quot;eczema&amp;quot;. It seems typical for the run of the mill family doctor to treat
-each flare-up of eczema as an isolated case of skin irritation, and miss the bigger picture. Your doctor probably
-doesn&amp;#39;t live with this condition, and isn&amp;#39;t there with you all day to take note of the lifestyle related things you do
-which could be making your eczema better or worse. He just knows that the prescribing drugs will work well enough to
-mask the symptoms and send you on your way for a while.&lt;/p&gt;
-
-&lt;p&gt;Medications may be useful for suppressing an eczema flare-up, but repeatedly taking this approach has diminishing
-returns. Steroid medications like triamcinolone are often the first line of treatment, but they can be hard on your
-body. Long term use can lead to the thinning of your skin. Injections of that medication can lead to harmful
-side effects like cataracts. Over time they may even become less effective and your condition will worsen. Given that,
-why not try to eliminate the cause rather than the symptoms?&lt;/p&gt;
-
-&lt;p&gt;From my experience I&amp;#39;ve learned that lifestyle factors are influential in managing eczema. Doctors aren&amp;#39;t so well
-coordinated in educating you on this lifestyle angle because they can only base their decisions based on the information
-they&amp;#39;ve read in established medical journals, which is limited. It takes a lot of experimentation and observation to
-figure out the triggers for your particular case. Only you are in the best position to figure out what works for you,
-which may vary from person to person. If you are successful, you will save yourself a great deal of discomfort,
-expenses, and the harmful long term side effects of prescription medication.&lt;/p&gt;
-
-&lt;h3&gt;Eczema and genetics&lt;/h3&gt;
-
-&lt;p&gt;There is definitely a genetic component to eczema. Some of the medical sites I&amp;#39;ve visited cite one of the root
-causes as the &lt;a href="https://ghr.nlm.nih.gov/condition/atopic-dermatitis#genes"&gt;FLG gene&lt;/a&gt;, which helps your body create
-certain proteins that waterproof the skin, thereby retaining moisture and keeping out substances that can cause
-irritation. People with a corrupted FLG gene do not produce this protein correctly.&lt;/p&gt;
-
-&lt;p&gt;As I learned more about this condition, I began to see links to my mother&amp;#39;s health. My mom worked in the hospital
-as a lab tech and often had trouble with dermatitis on her hands. She would constantly use moisturizers and blamed
-the irritation on latex gloves. However, she would sometimes get more extensive rashes and go to the doctor
-for creams and sometimes shots to subdue the discomfort.&lt;/p&gt;
-
-&lt;p&gt;Later on I would have conversations with my mom about my grandmother, who passed away in the Philippines long before
-I was born. I learned that my grandmother also dealt with the discomforts of eczema, but on the back of her ankles.
-Given this information, it became apparent that my case eczema was a token of the genetic lottery from my mother&amp;#39;s side
-of the family. My dad and his parents did not have any such skin problems.&lt;/p&gt;
-
-&lt;h3&gt;The immune system&amp;#39;s role in eczema&lt;/h3&gt;
-
-&lt;p&gt;Although science offers some clues, I don&amp;#39;t think medical research fully understands the mechanics of what causes full
-blown eczema. It&amp;#39;s not just that some eczema suffers lack certain proteins in the skin. There is also an immune system
-component. A lot of medical research into eczema revolves around overactive immune system response, which causes the
-inflammation in the skin that leads to rashes.&lt;/p&gt;
-
-&lt;p&gt;I subscribe to the idea that because an eczema suffer&amp;#39;s skin may be more porous, environmental irritants are more likely
-to get through the outer barriers and trigger the immune system to cause inflammation. This may be why so many doctors
-treat chronic eczema like they would a standard case of contact dermatitis (skin irritation/allergy) - because the
-body&amp;#39;s mechanisms in causing both kinds of rashes is the same. It&amp;#39;s just that a person with the chronic illness is much
-more sensitive to allergens and gets triggered more often.&lt;/p&gt;
-
-&lt;p&gt;Stubborn cases of chronic eczema could have multiple triggers, including a combination of allergens and pathogens. The
-porus skin of someone with the eczema gene is more susceptible to stealthy bacterial or fungal infections that produce
-eczema-like rashes. In such cases, taking a medication like fluconazole in combination with other medication can
-provide a great deal of relief and stomp out a persistent flare-up.&lt;/p&gt;
-
-&lt;p&gt;In the &lt;a href="three-allergic-triggers-that-can-cause-eczema.html"&gt;Part 2&lt;/a&gt; of this series, I go into more detail about the allergy and pathogenic factors causing eczema. If you like
-this blog series and want to add to the discussion, please leave your feedback on the Disqus board below.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
     <title>Three Allergic Triggers That Can Cause Eczema</title>
-    <link rel="alternate" href="http://blog.url.com/2019/02/03/three-allergic-triggers-that-can-cause-eczema.html"/>
-    <id>http://blog.url.com/2019/02/03/three-allergic-triggers-that-can-cause-eczema.html</id>
-    <published>2019-02-03T18:00:00-05:00</published>
-    <updated>2019-02-05T20:29:22-05:00</updated>
+    <link rel="alternate" href="http://blog.url.com/2019/02/04/three-allergic-triggers-that-can-cause-eczema.html"/>
+    <id>http://blog.url.com/2019/02/04/three-allergic-triggers-that-can-cause-eczema.html</id>
+    <published>2019-02-04T18:00:00-05:00</published>
+    <updated>2019-03-09T19:11:53-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
     <content type="html">&lt;h2&gt;Part 2: How Allergic Reactions and Eczema Are Related&lt;/h2&gt;
 
-&lt;p&gt;As I discussed in &lt;a href="i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"&gt;Part 1&lt;/a&gt; of this blog post series, there is an immune system and allergic reaction component to eczema.
+&lt;p&gt;As I discussed in &lt;a href="../03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"&gt;Part 1&lt;/a&gt; of this blog post series, there is an immune system and allergic reaction component to eczema.
 As someone who has dealt with quite severe eczema my whole life, I can confirm that allergies have a lot to do
 with it per my own experimentation with exposure and avoidance of certain triggers. In some respects, eczema sufferers
 are just people who are hypersensitive to environmental allergens. Eliminate the allergens, and the problem goes away.&lt;/p&gt;
@@ -273,11 +373,113 @@ it forces me to notice the link in an obvious way.&lt;/p&gt;
 </content>
   </entry>
   <entry>
+    <title>I Conquered Eczema after 30 Years of Itchy Skin, And You Can Too</title>
+    <link rel="alternate" href="http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"/>
+    <id>http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html</id>
+    <published>2019-02-03T18:00:00-05:00</published>
+    <updated>2019-02-03T18:43:23-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h2&gt;Part 1: Genetics and (Mis)Diagnosis&lt;/h2&gt;
+
+&lt;p&gt;According to the National Eczema Foundation, 30 million Americans are afflicted with the itchy, red, blistery skin
+condition medically referred to as atopic dermatitis, but better known as eczema. Eczema affects people of all races,
+ages, and gender. While it&amp;#39;s not typically a life threatening condition, it can impair quality of life for its sufferers
+with a great deal of discomfort and social anxiety. As a life-long sufferer of eczema, I&amp;#39;ve dealt with days where
+flare-ups on my hands that were so painful that I&amp;#39;ve had to use sick days from my office job on the computer. I can&amp;#39;t
+even imagine what an impairment this condition could become in trades requiring more intense physical labor.&lt;/p&gt;
+
+&lt;p&gt;If you&amp;#39;ve landed on this page, chances are you want to learn more about this condition. What I&amp;#39;m going to share in this
+series of blog posts is my findings on how to manage eczema, which I hope you will find useful too.&lt;/p&gt;
+
+&lt;h3&gt;Is it eczema or a single episode of dermatitis?&lt;/h3&gt;
+
+&lt;p&gt;I&amp;#39;ve had eczema since I was 5 years old, beginning as two itchy, dry patches of skin on the inner bend of my arms.
+The first few times my mom took me to the family doctor, I was given a cream to apply to it and told not to
+scratch. Scratching avoidance never seemed to make a difference for me - I would get the rash no matter how hard
+I resisted the itching. As a patient, being told not to scratch is upsetting because it can feel like you&amp;#39;re being
+blamed for making it worse even though you know that has little to do with the cause.&lt;/p&gt;
+
+&lt;p&gt;As a kid most of the time I would just put up with the discomfort and accepted it as part of life. I thought
+maybe it was just something everybody deals with, especially during the winter in Chicago. I remember in high school
+one day a classmate sitting next to me saw me roll up my sleeve and start scratching the inflamed, dry flakes on my arm.
+&amp;quot;You really need to put moisturizer on that!&amp;quot; she said.&lt;/p&gt;
+
+&lt;p&gt;Steroid medication always made the skin heal up for a while, but it wouldn&amp;#39;t be long before the problem would
+return. I would go back to the doctor on occasion during times when the itching would become unbearable. When I was
+a teen we started seeing a new family doctor and every time he would see my rashes on my arm or hands he would say
+&amp;quot;That&amp;#39;s contact dermatitis!&amp;quot;, prescribe the same steroid cream, and the cycle continued. It wasn&amp;#39;t until we got the
+Internet in my home that I Alta Vista&amp;#39;ed (because Google wasn&amp;#39;t a thing yet) my symptoms and found websites full of
+information about this skin problem. For the first time I had an answer as to why I kept getting itchy, flaky, red
+rashes in the same spots on my skin - it was eczema and the Internet was full of stories similar to mine.&lt;/p&gt;
+
+&lt;p&gt;I think that the episodic nature of our healthcare delivery system causes people with non-life threatening chronic
+problems like this to fall through the cracks until the situation gets severe. After a little over 10 years of doctor
+visits, not once was I ever diagnosed with &amp;quot;eczema&amp;quot;. It seems typical for the run of the mill family doctor to treat
+each flare-up of eczema as an isolated case of skin irritation, and miss the bigger picture. Your doctor probably
+doesn&amp;#39;t live with this condition, and isn&amp;#39;t there with you all day to take note of the lifestyle related things you do
+which could be making your eczema better or worse. He just knows that the prescribing drugs will work well enough to
+mask the symptoms and send you on your way for a while.&lt;/p&gt;
+
+&lt;p&gt;Medications may be useful for suppressing an eczema flare-up, but repeatedly taking this approach has diminishing
+returns. Steroid medications like triamcinolone are often the first line of treatment, but they can be hard on your
+body. Long term use can lead to the thinning of your skin. Injections of that medication can lead to harmful
+side effects like cataracts. Over time they may even become less effective and your condition will worsen. Given that,
+why not try to eliminate the cause rather than the symptoms?&lt;/p&gt;
+
+&lt;p&gt;From my experience I&amp;#39;ve learned that lifestyle factors are influential in managing eczema. Doctors aren&amp;#39;t so well
+coordinated in educating you on this lifestyle angle because they can only base their decisions based on the information
+they&amp;#39;ve read in established medical journals, which is limited. It takes a lot of experimentation and observation to
+figure out the triggers for your particular case. Only you are in the best position to figure out what works for you,
+which may vary from person to person. If you are successful, you will save yourself a great deal of discomfort,
+expenses, and the harmful long term side effects of prescription medication.&lt;/p&gt;
+
+&lt;h3&gt;Eczema and genetics&lt;/h3&gt;
+
+&lt;p&gt;There is definitely a genetic component to eczema. Some of the medical sites I&amp;#39;ve visited cite one of the root
+causes as the &lt;a href="https://ghr.nlm.nih.gov/condition/atopic-dermatitis#genes"&gt;FLG gene&lt;/a&gt;, which helps your body create
+certain proteins that waterproof the skin, thereby retaining moisture and keeping out substances that can cause
+irritation. People with a corrupted FLG gene do not produce this protein correctly.&lt;/p&gt;
+
+&lt;p&gt;As I learned more about this condition, I began to see links to my mother&amp;#39;s health. My mom worked in the hospital
+as a lab tech and often had trouble with dermatitis on her hands. She would constantly use moisturizers and blamed
+the irritation on latex gloves. However, she would sometimes get more extensive rashes and go to the doctor
+for creams and sometimes shots to subdue the discomfort.&lt;/p&gt;
+
+&lt;p&gt;Later on I would have conversations with my mom about my grandmother, who passed away in the Philippines long before
+I was born. I learned that my grandmother also dealt with the discomforts of eczema, but on the back of her ankles.
+Given this information, it became apparent that my case eczema was a token of the genetic lottery from my mother&amp;#39;s side
+of the family. My dad and his parents did not have any such skin problems.&lt;/p&gt;
+
+&lt;h3&gt;The immune system&amp;#39;s role in eczema&lt;/h3&gt;
+
+&lt;p&gt;Although science offers some clues, I don&amp;#39;t think medical research fully understands the mechanics of what causes full
+blown eczema. It&amp;#39;s not just that some eczema suffers lack certain proteins in the skin. There is also an immune system
+component. A lot of medical research into eczema revolves around overactive immune system response, which causes the
+inflammation in the skin that leads to rashes.&lt;/p&gt;
+
+&lt;p&gt;I subscribe to the idea that because an eczema suffer&amp;#39;s skin may be more porous, environmental irritants are more likely
+to get through the outer barriers and trigger the immune system to cause inflammation. This may be why so many doctors
+treat chronic eczema like they would a standard case of contact dermatitis (skin irritation/allergy) - because the
+body&amp;#39;s mechanisms in causing both kinds of rashes is the same. It&amp;#39;s just that a person with the chronic illness is much
+more sensitive to allergens and gets triggered more often.&lt;/p&gt;
+
+&lt;p&gt;Stubborn cases of chronic eczema could have multiple triggers, including a combination of allergens and pathogens. The
+porus skin of someone with the eczema gene is more susceptible to stealthy bacterial or fungal infections that produce
+eczema-like rashes. In such cases, taking a medication like fluconazole in combination with other medication can
+provide a great deal of relief and stomp out a persistent flare-up.&lt;/p&gt;
+
+&lt;p&gt;In the &lt;a href="2019-02-03-three-allergic-triggers-that-can-cause-eczema.html"&gt;Part 2&lt;/a&gt; of this series, I go into more detail about the allergy and pathogenic factors causing eczema. If you like
+this blog series and want to add to the discussion, please leave your feedback on the Disqus board below.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>How to Node on Ruby 2.5.0 (Debian Stretch) Docker Container</title>
     <link rel="alternate" href="http://blog.url.com/2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html"/>
     <id>http://blog.url.com/2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html</id>
     <published>2018-03-05T18:55:00-05:00</published>
-    <updated>2019-02-05T20:29:22-05:00</updated>
+    <updated>2018-03-05T22:35:41-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -308,7 +510,7 @@ RUN bundle install
     <link rel="alternate" href="http://blog.url.com/2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html"/>
     <id>http://blog.url.com/2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html</id>
     <published>2018-01-30T18:55:00-05:00</published>
-    <updated>2019-02-05T20:29:22-05:00</updated>
+    <updated>2018-01-31T00:25:59-05:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -452,99 +654,6 @@ module.exports = {
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Information source: &lt;a href="https://getbootstrap.com/docs/4.0/getting-started/webpack/"&gt;TWBS documentation&lt;/a&gt;, Stack Overflow&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Compiling SCSS to CSS in Webpack - INSANITY!</title>
-    <link rel="alternate" href="http://blog.url.com/2018/01/29/webpack-compile-scss-insanity.html"/>
-    <id>http://blog.url.com/2018/01/29/webpack-compile-scss-insanity.html</id>
-    <published>2018-01-29T20:55:00-05:00</published>
-    <updated>2019-02-05T20:29:22-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;I&amp;#39;m busy learning Webpack and it&amp;#39;s got some weird conventions that quite differ from normal web programming. So
-I want to work in SCSS and compile that to a CSS file for use in my project. Here&amp;#39;s what my files look like:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="html"&gt;&amp;lt;!-- index.html --&amp;gt;
-
-&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html&amp;gt;
-&amp;lt;head&amp;gt;
-  &amp;lt;title&amp;gt;Momentum Stock Scans&amp;lt;/title&amp;gt;
-  &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;/dist/style.css&amp;quot;&amp;gt;
-&amp;lt;/head&amp;gt;
-&amp;lt;body&amp;gt;
-&amp;lt;div id=&amp;quot;app&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
-&amp;lt;script src=&amp;quot;/dist/bundle.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;/body&amp;gt;
-
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class="scss"&gt;// style.scss
-body {
-  font-family: Verdana;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class="javascript"&gt;// webpack.config.js
-const path = require(&amp;#39;path&amp;#39;)
-
-module.exports = {
-  context: __dirname,
-  entry: &amp;quot;./js/App.jsx&amp;quot;,
-  watch: true,
-  output: {
-    path: path.resolve(__dirname, &amp;#39;dist&amp;#39;),
-    filename: &amp;#39;bundle.js&amp;#39;
-  },
-  stats: {
-    colors: true,
-    reasons: true
-  },
-  module: {
-    rules: [
-      {
-        test: /\.scss?$/,
-        use: [
-          { loader: &amp;quot;style-loader&amp;quot; },
-          { loader: &amp;quot;css-loader&amp;quot; },
-          {
-            loader: &amp;quot;sass-loader&amp;quot;
-            // options: {
-            //   includePaths: [&amp;quot;/stylesheets&amp;quot;]
-            // }
-          }
-        ]
-      },
-      { test: /\.jsx?$/, use: &amp;#39;babel-loader&amp;#39; }
-    ]
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now I was expecting this would compile my &lt;code&gt;style.scss&lt;/code&gt; file into a &lt;code&gt;style.css&lt;/code&gt; file in the &lt;code&gt;dist&lt;/code&gt; directory. But that&amp;#39;s
-not how Webpack works. Apparently the output file is a one-shot deal - meaning EVERYTHING goes into &lt;code&gt;bundle.js&lt;/code&gt;, including
-other types of information.&lt;/p&gt;
-
-&lt;p&gt;So this also means that you have to &lt;strong&gt;REQUIRE THE STYLESHEET&lt;/strong&gt; in the Javascript entry point file. So &lt;code&gt;./js/App.jsx&lt;/code&gt;
-should have this line at the top:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="javascript"&gt;require(&amp;#39;../style.scss&amp;#39;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then this compiles the following into the middle of &lt;strong&gt;&lt;code&gt;dist/bundle.js&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class="javascript"&gt;/***/ (function(module, exports, __webpack_require__) {
-
-eval(&amp;quot;exports = module.exports = __webpack_require__(4)(false);\n// imports\n\n\n// module\nexports.push([module.i, \&amp;quot;body {\\n  font-family: Verdana; }\\n\&amp;quot;, \&amp;quot;\&amp;quot;]);\n\n// exports\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy8uL3N0eWxlLnNjc3M/MTk1MSJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnRzID0gbW9kdWxlLmV4cG9ydHMgPSByZXF1aXJlKFwiLi9ub2RlX21vZHVsZXMvY3NzLWxvYWRlci9saWIvY3NzLWJhc2UuanNcIikoZmFsc2UpO1xuLy8gaW1wb3J0c1xuXG5cbi8vIG1vZHVsZVxuZXhwb3J0cy5wdXNoKFttb2R1bGUuaWQsIFwiYm9keSB7XFxuICBmb250LWZhbWlseTogVmVyZGFuYTsgfVxcblwiLCBcIlwiXSk7XG5cbi8vIGV4cG9ydHNcblxuXG5cbi8vLy8vLy8vLy8vLy8vLy8vL1xuLy8gV0VCUEFDSyBGT09URVJcbi8vIC4vbm9kZV9tb2R1bGVzL2Nzcy1sb2FkZXIhLi9ub2RlX21vZHVsZXMvc2Fzcy1sb2FkZXIvbGliL2xvYWRlci5qcyEuL3N0eWxlLnNjc3Ncbi8vIG1vZHVsZSBpZCA9IDNcbi8vIG1vZHVsZSBjaHVua3MgPSAwIl0sIm1hcHBpbmdzIjoiQUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOyIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///3\n&amp;quot;);
-
-/***/ }),
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;WTF!!!&lt;/strong&gt; That&amp;#39;s some strange unconventional shit going on right there. But I guess that&amp;#39;s the Webpack way.&lt;/p&gt;
 </content>
   </entry>
 </feed>

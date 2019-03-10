@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta charset='utf-8'>
+    <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
+    <title>Winston Kotzan's Technology Blog</title>
+    <link href="../stylesheets/site.css" rel="stylesheet" />
+    <script src="../javascripts/all.js"></script>
+    <script src="../javascripts/jquery-2.2.3.min.js"></script>
+    
+    
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-46648633-1', 'winstonkotzan.com');
+        ga('send', 'pageview');
+    </script>
+  </head>
+  <body class='unpublished unpublished_2019-02-xx-production-https-setup-for-ruby-on-rails-app-with-docker-AUDIO'>
+    <div class='jumbotron'>
+      <div class='container'>
+        <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
+          <div class='content'>
+            <a href="/blog/">Winston Kotzan's Technology Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container content' style='margin-bottom: 15px;'>
+      <p>In this video, I&#39;m going to show you how to add HTTPS to your domain using a tool called Certbot and its complementary
+      service, Let&#39;s Encrypt.</p>
+      
+      <h3>Why do you need HTTPS?</h3>
+      
+      <p>Secure HTTP is an essential service for modern web applications. By forcing connecting web browsers to use an encrypted
+      version of the standard HTTP web protocol, your web application will protect your users&#39; private data such as
+      passwords and account information from being intercepted by third parties on the Internet. Any hacker who manages to
+      spy on your users&#39; network traffic will only see information scrambled by a highly secure encryption algorithm.</p>
+      
+      <p>HTTPS also helps your users identify that they are on your website and not a malicious website doctored to look like
+      an authentic website. When a browser recognizes a secure HTTP connection, as verified by your site&#39;s CA certificate,
+      it will display a secure connection notification.</p>
+      
+      <p>And now that major web browsers like Chrome are proactively labeling non-HTTPS enabled websites with warnings
+      that they are insecure, HTTPS may soon be an expected feature for doing business online.</p>
+      
+      <h3>Prerequisites</h3>
+      
+      <p>For this example, I&#39;m going to make a few assumptions about your web server setup.</p>
+      
+      <ol>
+      <li>My web server uses Linux Ubuntu version 18.04. The steps I provide won&#39;t work for Heroku or Windows systems.</li>
+      <li>My application is coded in Ruby on Rails, but it&#39;s running inside of a Docker container and available on the local
+      port 8030. I used the Ruby deployment tool Capistrano to upload it to my server.</li>
+      <li>So that I can server multiple websites under different domains on the same server, I installed a Javascript based
+      web server software called NGINX. I installed NGINX directly on the system and it is running as a Linux service, but
+      some people like to run NGINX through a Docker container.</li>
+      <li>Certbot is installed on the system.</li>
+      </ol>
+      
+      <h3>What is NGINX?</h3>
+      
+      <p>We will be using NGINX NGINX is going to serve 3 main functions in our production website setup. It will
+      1) It will redirect web traffic seeking the standard HTTP port 80 to the HTTPS port 443, thereby force clients into
+         using the more secure protocol.
+      2) For the HTTPS connections, it will Integrate our HTTPS certificate into transport layer.
+      3) Route web traffic to the appropriate container for the domain name of the request. This will allow us to serve
+         multiple websites using the same Linux server.</p>
+      
+      <p>This kind of setup for routing web traffic is called a reverse-proxy.</p>
+      
+      <h4>How do you install NGINX?</h4>
+      
+      <p>Installation instructions are found on <a href="https://www.nginx.com/resources/wiki/start/topics/tutorials/install/">the official NGINX website</a>.
+      For this example instance, I installed NGINX using the <code>apt-get</code> repository:</p>
+      
+      <pre><code class="bash">$ sudo apt-get install nginx
+      </code></pre>
+      
+      <p>Once it&#39;s installed, a useful command to run is the configuration test, which verifies the OK status of its configuration
+      settings.
+      <code>
+      $ sudo nginx -T
+      nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+      nginx: configuration file /etc/nginx/nginx.conf test is successful
+      </code></p>
+      
+      <h3>What is Let&#39;s Encrypt and Certbot?</h3>
+      
+      <p>Let&#39;s Encrypt is a nonprofit organization that promises to be the Internet&#39;s free, automated, and open Certficate
+      Authority (CA). Several companies such as Symantec, DigiCert, GoDaddy are also CA&#39;s and offer certificates for a fee.
+      For HTTPS to work, your server needs to install a certificate from one of these companies, which is nothing more
+      than a private encryption key associated with your domain. When a client connects to your website, your server will send
+      a message encrypted with that private key, which can be decoded by a public key on the client&#39;s end. HTTPS enabled web
+      browsers like Firefox or Chrome come with these public keys preinstalled, per an arrangement with the CA companies.
+      If you want a more general overview of how HTTPS certificates work, here is a great <a href="https://www.youtube.com/watch?v=iQsKdtjwtYI">YouTube video</a>
+      explaining the process.</p>
+      
+      <p>Let&#39;s Encrypt has made the installation and renewal of SSL Certificates easy with a tool called <a href="https://github.com/certbot/certbot">Certbot</a>.
+      Certbot validates your server to the Let&#39;s Encrypt by having it perform what it calls an ACME <a href="https://certbot.eff.org/docs/challenges.html?highlight=http">challenge</a>.
+      An example would be when you run Certbot, it will make a temporary file available via HTTP which the Let&#39;s Encrypt
+      organization can access. Let&#39;s Encrypt will then check the DNS records to verify that the domain name you want to
+      certify points to the server you are running Certbot from. If the DNS matches, then Let&#39;s Encrypt will send
+      a newly issued certificate to your Certbot.</p>
+      
+      <h4>Certbot Tnstallation</h4>
+      
+      <p>Installation instructions are available on the <a href="https://certbot.eff.org/docs/install.html">Certbot user guides</a>, but
+      here is a summary of the commands I used to install Certbot:</p>
+      
+      <pre><code class="bash">$ sudo apt-get update
+      $ sudo apt-get install software-properties-common
+      $ sudo add-apt-repository universe
+      $ sudo add-apt-repository ppa:certbot/certbot
+      $ sudo apt-get update
+      $ sudo apt-get install certbot python-certbot-nginx
+      </code></pre>
+      
+      <p>Notice that I also installed the <code>python-certbot-nginx</code> module, which invokes our instance of NGINX in performing
+      the challenge.</p>
+      
+      <h3>Configure the DNS to Point to the Server&#39;s IP Address</h3>
+      
+      <p>All you need is an A or CNAME record pointing your domain to the IP address of your Linux server.</p>
+      
+      <h3>Run the Certbot ACME Challenge to Verify the Domain</h3>
+      
+      <pre><code>sudo certbot --nginx -d my-example-domain.com -d www.my-example-domain.com
+      </code></pre>
+      
+      <p>Passing the <code>nginx</code> flag tells Certbot to use NGINX to perform the ACME challenge. Certbot temporarily modifies the
+      NGINX settings so that the remote Let&#39;s Encrypt system can find a file on your system to complete the challenge.
+      Once complete, it will automatically install the received SSL certificate, which will act as a private key during the HTTPS initiation.</p>
+      
+      <h3>Update the NGINX settings to forward HTTP to HTTPS</h3>
+      
+      <p>Certbot should update your NGINX settings automatically, but here&#39;s now it will look after.</p>
+      
+      <pre><code># /etc/nginx/sites-available/my-example-domain.com
+      
+      server {
+          root /var/www/my-example-domain.com/current/public; # Directly serves anything in the Rails public folder
+          index index.html index.htm index.nginx-debian.html;
+          server_name my-example-domain.com www.my-example-domain.com; # managed by Certbot
+      
+          location / {
+              proxy_pass http://localhost:8030; # 8030 is the port the Docker container is running on
+                proxy_set_header Host $host;
+                #try_files $uri $uri/ =404;
+          }
+      
+          listen [::]:443 ssl ipv6only=on; # managed by Certbot
+          listen 443 ssl; # managed by Certbot
+          ssl_certificate /etc/letsencrypt/live/my-example-domain.com/fullchain.pem; # managed by Certbot
+          ssl_certificate_key /etc/letsencrypt/live/my-example-domain.com/privkey.pem; # managed by Certbot
+          include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+          ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+      }
+      
+      server {
+          if ($host = www.my-example-domain.com) {
+              return 301 https://$host$request_uri;
+          } # managed by Certbot
+      
+      
+          if ($host = my-example-domain.com) {
+              return 301 https://$host$request_uri;
+          } # managed by Certbot
+      
+          listen 80 ;
+          listen [::]:80 ;
+          server_name my-example-domain.com www.my-example-domain.com;
+          return 404; # managed by Certbot
+      }
+      
+      </code></pre>
+      
+      <p>NGINX has two important folders for domain settings:
+      <code>/etc/nginx/sites-available</code>
+      <code>/etc/nginx/sites-enabled</code></p>
+      
+      <p>The <code>sites-available</code> folder has the NGINX proxy settings for each individual website. The <code>sites-enabled</code> should
+      contain symlinks to the files in the <code>sites-available</code> folder. Create a symlink at the command line like this:</p>
+      
+      <pre><code>$ ln -s /etc/nginx/sites-enabled/my-example-domain.com /etc/nginx/sites-available/my-example-domain.com
+      </code></pre>
+      
+      <p>Additional Resources:</p>
+      
+      <ol>
+      <li>https://blog.heckel.xyz/2013/07/01/how-to-use-mitmproxy-to-read-and-modify-https-traffic-of-your-phone/</li>
+      <li>https://www.youtube.com/watch?v=iQsKdtjwtYI</li>
+      <li>http://nginx.org/en/docs/http/ngx<em>http</em>proxy_module.html</li>
+      </ol>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,264 @@
+<!--<html>-->
+<!--<head>-->
+<!--</head>-->
+<!--<body>-->
+<!--hello world-->
+<!--<%= yield %>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta charset='utf-8'>
+    <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
+    <title>How to Set Up HTTPS for Free on a Dockerized Ruby on Rails Production Server</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+    <link href="../../../stylesheets/site.css" rel="stylesheet" />
+    <script src="../../../javascripts/all.js"></script>
+    <script src="../../../javascripts/jquery-2.2.3.min.js"></script>
+    
+    
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-46648633-1', 'winstonkotzan.com');
+        ga('send', 'pageview');
+    </script>
+  </head>
+  <body class='x2019 x2019_03 x2019_03_09 x2019_03_09_production-https-setup-for-ruby-on-rails-app-with-docker'>
+    <div class='jumbotron'>
+      <div class='container'>
+        <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
+          <div class='content'>
+            <a href="/blog/">Winston Kotzan's Technology Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container content'>
+      <div class='col-md-8'>
+        <div class='main article-content' role='main'>
+          <h2 class='article-title'>How to Set Up HTTPS for Free on a Dockerized Ruby on Rails Production Server</h2>
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+          <!-- article-top -->
+          <ins class="adsbygoogle"
+               style="display:inline-block;width:728px;height:90px"
+               data-ad-client="ca-pub-9623179230776920"
+               data-ad-slot="7383597095"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+          <div class='article-date'>03/09/2019</div>
+          <div class='article-body'>
+            <p>I recently launched a Ruby on Rails based application and wanted to add HTTPS to my domain. In this
+            post, I&#39;m going to show you how to add HTTPS to your domain using a tool called Certbot.</p>
+            
+            <h3>Why do you need HTTPS?</h3>
+            
+            <p>HTTPS is an essential service for modern web applications. An HTTPS-enabled website will encrypt all of the data
+            sent between you and the website server. This protects your passwords and other sensitive information from
+            third parties on the Internet such as other users on your local Wifi network. HTTPS can also be used as a means
+            to help users identify that they are on a correct website and not a scam website doctored to look like an authentic
+            website. With the major web browsers like Chrome now labeling non-HTTPS enabled websites as insecure, HTTPS may soon
+            be a required feature for website delivery.</p>
+            
+            <div class="image-box">
+              <div class="image-box-content">
+                <a href="images/2019/Screen%20Shot%202019-02-23%20at%2010.45.25%20PM.png"><img src="../../../images/2019/ScreenShot2019-02-23at10.45.25PM.png" alt="Screen shot 2019 02 23 at 10.45.25 pm" /></a>
+              </div>
+                <div class="image-box-caption">
+                  Example of how an HTTPS enabled site displays
+                </div>
+            </div>
+            
+            <div class="image-box">
+              <div class="image-box-content">
+                <a href="images/2019/Screen%20Shot%202019-02-23%20at%2010.48.14%20PM.png"><img src="../../../images/2019/ScreenShot2019-02-23at10.48.14PM.png" alt="Screen shot 2019 02 23 at 10.48.14 pm" /></a>
+              </div>
+                <div class="image-box-caption">
+                  Example of how a not-HTTPS enabled site is displayed (as insecure)
+                </div>
+            </div>
+            
+            <h3>Prerequisites</h3>
+            
+            <p>This particular HTTPS setup is making several assumptions on your general website setup. In this case I had the
+            following pieces of software already running and configured:</p>
+            
+            <ol>
+            <li>Ubuntu Linux 18.04 (Bionic Beaver) - this won&#39;t work for Heroku or Windows.</li>
+            <li>Application running on Docker
+            
+            <ul>
+            <li>Rails app already installed on the server via Capistrano and running via Docker</li>
+            </ul></li>
+            <li>NGINX installed on the server (but you can also run it via a Docker container)</li>
+            <li>Certbot installed</li>
+            </ol>
+            
+            <h3>What is NGINX?</h3>
+            
+            <p>NGINX is a Node.js based web server. In the Javascript world it can be used similarly to WEBRICK, Puma, or Thin
+            of the Ruby world. You could whole Javacsript applications served by NGINX. It&#39;s also known for it&#39;s speed, which
+            has similar performance benchmarks to Apache HTTP Server.</p>
+            
+            <p>In this example NGINX serves three functions:
+            1) Integrate our HTTPS certificate into transport layer.
+            2) Redirect traffic seeking the HTTP port 80 to the HTTPS port 443 to force clients into using the more secure protocol.
+            3) Route web traffic to the appropriate container for the domain name of the request. This will allow us to serve
+               multiple websites using the same Linux server.</p>
+            
+            <p>This kind of setup for routing web traffic is called a reverse-proxy.</p>
+            
+            <div class="image-box">
+              <div class="image-box-content">
+                <a href="images/2019/Screen%20Shot%202019-02-24%20at%202.12.21%20PM.png"><img src="../../../images/2019/ScreenShot2019-02-24at2.12.21PM.png" alt="Screen shot 2019 02 24 at 2.12.21 pm" /></a>
+              </div>
+                <div class="image-box-caption">
+                  How the NGINX reverse proxy routes traffic to the appropriate application port based on the domain
+                </div>
+            </div>
+            
+            <h4>How do you install NGINX?</h4>
+            
+            <p>Installation instructions are found on <a href="https://www.nginx.com/resources/wiki/start/topics/tutorials/install/">the official NGINX website</a>.
+            For this example instance, I installed NGINX using the <code>apt-get</code> repository:</p>
+            
+            <pre><code class="bash">$ sudo apt-get install nginx&#x000A;</code></pre>
+            
+            <p>Once it&#39;s installed, a useful command to run is the configuration test, which verifies the OK status of its configuration
+            settings.
+            <code>&#x000A;$ sudo nginx -T&#x000A;nginx: the configuration file /etc/nginx/nginx.conf syntax is ok&#x000A;nginx: configuration file /etc/nginx/nginx.conf test is successful</code></p>
+            
+            <h3>What is Let&#39;s Encrypt and Certbot?</h3>
+            
+            <p>Let&#39;s Encrypt is a nonprofit organization that promises to be the Internet&#39;s free, automated, and open Certficate
+            Authority (CA). Several companies such as Symantec, DigiCert, GoDaddy are also CA&#39;s and offer certificates for a fee.
+            For HTTPS to work, your server needs to install a certificate from one of these companies, which is nothing more
+            than a private encryption key associated with your domain. When a client connects to your website, your server will send
+            a message encrypted with that private key, which can be decoded by a public key on the client&#39;s end. HTTPS enabled web
+            browsers like Firefox or Chrome come with these public keys preinstalled, per an arrangement with the CA companies.
+            If you want a more general overview of how HTTPS certificates work, here is a great <a href="https://www.youtube.com/watch?v=iQsKdtjwtYI">YouTube video</a>
+            explaining the process.</p>
+            
+            <p>Let&#39;s Encrypt has made the installation and renewal of SSL Certificates easy with a tool called <a href="https://github.com/certbot/certbot">Certbot</a>.
+            Certbot validates your server to the Let&#39;s Encrypt by having it perform what it calls an ACME <a href="https://certbot.eff.org/docs/challenges.html?highlight=http">challenge</a>.
+            An example would be when you run Certbot, it will make a temporary file available via HTTP which the Let&#39;s Encrypt
+            organization can access. Let&#39;s Encrypt will then check the DNS records to verify that the domain name you want to
+            certify points to the server you are running Certbot from. If the DNS matches, then Let&#39;s Encrypt will send
+            a newly issued certificate to your Certbot.</p>
+            
+            <h4>Certbot Tnstallation</h4>
+            
+            <p>Installation instructions are available on the <a href="https://certbot.eff.org/docs/install.html">Certbot user guides</a>, but
+            here is a summary of the commands I used to install Certbot:</p>
+            
+            <pre><code class="bash">$ sudo apt-get update&#x000A;$ sudo apt-get install software-properties-common&#x000A;$ sudo add-apt-repository universe&#x000A;$ sudo add-apt-repository ppa:certbot/certbot&#x000A;$ sudo apt-get update&#x000A;$ sudo apt-get install certbot python-certbot-nginx&#x000A;</code></pre>
+            
+            <p>Notice that I also installed the <code>python-certbot-nginx</code> module, which invokes our instance of NGINX in performing
+            the challenge.</p>
+            
+            <h3>Configure the DNS to Point to the Server&#39;s IP Address</h3>
+            
+            <p>All you need is an A or CNAME record pointing your domain to the IP address of your Linux server.</p>
+            
+            <h3>Run the Certbot ACME Challenge to Verify the Domain</h3>
+            
+            <pre><code>sudo certbot --nginx -d my-example-domain.com -d www.my-example-domain.com&#x000A;</code></pre>
+            
+            <p>Passing the <code>nginx</code> flag tells Certbot to use NGINX to perform the ACME challenge. Certbot temporarily modifies the
+            NGINX settings so that the remote Let&#39;s Encrypt system can find a file on your system to complete the challenge.
+            Once complete, it will automatically install the received SSL certificate, which will act as a private key during the HTTPS initiation.</p>
+            
+            <h3>Update the NGINX settings to forward HTTP to HTTPS</h3>
+            
+            <p>Certbot should update your NGINX settings automatically, but here&#39;s now it will look after.</p>
+            
+            <pre><code># /etc/nginx/sites-available/my-example-domain.com&#x000A;&#x000A;server {&#x000A;    root /var/www/my-example-domain.com/current/public; # Directly serves anything in the Rails public folder&#x000A;    index index.html index.htm index.nginx-debian.html;&#x000A;    server_name my-example-domain.com www.my-example-domain.com; # managed by Certbot&#x000A;&#x000A;    location / {&#x000A;        proxy_pass http://localhost:8030; # 8030 is the port the Docker container is running on&#x000A;          proxy_set_header Host $host;&#x000A;          #try_files $uri $uri/ =404;&#x000A;    }&#x000A;&#x000A;    listen [::]:443 ssl ipv6only=on; # managed by Certbot&#x000A;    listen 443 ssl; # managed by Certbot&#x000A;    ssl_certificate /etc/letsencrypt/live/my-example-domain.com/fullchain.pem; # managed by Certbot&#x000A;    ssl_certificate_key /etc/letsencrypt/live/my-example-domain.com/privkey.pem; # managed by Certbot&#x000A;    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot&#x000A;    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot&#x000A;}&#x000A;&#x000A;server {&#x000A;    if ($host = www.my-example-domain.com) {&#x000A;        return 301 https://$host$request_uri;&#x000A;    } # managed by Certbot&#x000A;&#x000A;&#x000A;    if ($host = my-example-domain.com) {&#x000A;        return 301 https://$host$request_uri;&#x000A;    } # managed by Certbot&#x000A;&#x000A;    listen 80 ;&#x000A;    listen [::]:80 ;&#x000A;    server_name my-example-domain.com www.my-example-domain.com;&#x000A;    return 404; # managed by Certbot&#x000A;}&#x000A;&#x000A;</code></pre>
+            
+            <p>NGINX has two important folders for domain settings:
+            <code>/etc/nginx/sites-available</code>
+            <code>/etc/nginx/sites-enabled</code></p>
+            
+            <p>The <code>sites-available</code> folder has the NGINX proxy settings for each individual website. The <code>sites-enabled</code> should
+            contain symlinks to the files in the <code>sites-available</code> folder. Create a symlink at the command line like this:</p>
+            
+            <pre><code>$ ln -s /etc/nginx/sites-enabled/my-example-domain.com /etc/nginx/sites-available/my-example-domain.com&#x000A;</code></pre>
+            
+            <p>Additional Resources:</p>
+            
+            <ol>
+            <li>https://blog.heckel.xyz/2013/07/01/how-to-use-mitmproxy-to-read-and-modify-https-traffic-of-your-phone/</li>
+            <li>https://www.youtube.com/watch?v=iQsKdtjwtYI</li>
+            </ol>
+          </div>
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+          <!-- article-bottom -->
+          <ins class="adsbygoogle"
+               style="display:inline-block;width:336px;height:280px"
+               data-ad-client="ca-pub-9623179230776920"
+               data-ad-slot="8860330295"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+          <div id="disqus_thread"></div>
+          <script>
+          
+            /**
+             *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+             *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+            /*
+             var disqus_config = function () {
+             this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+             this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+             };
+             */
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+              s.src = 'https://winstonkotzan.disqus.com/embed.js';
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+      </div>
+      <div class='col-md-4'>
+        <aside>
+          <h2>Recent Articles</h2>
+          <ol>
+            <li><a href="production-https-setup-for-ruby-on-rails-app-with-docker.html">How to Set Up HTTPS for Free on a Dockerized Ruby on Rails Production Server</a> <span>Mar  9</span></li>
+            <li><a href="../../02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html">How to connect a Docker application to a Postgres database on the host machine</a> <span>Feb  5</span></li>
+            <li><a href="../../02/04/three-allergic-triggers-that-can-cause-eczema.html">Three Allergic Triggers That Can Cause Eczema</a> <span>Feb  4</span></li>
+            <li><a href="../../02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html">I Conquered Eczema after 30 Years of Itchy Skin, And You Can Too</a> <span>Feb  3</span></li>
+            <li><a href="../../../2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html">How to Node on Ruby 2.5.0 (Debian Stretch) Docker Container</a> <span>Mar  5</span></li>
+            <li><a href="../../../2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html">How to Install Twitter Bootstrap into a Webpack/React.js Application</a> <span>Jan 30</span></li>
+            <li><a href="../../../2018/01/29/webpack-compile-scss-insanity.html">Compiling SCSS to CSS in Webpack - INSANITY!</a> <span>Jan 29</span></li>
+            <li><a href="../../../2018/01/29/frontendmasters-review.html">Review of FrontendMasters React.js/Redux Tutorial v3</a> <span>Jan 29</span></li>
+            <li><a href="../../../2017/09/05/shutting-down-momo-scans-and-ustreasurycurve.html">Shut Down of MomentumStockScans.com and USTreasuryYieldCurve.com</a> <span>Sep  5</span></li>
+            <li><a href="../../../2017/07/31/bitcoin-will-fail-for-shtf.html">Why Bitcoin Will Fail for SHTF</a> <span>Jul 31</span></li>
+          </ol>
+          <h2>By Year</h2>
+          <ol>
+            <li><a href="../../../2019.html">2019 (4)</a></li>
+            <li><a href="../../../2018.html">2018 (4)</a></li>
+            <li><a href="../../../2017.html">2017 (20)</a></li>
+            <li><a href="../../../2016.html">2016 (7)</a></li>
+          </ol>
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+          <!-- Sidebar ad -->
+          <ins class="adsbygoogle"
+               style="display:inline-block;width:300px;height:600px"
+               data-ad-client="ca-pub-9623179230776920"
+               data-ad-slot="2953397495"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>
