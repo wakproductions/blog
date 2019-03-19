@@ -14,7 +14,7 @@
     <link rel="alternate" href="http://blog.url.com/2019/03/09/production-https-setup-for-ruby-on-rails-app-with-docker.html"/>
     <id>http://blog.url.com/2019/03/09/production-https-setup-for-ruby-on-rails-app-with-docker.html</id>
     <published>2019-03-09T18:00:00-05:00</published>
-    <updated>2019-03-09T22:12:01-05:00</updated>
+    <updated>2019-03-18T00:49:08-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -216,7 +216,7 @@ contain symlinks to the files in the &lt;code&gt;sites-available&lt;/code&gt; fo
     <link rel="alternate" href="http://blog.url.com/2019/02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html"/>
     <id>http://blog.url.com/2019/02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html</id>
     <published>2019-02-05T01:00:00-05:00</published>
-    <updated>2019-03-09T19:14:19-05:00</updated>
+    <updated>2019-03-18T23:41:45-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -269,7 +269,7 @@ variable you can have that set to the database password so that it won&amp;#39;t
     <link rel="alternate" href="http://blog.url.com/2019/02/04/three-allergic-triggers-that-can-cause-eczema.html"/>
     <id>http://blog.url.com/2019/02/04/three-allergic-triggers-that-can-cause-eczema.html</id>
     <published>2019-02-04T18:00:00-05:00</published>
-    <updated>2019-03-09T19:11:53-05:00</updated>
+    <updated>2019-03-18T23:52:04-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -377,7 +377,7 @@ it forces me to notice the link in an obvious way.&lt;/p&gt;
     <link rel="alternate" href="http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"/>
     <id>http://blog.url.com/2019/02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html</id>
     <published>2019-02-03T18:00:00-05:00</published>
-    <updated>2019-02-03T18:43:23-05:00</updated>
+    <updated>2019-03-18T23:51:28-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
