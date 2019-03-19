@@ -2,6 +2,8 @@
 title: How to connect a Docker application to a Postgres database on the host machine
 date: 2019-02-05 01:00 EST
 tags:
+meta_short_description: Connecting a Docker application to non-Dockerized Postgres database from is a more complicated task than you would think. 
+meta_image_path: images/blog-default-social-media-image.jpg
 ---
 
 Connecting a Docker application to non-Dockerized Postgres database from is a more complicated task
