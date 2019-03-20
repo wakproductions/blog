@@ -1,4 +1,5 @@
 require 'tzinfo'
+require 'lib/custom_helpers'
 
 ###
 # Page options, layouts, aliases and proxies
@@ -76,5 +77,8 @@ set :markdown, :fenced_code_blocks => true#, :smartypants => true
 
 set :relative_links, true
 
-
 Time.zone = "EST"
+
+### CUSTOM FOR THIS APP WINSTON'S TECH BLOG ###
+set :base_url, 'http://www.winstonkotzan.com/blog/'
+helpers CustomHelpers
