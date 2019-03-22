@@ -12,6 +12,8 @@
     %meta{ property: "og:description", content: "#{current_article.data['meta_short_description']}" }
     %meta{ property: "og:image", content: "#{social_media_image(current_article.data['meta_image_path'])}" }
 
+    %meta{ name: "twitter:card", content: "#{current_article.data['meta_short_description']}" }
+
     %title= "#{current_article.nil? ? 'Winston Kotzan\'s Technology Blog' : current_article.title}"
     =feed_tag(:atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed")
 
