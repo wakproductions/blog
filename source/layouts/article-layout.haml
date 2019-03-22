@@ -6,7 +6,7 @@
     %meta{ content: "width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no", name: "viewport" }
 
     / For Facebook link formatting
-    %meta{ property: "og:url", content: "#{current_page.url}" }
+    %meta{ property: "og:url", content: "#{social_media_url(current_page.url)}" }
     %meta{ property: "og:type", content: "article" }
     %meta{ property: "og:title", content: "#{current_article.title}" }
     %meta{ property: "og:description", content: "#{current_article.data['meta_short_description']}" }
