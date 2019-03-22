@@ -1,0 +1,45 @@
+---
+title: Make Your Blog Posts Shareable with OpenGraph Meta Tags 
+date: 2019-03-23 18:00 EST
+tags:
+meta_short_description: Get your blog posts to share with nicely formatted descriptions and pictures on social media. 
+meta_image_path:  
+---
+
+This blog is written in a Ruby tool called [Middleman](https://middlemanapp.com/). I noticed that when trying to share
+one of my posts on social media, it doesn't format as nicely as sharing articles from other big media sites.
+
+<%= partial 'image', locals: { filename: '2019/03/bad-social-media-share-link.png', caption: 'How one of my blog articles looked when I tried to share'} %>
+
+<%= partial 'image', locals: { filename: '2019/03/msm-social-media-link-example.png', caption: 'What a nicely formatted blog post share looks like'} %>
+<%= partial 'image', locals: { filename: '2019/03/corrected-social-media-link.png', caption: 'What a nicely formatted blog post share looks like'} %>
+
+## Facebook OpenGraph Tags
+
+I found out that Facebook invented a meta tag standard called [OpenGraph](https://developers.facebook.com/docs/sharing/webmasters/#user-agent) which allows you to specify how your blog
+post will display when shared on Facebook. Many other social media sites like LinkedIn and Twitter read the same tags.
+
+I was able to fix my blog post display by adding the following meta tags to the `<head>` section of each web page.
+
+```html
+<head>
+  <meta content='http://www.winstonkotzan.com/2019/03/09/production-https-setup-for-ruby-on-rails-app-with-docker.html' property='og:url'>
+  <meta content='article' property='og:type'>
+  <meta content='Human Readable Title of the Blog Post' property='og:title'>
+  <meta content="Short description of my blog post." property='og:description'>
+  <meta content='https://my-blog-url.com/link/to/image-to-display.png' property='og:image'>
+  <meta content="Same as the og:description value above" name='twitter:card'>
+</head>
+```
+
+Facebook also has a [debugger tool](https://developers.facebook.com/tools/debug/sharing/?q=http%3A%2F%2Fwinstonkotzan.com%2Fblog%2F2019%2F02%2F04%2Fthree-allergic-triggers-that-can-cause-eczema.html)
+that can help you validate your HTML meta tag markup.
+
+<%= partial 'image', locals: { filename: '2019/03/corrected-social-media-link.png', caption: 'Facebook debugger tool'} %>
+ 
+
+Additional Resources:
+
+1. [Facebook OpenGraph Docs](https://developers.facebook.com/docs/sharing/webmasters/#user-agent)
+2. [Facebook OpenGraph Debugger](https://developers.facebook.com/tools/debug/sharing/?q=http%3A%2F%2Fwinstonkotzan.com%2Fblog%2F2019%2F02%2F04%2Fthree-allergic-triggers-that-can-cause-eczema.html)
+2. [Twitter](https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started.html)
