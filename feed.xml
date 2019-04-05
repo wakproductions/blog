@@ -5,10 +5,109 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2019-03-21T19:00:00-04:00</updated>
+  <updated>2019-04-03T19:00:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Don't Make This Mistake When Using Docker Volumes!</title>
+    <link rel="alternate" href="http://blog.url.com/2019/04/03/docker-volumes-dont-make-this-mistake.html"/>
+    <id>http://blog.url.com/2019/04/03/docker-volumes-dont-make-this-mistake.html</id>
+    <published>2019-04-03T19:00:00-04:00</published>
+    <updated>2019-04-04T23:36:05-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;This week when doing a production deploy to &lt;a href="https://www.ustreasuryyieldcurve.com/"&gt;ustreasuryyieldcurve.com&lt;/a&gt;, I had an accident where I almost lost all the
+latest snapshot of production data!&lt;/p&gt;
+
+&lt;p&gt;Docker volumes is a feature that is handy for making your container&amp;#39;s application-specific data persistent across
+deploys. When containers get rebuilt, redeployed, and restarted, all of the information in the container gets
+scrapped. However, some data like your database of users and information you would want to keep outside of the
+container and reused. That&amp;#39;s where Docker volumes comes in. You can specify a folder inside of your Docker container
+to symlink to a folder outside of Docker on the host machine. The data will not only be persistent, but
+can easily be backed up.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;version: &amp;#39;3&amp;#39;
+services:
+  database:
+    container_name: ycurve_database
+    image: &amp;quot;postgres:9.6.5-alpine&amp;quot;
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DB_DATA_DIR: ${DB_DATA_DIR}
+    networks:
+      - ycurve
+    volumes:
+      - &amp;quot;./data/postgresql965/:/var/lib/postgresql/data/&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;A Postgres database container with external volume specified as a directory on the local system&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Docker volumes also has a feature where you can specify a volume name rather than a folder path on the host machine.
+Docker will use the name as a tag to manage the data location for you. You can find the exact location where
+Docker is storing the data using the &lt;code&gt;docker inspect&lt;/code&gt; command.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;version: &amp;#39;3&amp;#39;
+services:
+  database:
+    container_name: ycurve_database
+    image: &amp;quot;postgres:9.6.5-alpine&amp;quot;
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DB_DATA_DIR: ${DB_DATA_DIR}
+    networks:
+      - ycurve
+    volumes:
+      - &amp;quot;ycurve_database_postgres965:/var/lib/postgresql/data/&amp;quot;
+
+volumes:
+  ycurve_database_postgres965:
+    # This prevents the volume name from being prepended by the Capistrano release number. Without it
+    # data would be stored in /var/lib/docker/volumes/&amp;lt;release_number&amp;gt;_ycurve_database_postgres965, so
+    # then the next data deploy will get lost.
+    external: true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;A Postgres database container with external volume specified by the Docker named volume. Note the need for a &lt;code&gt;volumes&lt;/code&gt;
+section below&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class="image-box"&gt;
+  &lt;div class="image-box-content"&gt;
+    &lt;a href="../../../images/2019/03/docker-inspect.png"&gt;&lt;img src="../../../images/2019/03/docker-inspect.png" alt="Docker inspect" /&gt;&lt;/a&gt;
+  &lt;/div&gt;
+    &lt;div class="image-box-caption"&gt;
+      `docker inspect` shows you where the volumes are stored on the file system`
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The problem I encountered was when I performed a deploy using a Ruby tool called Capistrano and restarted the website,
+all of the data was suddenly missing. I logged into the database using the Rails console and it reported to be completely
+empty. So the next step I took was to use the &lt;code&gt;docker inspect&lt;/code&gt; command to see where the database volume was being stored.
+I noticed that in the Docker volumes directory, there were separate volume folders corresponding to each Capistrano release
+I&amp;#39;ve recently performed, with the release number prepending the directory. I only wanted it to be using a single
+directory with no prepending.&lt;/p&gt;
+
+&lt;div class="image-box"&gt;
+  &lt;div class="image-box-content"&gt;
+    &lt;a href="../../../images/2019/03/volume-folders-prepended-by-release.png"&gt;&lt;img src="../../../images/2019/03/volume-folders-prepended-by-release.png" alt="Volume folders prepended by release" /&gt;&lt;/a&gt;
+  &lt;/div&gt;
+    &lt;div class="image-box-caption"&gt;
+      The volume folders were being prepended with the release number, so each time I deploy it created a new database.
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;So after some further research, I learned that I had to make a modification to my docker-compose file by adding the
+&lt;code&gt;external&lt;/code&gt; keyword to the volume declaration. I also had to go onto the server and manually create the volume
+using the command &lt;code&gt;docker volume create ycurve_database&lt;/code&gt;. I then figured out which release folder contained the
+previous deploy&amp;#39;s working data and copied the contents into the newly created external volume folder. The next deploy
+containing the updated &lt;code&gt;docker-compose.yml&lt;/code&gt; brought the site was back to normal!&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Make Your Blog Posts Shareable with OpenGraph Meta Tags</title>
     <link rel="alternate" href="http://blog.url.com/2019/03/21/make-blog-posts-shareable-with-opengraph-meta-tags.html"/>
@@ -549,37 +648,6 @@ provide a great deal of relief and stomp out a persistent flare-up.&lt;/p&gt;
 
 &lt;p&gt;In the &lt;a href="2019-02-03-three-allergic-triggers-that-can-cause-eczema.html"&gt;Part 2&lt;/a&gt; of this series, I go into more detail about the allergy and pathogenic factors causing eczema. If you like
 this blog series and want to add to the discussion, please leave your feedback on the Disqus board below.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>How to Node on Ruby 2.5.0 (Debian Stretch) Docker Container</title>
-    <link rel="alternate" href="http://blog.url.com/2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html"/>
-    <id>http://blog.url.com/2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html</id>
-    <published>2018-03-05T18:55:00-05:00</published>
-    <updated>2018-03-05T22:35:41-05:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;Another Ruby version, another curveball. Node is no longer in the default package repository for Debian, so you have
-to manually add it. Here&amp;#39;s how I got my Dockerfile to run:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Dockerfile
-FROM ruby:2.5.0
-RUN apt-get update
-RUN curl -sL https://deb.nodesource.com/setup_9.x | bash -
-RUN apt-get install -y nodejs
-RUN apt-get install -y npm
-RUN npm install yarn -g
-
-CMD mkdir /app
-WORKDIR /app
-COPY Gemfile /app
-COPY Gemfile.lock /app
-
-RUN gem install bundler -v 1.16.1
-RUN bundle install
-
-&lt;/code&gt;&lt;/pre&gt;
 </content>
   </entry>
 </feed>

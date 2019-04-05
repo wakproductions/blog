@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta charset='utf-8'>
+    <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no' name='viewport'>
+    <!-- For Facebook link formatting -->
+    <meta content='http://www.winstonkotzan.com/2019/04/03/docker-volumes-dont-make-this-mistake.html' property='og:url'>
+    <meta content='article' property='og:type'>
+    <meta content="Don't Make This Mistake When Using Docker Volumes!" property='og:title'>
+    <meta content='Docker Volumes is a feature which makes it easy to manage your application specific data. But, if used improperly you may lose your production application data on a subsequent deploy!' property='og:description'>
+    <meta content='http://www.winstonkotzan.com/blog/images/blog-default-social-media-image.jpg' property='og:image'>
+    <meta content='Docker Volumes is a feature which makes it easy to manage your application specific data. But, if used improperly you may lose your production application data on a subsequent deploy!' name='twitter:card'>
+    <title>Don't Make This Mistake When Using Docker Volumes!</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+    <link href="../../../stylesheets/site.css" rel="stylesheet" />
+    <script src="../../../javascripts/all.js"></script>
+    <script src="../../../javascripts/jquery-2.2.3.min.js"></script>
+    
+    
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-46648633-1', 'winstonkotzan.com');
+        ga('send', 'pageview');
+    </script>
+  </head>
+  <body class='x2019 x2019_04 x2019_04_03 x2019_04_03_docker-volumes-dont-make-this-mistake'>
+    <div class='jumbotron'>
+      <div class='container'>
+        <div class='col-lg-offset-6 col-lg-6 blog-title-box'>
+          <div class='content'>
+            <a href="/blog/">Winston Kotzan's Technology Blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container content'>
+      <div class='col-md-8'>
+        <div class='main article-content' role='main'>
+          <h2 class='article-title'>Don't Make This Mistake When Using Docker Volumes!</h2>
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+          <!-- article-top -->
+          <ins class="adsbygoogle"
+               style="display:inline-block;width:728px;height:90px"
+               data-ad-client="ca-pub-9623179230776920"
+               data-ad-slot="7383597095"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+          <div class='article-date'>04/03/2019</div>
+          <div class='article-body'>
+            <p>This week when doing a production deploy to <a href="https://www.ustreasuryyieldcurve.com/">ustreasuryyieldcurve.com</a>, I had an accident where I almost lost all the
+            latest snapshot of production data!</p>
+            
+            <p>Docker volumes is a feature that is handy for making your container&#39;s application-specific data persistent across
+            deploys. When containers get rebuilt, redeployed, and restarted, all of the information in the container gets
+            scrapped. However, some data like your database of users and information you would want to keep outside of the
+            container and reused. That&#39;s where Docker volumes comes in. You can specify a folder inside of your Docker container
+            to symlink to a folder outside of Docker on the host machine. The data will not only be persistent, but
+            can easily be backed up.</p>
+            
+            <pre><code>version: &#39;3&#39;&#x000A;services:&#x000A;  database:&#x000A;    container_name: ycurve_database&#x000A;    image: &quot;postgres:9.6.5-alpine&quot;&#x000A;    environment:&#x000A;      POSTGRES_USER: ${DB_USER}&#x000A;      POSTGRES_PASSWORD: ${DB_PASSWORD}&#x000A;      POSTGRES_DB: ${DB_NAME}&#x000A;      DB_DATA_DIR: ${DB_DATA_DIR}&#x000A;    networks:&#x000A;      - ycurve&#x000A;    volumes:&#x000A;      - &quot;./data/postgresql965/:/var/lib/postgresql/data/&quot;&#x000A;</code></pre>
+            
+            <p><strong>A Postgres database container with external volume specified as a directory on the local system</strong></p>
+            
+            <p>Docker volumes also has a feature where you can specify a volume name rather than a folder path on the host machine.
+            Docker will use the name as a tag to manage the data location for you. You can find the exact location where
+            Docker is storing the data using the <code>docker inspect</code> command.</p>
+            
+            <pre><code>version: &#39;3&#39;&#x000A;services:&#x000A;  database:&#x000A;    container_name: ycurve_database&#x000A;    image: &quot;postgres:9.6.5-alpine&quot;&#x000A;    environment:&#x000A;      POSTGRES_USER: ${DB_USER}&#x000A;      POSTGRES_PASSWORD: ${DB_PASSWORD}&#x000A;      POSTGRES_DB: ${DB_NAME}&#x000A;      DB_DATA_DIR: ${DB_DATA_DIR}&#x000A;    networks:&#x000A;      - ycurve&#x000A;    volumes:&#x000A;      - &quot;ycurve_database_postgres965:/var/lib/postgresql/data/&quot;&#x000A;&#x000A;volumes:&#x000A;  ycurve_database_postgres965:&#x000A;    # This prevents the volume name from being prepended by the Capistrano release number. Without it&#x000A;    # data would be stored in /var/lib/docker/volumes/&lt;release_number&gt;_ycurve_database_postgres965, so&#x000A;    # then the next data deploy will get lost.&#x000A;    external: true&#x000A;</code></pre>
+            
+            <p><strong>A Postgres database container with external volume specified by the Docker named volume. Note the need for a <code>volumes</code>
+            section below</strong></p>
+            
+            <div class="image-box">
+              <div class="image-box-content">
+                <a href="../../../images/2019/03/docker-inspect.png"><img src="../../../images/2019/03/docker-inspect.png" alt="Docker inspect" /></a>
+              </div>
+                <div class="image-box-caption">
+                  `docker inspect` shows you where the volumes are stored on the file system`
+                </div>
+            </div>
+            
+            <p>The problem I encountered was when I performed a deploy using a Ruby tool called Capistrano and restarted the website,
+            all of the data was suddenly missing. I logged into the database using the Rails console and it reported to be completely
+            empty. So the next step I took was to use the <code>docker inspect</code> command to see where the database volume was being stored.
+            I noticed that in the Docker volumes directory, there were separate volume folders corresponding to each Capistrano release
+            I&#39;ve recently performed, with the release number prepending the directory. I only wanted it to be using a single
+            directory with no prepending.</p>
+            
+            <div class="image-box">
+              <div class="image-box-content">
+                <a href="../../../images/2019/03/volume-folders-prepended-by-release.png"><img src="../../../images/2019/03/volume-folders-prepended-by-release.png" alt="Volume folders prepended by release" /></a>
+              </div>
+                <div class="image-box-caption">
+                  The volume folders were being prepended with the release number, so each time I deploy it created a new database.
+                </div>
+            </div>
+            
+            <p>So after some further research, I learned that I had to make a modification to my docker-compose file by adding the
+            <code>external</code> keyword to the volume declaration. I also had to go onto the server and manually create the volume
+            using the command <code>docker volume create ycurve_database</code>. I then figured out which release folder contained the
+            previous deploy&#39;s working data and copied the contents into the newly created external volume folder. The next deploy
+            containing the updated <code>docker-compose.yml</code> brought the site was back to normal!</p>
+          </div>
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+          <!-- article-bottom -->
+          <ins class="adsbygoogle"
+               style="display:inline-block;width:336px;height:280px"
+               data-ad-client="ca-pub-9623179230776920"
+               data-ad-slot="8860330295"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+          <div id="disqus_thread"></div>
+          <script>
+          
+            /**
+             *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+             *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+            /*
+             var disqus_config = function () {
+             this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+             this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+             };
+             */
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+              s.src = 'https://winstonkotzan.disqus.com/embed.js';
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+      </div>
+      <div class='col-md-4'>
+        <aside>
+          <h2>Recent Articles</h2>
+          <ol>
+            <li><a href="docker-volumes-dont-make-this-mistake.html">Don't Make This Mistake When Using Docker Volumes!</a> <span>Apr  3</span></li>
+            <li><a href="../../03/21/make-blog-posts-shareable-with-opengraph-meta-tags.html">Make Your Blog Posts Shareable with OpenGraph Meta Tags</a> <span>Mar 21</span></li>
+            <li><a href="../../03/09/production-https-setup-for-ruby-on-rails-app-with-docker.html">How to Set Up HTTPS for Free on a Dockerized Ruby on Rails Production Server</a> <span>Mar  9</span></li>
+            <li><a href="../../02/05/how-to-connect-docker-to-a-postgres-database-on-host-machine-localhost.html">How to connect a Docker application to a Postgres database on the host machine</a> <span>Feb  5</span></li>
+            <li><a href="../../02/04/three-allergic-triggers-that-can-cause-eczema.html">Three Allergic Triggers That Can Cause Eczema</a> <span>Feb  4</span></li>
+            <li><a href="../../02/03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html">I Conquered Eczema after 30 Years of Itchy Skin, And You Can Too</a> <span>Feb  3</span></li>
+            <li><a href="../../../2018/03/05/how-to-install-node-on-ruby-5-debian-stretch-docker-container.html">How to Node on Ruby 2.5.0 (Debian Stretch) Docker Container</a> <span>Mar  5</span></li>
+            <li><a href="../../../2018/01/30/how-to-install-twitter-bootstrap-into-webpack-react-application.html">How to Install Twitter Bootstrap into a Webpack/React.js Application</a> <span>Jan 30</span></li>
+            <li><a href="../../../2018/01/29/webpack-compile-scss-insanity.html">Compiling SCSS to CSS in Webpack - INSANITY!</a> <span>Jan 29</span></li>
+            <li><a href="../../../2018/01/29/frontendmasters-review.html">Review of FrontendMasters React.js/Redux Tutorial v3</a> <span>Jan 29</span></li>
+          </ol>
+          <h2>By Year</h2>
+          <ol>
+            <li><a href="../../../2019.html">2019 (6)</a></li>
+            <li><a href="../../../2018.html">2018 (4)</a></li>
+            <li><a href="../../../2017.html">2017 (20)</a></li>
+            <li><a href="../../../2016.html">2016 (7)</a></li>
+          </ol>
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+          <!-- Sidebar ad -->
+          <ins class="adsbygoogle"
+               style="display:inline-block;width:300px;height:600px"
+               data-ad-client="ca-pub-9623179230776920"
+               data-ad-slot="2953397495"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>
