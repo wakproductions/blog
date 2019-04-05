@@ -14,11 +14,17 @@
     <link rel="alternate" href="http://blog.url.com/2019/04/03/docker-volumes-dont-make-this-mistake.html"/>
     <id>http://blog.url.com/2019/04/03/docker-volumes-dont-make-this-mistake.html</id>
     <published>2019-04-03T19:00:00-04:00</published>
-    <updated>2019-04-04T23:36:05-04:00</updated>
+    <updated>2019-04-05T00:14:25-04:00</updated>
     <author>
       <name>Article Author</name>
     </author>
-    <content type="html">&lt;p&gt;This week when doing a production deploy to &lt;a href="https://www.ustreasuryyieldcurve.com/"&gt;ustreasuryyieldcurve.com&lt;/a&gt;, I had an accident where I almost lost all the
+    <content type="html">&lt;div class="image-box"&gt;
+  &lt;div class="image-box-content"&gt;
+    &lt;a href="../../../images/2019/thumbnail-2019-04-05-docker-volumes-mistake.png"&gt;&lt;img src="../../../images/2019/thumbnail-2019-04-05-docker-volumes-mistake.png" alt="Thumbnail 2019 04 05 docker volumes mistake" /&gt;&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This week when doing a production deploy to &lt;a href="https://www.ustreasuryyieldcurve.com/"&gt;ustreasuryyieldcurve.com&lt;/a&gt;, I had an accident where I almost lost all the
 latest snapshot of production data!&lt;/p&gt;
 
 &lt;p&gt;Docker volumes is a feature that is handy for making your container&amp;#39;s application-specific data persistent across
