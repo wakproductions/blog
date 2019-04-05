@@ -1,0 +1,86 @@
+---
+title: Don't Make This Mistake When Using Docker Volumes!
+date: 2019-04-03 18:00 EST
+tags:
+meta_short_description: Docker Volumes is a feature which makes it easy to manage your application specific data. But,
+                        if used improperly you may lose your production application data on a subsequent deploy!
+meta_image_path:
+---
+
+This week when doing a production deploy to [ustreasuryyieldcurve.com](https://www.ustreasuryyieldcurve.com/), I had an accident where I almost lost all the
+latest snapshot of production data!
+
+Docker volumes is a feature that is handy for making your container's application-specific data persistent across
+deploys. When containers get rebuilt, redeployed, and restarted, all of the information in the container gets
+scrapped. However, some data like your database of users and information you would want to keep outside of the
+container and reused. That's where Docker volumes comes in. You can specify a folder inside of your Docker container
+to symlink to a folder outside of Docker on the host machine. The data will not only be persistent, but
+can easily be backed up.
+
+```
+version: '3'
+services:
+  database:
+    container_name: ycurve_database
+    image: "postgres:9.6.5-alpine"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DB_DATA_DIR: ${DB_DATA_DIR}
+    networks:
+      - ycurve
+    volumes:
+      - "./data/postgresql965/:/var/lib/postgresql/data/"
+```
+**A Postgres database container with external volume specified as a directory on the local system**
+
+Docker volumes also has a feature where you can specify a volume name rather than a folder path on the host machine.
+Docker will use the name as a tag to manage the data location for you. You can find the exact location where
+Docker is storing the data using the `docker inspect` command.
+
+```
+version: '3'
+services:
+  database:
+    container_name: ycurve_database
+    image: "postgres:9.6.5-alpine"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DB_DATA_DIR: ${DB_DATA_DIR}
+    networks:
+      - ycurve
+    volumes:
+      - "ycurve_database_postgres965:/var/lib/postgresql/data/"
+
+volumes:
+  ycurve_database_postgres965:
+    # This prevents the volume name from being prepended by the Capistrano release number. Without it
+    # data would be stored in /var/lib/docker/volumes/<release_number>_ycurve_database_postgres965, so
+    # then the next data deploy will get lost.
+    external: true
+```
+**A Postgres database container with external volume specified by the Docker named volume. Note the need for a `volumes`
+section below**
+
+<%= partial 'image', locals: { filename: '2019/03/docker-inspect.png', caption: '`docker inspect` shows you where the volumes are stored on the file system`'} %>
+
+The problem I encountered was when I performed a deploy using a Ruby tool called Capistrano and restarted the website,
+all of the data was suddenly missing. I logged into the database using the Rails console and it reported to be completely
+empty. So the next step I took was to use the `docker inspect` command to see where the database volume was being stored.
+I noticed that in the Docker volumes directory, there were separate volume folders corresponding to each Capistrano release
+I've recently performed, with the release number prepending the directory. I only wanted it to be using a single
+directory with no prepending.
+
+<%= partial 'image', locals: { filename: '2019/03/volume-folders-prepended-by-release.png', caption: 'The volume folders were being prepended with the release number, so each time I deploy it created a new database.'} %>
+
+So after some further research, I learned that I had to make a modification to my docker-compose file by adding the
+`external` keyword to the volume declaration. I also had to go onto the server and manually create the volume
+using the command `docker volume create ycurve_database`. I then figured out which release folder contained the
+previous deploy's working data and copied the contents into the newly created external volume folder. The next deploy
+containing the updated `docker-compose.yml` brought the site was back to normal!
+
+
+
