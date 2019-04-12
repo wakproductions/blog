@@ -5,10 +5,120 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2019-04-09T19:00:00-04:00</updated>
+  <updated>2019-04-10T19:00:00-04:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>How to Use Standard Javascript Components with Vue.js</title>
+    <link rel="alternate" href="http://blog.url.com/2019/04/10/how-to-use-a-regular-js-component-with-vue.html"/>
+    <id>http://blog.url.com/2019/04/10/how-to-use-a-regular-js-component-with-vue.html</id>
+    <published>2019-04-10T19:00:00-04:00</published>
+    <updated>2019-04-11T22:55:47-04:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Vue is a great platform for development the web frontend, but sometimes you might one to use a traditional Javascript
+component for certain feature on your website. There are many great components out there that have not yet been
+encapulated by a fancy Vue wrapper that allows you to drop it into your template using a Vue.js tag. Here&amp;#39;s an easy way
+to get a traditional Javascript component plain-vanilla linking to an HTML element in your Vue program. As an example, I
+will be featuring the &lt;a href="https://www.npmjs.com/package/js-datepicker"&gt;js-datepicker&lt;/a&gt; component, which I recently installed
+on &lt;a href="https://www.ustreasuryyieldcurve.com"&gt;ustreasuryyieldcurve.com&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;Add the component using npm or yarn&lt;/h2&gt;
+
+&lt;p&gt;I&amp;#39;m using yarn, so I installed via the command line:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ yarn add js-datepicker
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Import the stylesheets and Javascript component&lt;/h2&gt;
+
+&lt;p&gt;A tricky thing to figure out is how to import the js-datepicker assets. There&amp;#39;s a Javascript file and a stylesheet
+required for it to work. To import the stylesheet, I had to use a &lt;code&gt;&amp;lt;link /&amp;gt;&lt;/code&gt; tag in the &lt;code&gt;&amp;lt;head /&amp;gt;&lt;/code&gt; section of my
+HTML template. so it looked something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="html"&gt;  &amp;lt;head&amp;gt;
+    &amp;lt;!-- other declarations --&amp;gt;
+    &amp;lt;link href=&amp;quot;../node_modules/js-datepicker/dist/datepicker.min.css&amp;quot; type=&amp;quot;text/css&amp;quot; rel=&amp;quot;stylesheet&amp;quot;&amp;gt;&amp;lt;/link&amp;gt;
+  &amp;lt;/head&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;/public/index.html - note how I am loading it from node_modules&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;The Javacript had to be loaded from the top level Vue component in &lt;code&gt;App.vue&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+  &amp;lt;!-- template section of the Vue file --&amp;gt;
+&amp;lt;/template&amp;gt;
+
+&amp;lt;script&amp;gt;
+  // Javascript section of the Vue file
+&amp;lt;/script&amp;gt;
+
+&amp;lt;style lang=&amp;quot;scss&amp;quot;&amp;gt;
+  @import &amp;#39;node_modules/js-datepicker/dist/datepicker.min&amp;#39;
+&amp;lt;/style&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;/src/App.vue&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2&gt;Import it in the component where it is used&lt;/h2&gt;
+
+&lt;p&gt;The final step was making the correct imports and referencing. I&amp;#39;m using it in my custom DateNavigation Vue component,
+and here are the import pieces of code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+  &amp;lt;!-- other HTML stuff --&amp;gt;
+
+  &amp;lt;input id=&amp;quot;dateSelector&amp;quot; type=&amp;quot;text&amp;quot; v-model=&amp;quot;_viewerDate&amp;quot; /&amp;gt;
+
+  &amp;lt;!-- other HTML stuff --&amp;gt;
+&amp;lt;/template&amp;gt;
+
+&amp;lt;script&amp;gt;
+import datepicker from &amp;quot;js-datepicker&amp;quot;;
+// other declarations
+
+export default {
+  name: &amp;quot;DateNavigation&amp;quot;,
+  methods: {
+    datepickerSelect(instance, date) {
+      this._viewerDate = date.toLocaleDateString();
+    },
+  },
+  mounted() {
+    this.$jsdatepicker = datepicker(&amp;quot;#dateSelector&amp;quot;, {
+      onSelect: this.datepickerSelect,
+      formatter: (instance, date) =&amp;gt; {
+        instance.value = date.toLocaleDataString();
+      }
+    });
+  }
+}
+&amp;lt;/script&amp;gt;
+
+&amp;lt;style scoped lang=&amp;quot;scss&amp;quot;&amp;gt;
+// no relevant code here. See App.vue for the import of js-datepicker related CSS.
+&amp;lt;/style&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;src/components/DateNavigation.vue&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;So here it&amp;#39;s pretty basic in line with how the official js-datepicker docs say to use the component. I set up the
+Java code to reference the &lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt; element with the tag &lt;code&gt;#dateSelector&lt;/code&gt;. The &lt;code&gt;_viewerDate&lt;/code&gt; data varable declared in my
+Vue logic bound to the input via Vue&amp;#39;s metatag, &lt;code&gt;v-model&lt;/code&gt;. That allows the text in the datepicker seen by the user to
+change if the data store internal to the program switches to a new date.&lt;/p&gt;
+
+&lt;p&gt;The Javascript part of setting up js-datepicker is handled in the &lt;code&gt;mounted()&lt;/code&gt; section of the Vue callbacks. Also note
+how I set up an internal variable &lt;code&gt;$jsdatepicker&lt;/code&gt; to hold the datepicker object for later reference.&lt;/p&gt;
+
+&lt;h2&gt;Additional Resources&lt;/h2&gt;
+
+&lt;p&gt;You can view all of the changes made in the US Treasury Yield Curve app related to this component implementation
+by reviewing &lt;a href="https://github.com/wakproductions/ycurve-vue/commit/5752086187f8ac5275dd98cbb954596c4d73625c#diff-469caf495b19ce1fc1b98875fccc65b123eb9b0d"&gt;the full commit on Github&lt;/a&gt;.&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>The Easy Guide to Making Your Github Pages Site HTTPS</title>
     <link rel="alternate" href="http://blog.url.com/2019/04/09/the-easy-guide-to-making-your-github-pages-site-https.html"/>
@@ -538,114 +648,6 @@ postgres=#
 
 &lt;p&gt;Note that it&amp;#39;s necessary to specify the &lt;code&gt;-h localhost&lt;/code&gt; parameter. Also, if you make use of the &lt;code&gt;PGPASSWORD&lt;/code&gt; environment
 variable you can have that set to the database password so that it won&amp;#39;t prompt you to type it in.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Three Allergic Triggers That Can Cause Eczema</title>
-    <link rel="alternate" href="http://blog.url.com/2019/02/04/three-allergic-triggers-that-can-cause-eczema.html"/>
-    <id>http://blog.url.com/2019/02/04/three-allergic-triggers-that-can-cause-eczema.html</id>
-    <published>2019-02-04T18:00:00-05:00</published>
-    <updated>2019-03-20T00:11:43-04:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h2&gt;Part 2: How Allergic Reactions and Eczema Are Related&lt;/h2&gt;
-
-&lt;p&gt;As I discussed in &lt;a href="../03/i-conquered-eczema-after-30-years-of-itchy-skin-and-you-can-too.html"&gt;Part 1&lt;/a&gt; of this blog post series, there is an immune system and allergic reaction component to eczema.
-As someone who has dealt with quite severe eczema my whole life, I can confirm that allergies have a lot to do
-with it per my own experimentation with exposure and avoidance of certain triggers. In some respects, eczema sufferers
-are just people who are hypersensitive to environmental allergens. Eliminate the allergens, and the problem goes away.&lt;/p&gt;
-
-&lt;p&gt;The way your body produces inflammation is complex. I find that most educational resources that describe the process go
-into a lot of detail on the specific chemical interactions, which makes it hard to understand. But I think a key
-takeaway about inflammation in regard to allergy is that it can turn into a perpetual chain reaction like a nuclear
-reactor or a flame burning through fuel. A few of your cells identify a foreign substance in your skin that shouldn&amp;#39;t
-be there, so those cells respond by releasing antibodies and other chemicals to fight the invader. But these same
-chemicals also trigger other cells to start doing the same and produce even more of these immune response proteins. Soon, the entire
-area of skin is producing these chemicals and the inflammatory reaction spreads.&lt;/p&gt;
-
-&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/cdCh4_Ckor0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
-
-&lt;p&gt;In the case of an allergy, your body is reacting to a benign environmental substance like cat saliva proteins for example,
-which it&amp;#39;s trying to purge like it would a virus or bacteria. Once this process gets going it could keep itself going
-and you have a rash long after you&amp;#39;ve been exposed to the allergen. It is at this point that your doctor may say it&amp;#39;s
-necessary to &amp;quot;calm it down&amp;quot; with the use of a topical drug. The video below describes how the drug Eucrisa is thought
-to work. It interferes in this reaction, blocking some of the immune system signaling proteins, and thereby stopping
-the chain reaction of inflammation. Basically most drugs used to treat inflammatory response work similarly by
-interfering somewhere along the chain of chemical reactions.&lt;/p&gt;
-
-&lt;p&gt;&lt;video src="videos/2019/PFEU7008000H_Eucrisa_DTC_MOA-5575791536001.mp4" style="width: 640px;" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Although drugs may be necessary sometimes to calm eczema down, I find that the best way of staying healthy is to avoid
-allergy triggers altogether. Sometimes it is difficult to pin down your specific allergic triggers as every person&amp;#39;s
-case is different. I hope this brief list gives you clues on where to begin experimenting to find your own triggers.&lt;/p&gt;
-
-&lt;h4&gt;Shampoos, soaps, and other personal care products that contact your skin&lt;/h4&gt;
-
-&lt;p&gt;In my early 20s around the time I met my future wife, I started getting a really bad series of eczema outbreaks all
-along my arms. My left arm especially was covered in itchy red rashes. I went to multiple doctors, and got the usual
-treatment of triamcinolone, which only worked briefly before the rashes ripped right back. They tried more powerful
-creams like fluocinonide and the problem kept getting worse.&lt;/p&gt;
-
-&lt;p&gt;It wasn&amp;#39;t until one dermatologist I visited noticed that the rash on my wrist seem to fall in a perfectly straight line.
-She asked me what I do that I might be rubbing against something causing me an allergy. She told a story of another
-patient with a similar case of hand eczema, and they figured out that that patient had an allergy to the chemicals in
-money and it was the way she would hold dollar bills that caused the rashes on her hands.&lt;/p&gt;
-
-&lt;p&gt;After much thinking, we suspected that the rash on my wrist might be from the way I would play with my wife&amp;#39;s
-hair when we&amp;#39;re walking around the streets of Chicago on our dates. We scrutinized her shampoo. A patch test confirmed
-that I was allergic to Pantene. My dermatologist said that shampoo allergies are actually a common thing people end up
-getting treated for.&lt;/p&gt;
-
-&lt;div class="image-box"&gt;
-  &lt;div class="image-box-content"&gt;
-    &lt;a href="../../../images/2019/right-hand-wrist-eczema.jpg"&gt;&lt;img src="../../../images/2019/right-hand-wrist-eczema.jpg" alt="Right hand wrist eczema" /&gt;&lt;/a&gt;
-  &lt;/div&gt;
-    &lt;div class="image-box-caption"&gt;
-      Dermatitis rash on my wrist with a well defined line at the allergen point of contact
-    &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Over the years we&amp;#39;ve experimented with several shampoos to see what I&amp;#39;m allergic to. I&amp;#39;ve switched to the Free and Clear
-brand of shampoo, which is supposed to not contain a lot of the toxic ingredients of the big brand shampoos. The common
-ingredient that I could find causing me trouble is &lt;strong&gt;cocamide DEA&lt;/strong&gt;, an agent used to help the shampoo produce those
-frothy bubbles when you rub it in your hair. I&amp;#39;m not 100% certain if that&amp;#39;s the only problematic ingredient, but it does
-seem to have a correlation.&lt;/p&gt;
-
-&lt;h4&gt;Allergies to dogs and cats&lt;/h4&gt;
-
-&lt;p&gt;I&amp;#39;ve known since I was a kid that cats in proximity cause me to have watery eyes and a stuffy nose. But it was only
-in recent years that I learned they can cause me dermatitis outbreaks as well. On a prick test when I was 23, I was told
-that I had an affirmative reaction to both dog and cat proteins. Several years later I decided to fight through
-my allergy and tried petting a cat that approached me. After a few minutes, my arm broke out in hives and in the
-following days I got a pretty nasty dermatitis rash. It didn&amp;#39;t kill me, but it didn&amp;#39;t make me stronger either.&lt;/p&gt;
-
-&lt;p&gt;More sneaky is my allergy to dogs. I really like dogs, but unfortunately I can&amp;#39;t interact with them a whole lot without
-getting a dermatitis rash. I say it&amp;#39;s sneaky because I&amp;#39;ve figured out that when I pet a dog, the rashes don&amp;#39;t manifest
-until at least a day or two later. Wearing disposable plastic gloves seems to work in preventing the rashes if I want
-to pet a dog.&lt;/p&gt;
-
-&lt;h4&gt;Food allergies&lt;/h4&gt;
-
-&lt;p&gt;A less examined link between chronic eczema and allergens is food allergy. Allergens you ingest could manifest as a skin
-rash, making it very difficult to see the link. However, there&amp;#39;s a growing body of scientific evidence demonstrating this,
-such as &lt;a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2923958/"&gt;this case study by the NIH&lt;/a&gt; showing a link between
-patients who suffered from dematitis rashes and the consumption of nickel in their diet. Nickel is often absorbed
-through whole grain breads and oatmeal.&lt;/p&gt;
-
-&lt;p&gt;In my case I discovered that I have an allergy to coconut. I really like the taste of coconut, so was shocked when I
-figured this out, but it makes sense since it could be related to my allergic reaction to cocamide DEA in shampoos.
-I first started suspecting this when I noticed that the sweat I&amp;#39;d get during workouts seemed to cause a lot of itching
-and later dermatitis around my neck. It was hard to deal with because I didn&amp;#39;t know exactly what to do about it. It
-steadily became more of a problem over a 2 year period.&lt;/p&gt;
-
-&lt;p&gt;I started to wonder what if there&amp;#39;s something &lt;em&gt;in&lt;/em&gt; my sweat that was causing the problem, like a food I&amp;#39;ve been eating
-that&amp;#39;s getting sweat out during the exercise. What have I been doing differently lately that it&amp;#39;s becoming more of a
-problem than before? I started making pre-workout smoothies with coconut water and various fruits. So I tested this
-out by eliminating all coconut from my diet, and this seems to have worked. If I eat anything coconut like coconut
-milk or coconut water I start to have some eczema problems in the following days. This was a tricky one to figure out
-because like the cat and dog allegy, there is a delayed reaction and the symptoms aren&amp;#39;t so severe right away that
-it forces me to notice the link in an obvious way.&lt;/p&gt;
 </content>
   </entry>
 </feed>
