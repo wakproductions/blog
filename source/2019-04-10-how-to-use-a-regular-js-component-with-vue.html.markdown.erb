@@ -1,0 +1,111 @@
+---
+title: How to Use Standard Javascript Components with Vue.js
+date: 2019-04-10 18:00 EST
+tags:
+meta_short_description: Vue is a great platform for development the web frontend, but sometimes you might one to use a traditional Javascript
+                        component for certain feature on your website.
+meta_image_path: images/2019/vue-logo.png
+---
+
+Vue is a great platform for development the web frontend, but sometimes you might one to use a traditional Javascript
+component for certain feature on your website. There are many great components out there that have not yet been
+encapulated by a fancy Vue wrapper that allows you to drop it into your template using a Vue.js tag. Here's an easy way
+to get a traditional Javascript component plain-vanilla linking to an HTML element in your Vue program. As an example, I
+will be featuring the [js-datepicker](https://www.npmjs.com/package/js-datepicker) component, which I recently installed
+on [ustreasuryyieldcurve.com](https://www.ustreasuryyieldcurve.com)
+
+## Add the component using npm or yarn
+
+I'm using yarn, so I installed via the command line:
+
+```
+$ yarn add js-datepicker
+```
+
+## Import the stylesheets and Javascript component
+
+A tricky thing to figure out is how to import the js-datepicker assets. There's a Javascript file and a stylesheet
+required for it to work. To import the stylesheet, I had to use a `<link />` tag in the `<head />` section of my
+HTML template. so it looked something like this:
+
+```html
+  <head>
+    <!-- other declarations -->
+    <link href="../node_modules/js-datepicker/dist/datepicker.min.css" type="text/css" rel="stylesheet"></link>
+  </head>
+```
+**/public/index.html - note how I am loading it from node_modules**
+
+The Javacript had to be loaded from the top level Vue component in `App.vue`:
+
+```
+<template>
+  <!-- template section of the Vue file -->
+</template>
+
+<script>
+  // Javascript section of the Vue file
+</script>
+
+<style lang="scss">
+  @import 'node_modules/js-datepicker/dist/datepicker.min'
+</style>
+```
+**/src/App.vue**
+
+## Import it in the component where it is used
+
+The final step was making the correct imports and referencing. I'm using it in my custom DateNavigation Vue component,
+and here are the import pieces of code:
+
+```
+<template>
+  <!-- other HTML stuff -->
+
+  <input id="dateSelector" type="text" v-model="_viewerDate" />
+
+  <!-- other HTML stuff -->
+</template>
+
+<script>
+import datepicker from "js-datepicker";
+// other declarations
+
+export default {
+  name: "DateNavigation",
+  methods: {
+    datepickerSelect(instance, date) {
+      this._viewerDate = date.toLocaleDateString();
+    },
+  },
+  mounted() {
+    this.$jsdatepicker = datepicker("#dateSelector", {
+      onSelect: this.datepickerSelect,
+      formatter: (instance, date) => {
+        instance.value = date.toLocaleDataString();
+      }
+    });
+  }
+}
+</script>
+
+<style scoped lang="scss">
+// no relevant code here. See App.vue for the import of js-datepicker related CSS.
+</style>
+```
+**src/components/DateNavigation.vue**
+
+So here it's pretty basic in line with how the official js-datepicker docs say to use the component. I set up the
+Java code to reference the `<input>` element with the tag `#dateSelector`. The `_viewerDate` data varable declared in my
+Vue logic bound to the input via Vue's metatag, `v-model`. That allows the text in the datepicker seen by the user to
+change if the data store internal to the program switches to a new date.
+
+The Javascript part of setting up js-datepicker is handled in the `mounted()` section of the Vue callbacks. Also note
+how I set up an internal variable `$jsdatepicker` to hold the datepicker object for later reference.
+
+## Additional Resources
+
+You can view all of the changes made in the US Treasury Yield Curve app related to this component implementation
+by reviewing [the full commit on Github](https://github.com/wakproductions/ycurve-vue/commit/5752086187f8ac5275dd98cbb954596c4d73625c#diff-469caf495b19ce1fc1b98875fccc65b123eb9b0d).
+
+
